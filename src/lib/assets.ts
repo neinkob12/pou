@@ -4,7 +4,7 @@
 
 import type { ImageSourcePropType } from 'react-native';
 
-import type { StrainId } from '../game/config';
+import type { CosmeticId, StrainId } from '../game/config';
 
 type AssetMap = Record<string, ImageSourcePropType>;
 type SoundMap = Record<string, number>;
@@ -113,6 +113,16 @@ export type UpgradeAssetId =
   | 'u6_dehumidifier'
   | 'beneficials';
 export const upgrades: Partial<Record<UpgradeAssetId, ImageSourcePropType>> = {};
+
+// --- Kosmetik: Accessoires für den Accessoire-Slot von Budi (P25) ---
+// U16 aus docs/ASSETS.md, Ebenen auf der Budi-Leinwand 1024 × 1024. Die Dateien in assets/budi/
+// sind Platzhalter (farbige Form + Text) unter den endgültigen Namen: echte Grafik drüberkopieren.
+export const cosmetics: Record<CosmeticId, ImageSourcePropType> = {
+  u16_sunglasses: require('../../assets/budi/u16_sunglasses.png'),
+  u16_hat_cap: require('../../assets/budi/u16_hat_cap.png'),
+  u16_hat_straw: require('../../assets/budi/u16_hat_straw.png'),
+  u16_hat_crown: require('../../assets/budi/u16_hat_crown.png'),
+};
 
 // --- Minispiele: Sprites und Hintergründe (P08, P12 bis P14, P22) ---
 export const minigames: AssetMap = {};

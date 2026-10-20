@@ -4,6 +4,7 @@ import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 
 import { care } from '../../content/strings';
+import { useEquippedAccessory } from '../../hooks/useEquippedAccessory';
 import { useNeeds } from '../../hooks/useNeeds';
 import { Budi } from '../budi/Budi';
 import { budiSpeak } from '../budi/voice';
@@ -46,7 +47,7 @@ export function BudiStage() {
           accessibilityActions={[{ name: 'activate' }]}
           onAccessibilityAction={() => canCare && onPet()}
         >
-          <Budi condition={condition} reaction={reaction} hovering={hovering} />
+          <Budi condition={condition} reaction={reaction} hovering={hovering} accessory={useEquippedAccessory()} />
           <JoyBurst trigger={joy} color="coral" />
           <Pests />
           <ComaOverlay condition={condition} />

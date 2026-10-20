@@ -2,6 +2,7 @@
 // Büro-Regel: Eigener Slice als Datei src/store/slices/<bereich>.ts, hier eine Zeile im
 // Objekt `slices` (plus Import). Der Schlüssel ist der Bereichsname.
 
+import { createCosmeticsSlice } from './cosmetics';
 import { createDailyGoalsSlice } from './dailyGoals';
 import { createDebugSlice } from './debug';
 import { createFactsSlice } from './facts';
@@ -26,6 +27,7 @@ export const slices = {
   jump: createJumpSlice,
   harvest: createHarvestSlice,
   shop: createShopSlice,
+  cosmetics: createCosmeticsSlice,
   facts: createFactsSlice,
   dailyGoals: createDailyGoalsSlice,
 };
