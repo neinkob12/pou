@@ -10,6 +10,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 
 import { dropsGame as t } from '../../../content/strings';
 import { DROPS_GAME, MINIGAME_FRAMEWORK } from '../../../game/config';
+import { cue, useMinigameAudio } from '../../../lib/audio';
 import type { MinigameSession } from '../framework/useMinigameSession';
 import { DropsCanvas } from './DropsCanvas';
 import { DropsHud } from './DropsHud';
@@ -24,9 +25,12 @@ export function DropsGame({ session }: { session: MinigameSession }) {
   const [caught, setCaught] = useState({ water: 0, fertilizer: 0 });
   const [reward, setReward] = useState<DropsReward | null | undefined>(undefined);
   const rewardedRef = useRef(false);
+  useMinigameAudio(phase, result?.coins ?? null);
 
   const onStep = useCallback(
-    (points: number, livesLeft: number, water: number, fertilizer: number) => {
+    (points: number, livesLeft: number, water: number, fertilizer: number, livesLost: number) => {
+      if (livesLost > 0) cue(livesLeft <= 0 ? 'fail' : 'ouch');
+      else if (points > 0) cue('catch');
       if (points > 0) {
         addScore(points);
         setCaught({ water, fertilizer });
@@ -47,7 +51,7 @@ export function DropsGame({ session }: { session: MinigameSession }) {
     const { field: next, events } = stepField(before, dt, elapsedMs, width, height, Math.random(), Math.random());
     field.set(next);
     if (events.points > 0 || events.livesLost > 0) {
-      scheduleOnRN(onStep, events.points, next.lives, next.caughtWater, next.caughtFertilizer);
+      scheduleOnRN(onStep, events.points, next.lives, next.caughtWater, next.caughtFertilizer, events.livesLost);
     }
   });
 

@@ -304,6 +304,15 @@ export const settings = {
   devTitle: 'Entwicklung',
 };
 
+// Ton und Vibration in den Einstellungen (Auftrag P23)
+export const soundSettings = {
+  title: 'Ton und Vibration',
+  music: 'Musik',
+  effects: 'Soundeffekte',
+  haptics: 'Vibration',
+  hint: 'Der Stummschalter deines Handys gilt immer. Andere Apps spielen weiter.',
+};
+
 export const debug = {
   title: 'Debug-Menü',
   sectionTitle: 'Debug',

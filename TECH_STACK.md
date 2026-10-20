@@ -145,6 +145,7 @@ Zusätzlich installiert, weil Pflicht-Abhängigkeit der genannten Pakete:
 - `react-dom`: Peer von Expo Router (sonst bricht `npm install` ab).
 - `babel-preset-expo` (dev): NativeWind braucht eine eigene `babel.config.js`, die das Preset direkt referenziert.
 - `expo-dev-client`: für den Development Build (Profil `development` in `eas.json`), weil Skia und MMKV nicht in Expo Go laufen.
+- `expo-audio` (P23, ~58.0.9): das Audio-Paket aus "Spiel und Animation". `expo-av` gibt es in SDK 58 nicht mehr. Plugin in `app.json` ohne Mikrofon-Berechtigung und ohne Hintergrund-Wiedergabe (Musik soll im Hintergrund schweigen, keine unnötigen Store-Angaben).
 
 Abweichungen bei P01:
 
