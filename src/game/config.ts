@@ -203,6 +203,35 @@ export const BLOOM_FERTILIZER_PHASES: readonly PhaseId[] = ['flowering', 'ready'
 export const COMA_REVIVE_NEED_LEVEL = 50;
 
 // ---------------------------------------------------------------------------
+// Minigames: Tropfen-Fang (Auftrag P13)
+// ---------------------------------------------------------------------------
+
+/** Tropfen-Fang: Topf unten fängt Wasser und Dünger, Salz kostet ein Leben. Längen in Punkten (dp). */
+export const DROPS_GAME = {
+  lives: 3,
+  /** Höchstens so viel füllt eine Runde je Balken auf (Wasser und Nährstoffe getrennt). */
+  maxBarGainPerRound: 40,
+  /** So viel füllt ein gefangener Tropfen auf seinen Balken. */
+  barGainPerDrop: 4,
+  pointsPerDrop: 1,
+  /** Fallgeschwindigkeit (dp pro Sekunde): Start, Zuwachs pro Spielsekunde, Obergrenze. */
+  startFallSpeed: 160,
+  fallSpeedPerSecond: 6,
+  maxFallSpeed: 520,
+  /** Abstand zwischen zwei neuen Tropfen (ms): Start, Abnahme pro Spielsekunde, Untergrenze. */
+  startSpawnIntervalMs: 1100,
+  spawnIntervalDecreasePerSecond: 12,
+  minSpawnIntervalMs: 420,
+  /** Anteile der Tropfenarten (Summe 1). */
+  spawnWeights: { water: 0.45, fertilizer: 0.3, salt: 0.25 },
+  dropRadius: 14,
+  potWidth: 96,
+  potHeight: 56,
+  /** Abstand des Topfs vom unteren Rand. */
+  potBottomMargin: 16,
+} as const;
+
+// ---------------------------------------------------------------------------
 // Ertrag und Wirtschaft
 // ---------------------------------------------------------------------------
 
