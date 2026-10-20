@@ -11,13 +11,14 @@ import { TabIcon } from '../src/components/ui/TabIcon';
 import { tabs } from '../src/content/strings';
 import { useAppFonts } from '../src/hooks/useAppFonts';
 import { useNotificationScheduler } from '../src/hooks/useNotificationScheduler';
+import { HIDDEN_TAB_OPTIONS } from '../src/lib/hiddenTab';
 import { colors, fonts } from '../src/lib/theme';
 
 SplashScreen.preventAutoHideAsync();
 
-// Gehört P01. Alle Routen sind hier registriert; Screens ohne Tab haben href: null.
+// Gehört P01. Alle Routen sind hier registriert; Screens ohne Tab nutzen HIDDEN_TAB_OPTIONS.
 // Fehlt eine Route, den Leiter fragen, statt dieses Layout zu ändern.
-const hidden = { href: null, tabBarStyle: { display: 'none' } } as const;
+const hidden = HIDDEN_TAB_OPTIONS;
 
 export default function RootLayout() {
   const fontsReady = useAppFonts();
