@@ -2,7 +2,7 @@
 
 Wird vom Leiter (Abteilungsleiter PotPou) nach jedem Merge aus `docs/progress/pNN.md` zusammengeführt. Kollegen schreiben nur ihre eigene Notiz. Du kannst hier selbst Notizen ergänzen.
 
-Stand: 31 Aufträge gemergt (28 aus dem Plan, dazu die Nacharbeiten P09b, P10b, P27b). Welle 1 bis 3 fertig, aus Welle 4 läuft P31, P32 wartet auf Merge. Der Rest wartet auf dich (siehe "Braucht dich"). Plan: `docs/AUFTRAEGE.md`.
+Stand: 34 Aufträge gemergt (30 aus dem Plan, die Nacharbeiten P09b, P10b, P27b und die Web-Version PWEB). Alles, was ohne dich geht, ist fertig. Offen sind P28, P29, P32b und P33, alle warten auf dich (siehe "Braucht dich"). Plan: `docs/AUFTRAEGE.md`.
 
 ## Auftragsstatus
 
@@ -39,11 +39,12 @@ Stand: 31 Aufträge gemergt (28 aus dem Plan, dazu die Nacharbeiten P09b, P10b, 
 | P27 Zeit-Robustheit | gemergt | #19 | ja |
 | P27b Monotone Uhr eingehängt | gemergt | #26 | ja |
 | P30 Audio: Musik, Effekte, Budi-Stimme | gemergt | #37 | ja |
-| P31 Robustheit, Bugfixes | in Arbeit | | |
-| P32 Balancing-Simulation | PR offen | #38 | nein, Entscheidung |
+| P31 Robustheit, Bugfixes | gemergt | #40 | ja |
+| P32 Balancing-Simulation | gemergt | #38 | nein, Entscheidung |
 | P32b Balancing anwenden | wartet auf deine Entscheidung | | |
 | P33 Kosmetik gegen Echtgeld, Saisonpass | wartet auf P28 | | |
 | P28, P29 | warten auf deine Konten | | |
+| PWEB Web-Version (Zusatzauftrag) | gemergt | #41 | ja, im Browser |
 
 ## Fertig
 
@@ -70,13 +71,16 @@ Stand: 31 Aufträge gemergt (28 aus dem Plan, dazu die Nacharbeiten P09b, P10b, 
 - P21 (#25): Schädlinge wegtippen, Schimmel behandeln, Koma mit Wiederbeleben gegen 30 Münzen
 - P25 (#33): Kosmetik-Tab im Shop, Accessoires anprobieren, kaufen, Budi trägt sie im Raum
 - P30 (#37): Raum-Musik, Sounds für Pflege, Phasenwechsel und Ernte, Budi-Stimme mit Tonhöhe je Laune
+- P31 (#40): Doppel-Tap bei Upgrade und Wiederbeleben bezahlt nur einmal, voller Speicher stürzt nicht mehr ab, Ernte-Ansicht flüssig, kein Aufblitzen des Raums vor der Altersfrage, Spieluhr überall
+- P32 (#38): Balancing-Simulation mit drei Spielertypen über 30 Tage (`scripts/simulate.ts`), Vorschläge in `docs/progress/p32.md`
+- PWEB (#41): Web-Version im Browser, auch auf dem Handy; behebt nebenbei einen Fehler, durch den Altersfrage, Ernte, Samenauswahl und Debug nativ nicht erreichbar waren
 - P24 (#23): Ernte mit Lupe, Schere, Trocknen, Abschluss, neue Sorte freigeschaltet
 - P26 (#22): Altersfrage 18+, Tutorial im Raum, rechtliche Links
 - P27 (#19), P27b (#26): Monotone Uhr, überall eingehängt (Alter sinkt nie bei zurückgestellter Uhr)
 
 ## Offen
 
-- Offener PR: P32 (#38). In Arbeit: P31
+- Keine offenen PRs, kein Kollege arbeitet. Alles Weitere wartet auf dich
 - P19b entfällt: P19 hat die Minigame-Ziele gleich mit eingebaut
 - P25: Topf-Skins (U16 Gestreift, Gold, Köln-Dom) nicht gebaut, brauchen einen eigenen Topf-Slot in `Budi.tsx`; Kandidat für P33
 - P30: Stimme bei Sprüchen fehlt, weil es noch keine Sprechblase für `quotes.ts` gibt
@@ -90,6 +94,7 @@ Stand: 31 Aufträge gemergt (28 aus dem Plan, dazu die Nacharbeiten P09b, P10b, 
 
 ## Braucht dich (gesammelt vom Leiter)
 
+1. **GitHub Pages einschalten:** Settings > Pages > Source: GitHub Actions. Danach läuft das Spiel nach dem nächsten Push auf main unter https://neinkob12.github.io/pou-/ (Debug-Menü sichtbar, Spielstand nur im Browser). Ohne diesen Schalter schlägt nur der Pages-Lauf fehl, die CI bleibt grün.
 1. **Balancing aus P32 entscheiden** (Tabelle "Vorschläge" in `docs/progress/p32.md`, Ja/Nein je Zeile). Kern: Wer einmal am Tag spielt, liegt heute ca. 14 Mal in 30 Tagen im Koma und hat nie eine seltene Sorte. Vorschlag: Koma nach 36 statt 24 h, Wasser 3 und Laune 3 statt 5 und 4 pro Stunde, Lila Lotte ab 1 Ernte, Tageskiste 25 statt 60, Münzen je Ertragseinheit 10 statt 5, Jump-Münzkurs 0,05. Ergebnis: 0 Koma, Lila Lotte an Tag 13. Danach legt der Leiter P32b an.
 1. Development Build auf dem Handy installieren: Anleitung in `docs/progress/p01.md`. Danach die `projectId` aus `eas init` an den Leiter geben. Seit P23 ist `expo-audio` dabei: ein schon installierter Build muss neu gebaut werden.
 2. Balancing: Licht-Balken, wie viele Punkte pro echter Stunde? Ohne Wert sinkt er nie, LED-Upgrade wirkt nicht. P32 empfiehlt: keinen Abfallwert, solange der Balken nichts bewirkt.
@@ -103,10 +108,10 @@ Stand: 31 Aufträge gemergt (28 aus dem Plan, dazu die Nacharbeiten P09b, P10b, 
 
 ## Handy-Tests für dich
 
-Alle erst nach Installation des Development Builds. Pro Auftrag die wichtigsten Punkte, alle Details in `docs/progress/pNN.md`.
+Vieles geht schon in der Web-Version (ohne Benachrichtigungen, Vibration und Neigen, Details in `docs/progress/pweb.md`). Sonst erst nach Installation des Development Builds. Pro Auftrag die wichtigsten Punkte, alle Details in `docs/progress/pNN.md`.
 
-Start und Raum (P01, P03, P26):
-1. Frische Installation: Altersfrage. "Nein" sperrt, "Ja" führt ins Zimmer mit Tutorial "Dein erster Samen".
+Start und Raum (P01, P03, P26, P31, PWEB):
+1. Frische Installation: zuerst nur heller Hintergrund, dann Altersfrage (kein Zimmer dazwischen, keine Endlosschleife). "Nein" sperrt, "Ja" führt ins Zimmer mit Tutorial "Dein erster Samen".
 2. Tutorial: Samen pflanzen, gießen, Balken, Minigames. "Überspringen" beendet es dauerhaft.
 3. Raum: oben vier Balken und Münzen, Phasenkopf, Lampe, Budi auf dem Topf, unten runde Knöpfe.
 
@@ -150,6 +155,10 @@ Shop und Sorten (P15, P16, P09b):
 1. Shop: Upgrade kaufen, Münzen sinken, Upgrade steht im Raum unter der Lampe, bleibt nach Neustart.
 2. Album "Sorten": nur Gurken-Gustav frei. Debug "Alle Sorten freischalten": alle frei, Samenauswahl erlaubt alle.
 
+Robustheit (P31):
+1. Shop: zweimal ganz schnell auf ein Upgrade tippen, nur eine Stufe wird gekauft. Im Koma zweimal schnell "Wiederbeleben": nur 30 Münzen weg.
+2. iPhone: gießen, App im App-Umschalter wegwischen, die Benachrichtigung kommt trotzdem.
+
 Speichern, Zeit, Benachrichtigungen (P02, P27, P18):
 1. Münzen geben, App ganz schließen, neu öffnen: Münzen sind noch da.
 2. Gerätezeit einen Tag zurückstellen: Alter und Phase springen nicht zurück.
@@ -178,10 +187,9 @@ Texte (P07, ohne Handy):
 
 ## Bekannte Bugs
 
-- P24: Ernte-Ansicht rechnet nur minütlich neu; im Zeitraffer springt der Trocknungsbalken, "Einsammeln" erscheint bis zu einer Minute zu spät
-- P26: Beim allerersten Start ist der Raum einen Augenblick zu sehen, bevor die Altersfrage kommt
 - P27: Uhr vorstellen bleibt ein Trick (Höchststand gilt). Ohne Serverzeit nicht lösbar, nach dem Launch
-- P18: Wird die App hart beendet, ohne dass das System "Hintergrund" meldet, wird keine Benachrichtigung geplant
+- P18: Stürzt die App ab, wird keine Benachrichtigung geplant (Wegwischen ist seit P31 abgedeckt, ein echter Absturz nicht lösbar, siehe p31.md)
+- Web-Version: Sounds erst nach der ersten Berührung (Browser-Regel), Spielstand nur im jeweiligen Browser
 
 ## Entscheidungen
 
@@ -205,5 +213,7 @@ Texte (P07, ohne Handy):
 - P25: Budi trägt höchstens ein Accessoire, Anprobe wird nicht gespeichert; `purchaseCompleted` mit `cosmetic:<id>` (P33 nutzt dieselbe Form)
 - P30: Raum-Musik läuft in allen Tabs weiter und endet nur im Minigame; Budi-Stimme hängt am Streicheln und zählt als Effekt
 - P32: Simulationsskript `scripts/simulate.ts` läuft nicht in der Testsuite, Aufruf in `docs/progress/p32.md`
+- P31: Spieldateien schreiben nur über `safeSet` (`src/lib/storage.ts`); Käufe prüfen den erwarteten Stand (`buyUpgrade(..., expectedLevel)`); `PHASE_LABELS` heißt jetzt `phaseLabels` in `strings.ts`; `useNow` liegt in `src/hooks/`
+- PWEB: Versteckte Routen über `HIDDEN_TAB_OPTIONS` (`src/lib/hiddenTab.ts`) statt `href: null`; Web-Abweichungen nur als `.web.ts`-Dateien; P28 und P29 brauchen je eine leere `.web.ts`-Datei
 - `config.ts`-Abschnitte, vom Leiter zugewiesen: P11 "Licht und Phasen" vor "Shop-Upgrades", P12 vor "Sorten", P13 vor "Ertrag und Wirtschaft", P14/P22 vor "Gesundheit", P17 im Minigame-Abschnitt am Dateiende; P18 oben und P19 unten im Abschnitt Tagesziele/Benachrichtigungen; P25 oben im Abschnitt Kosmetik; P30 als Block "Audio (P30)" direkt vor dem Minigame-Abschnitt
 - Büro-Betrieb: Merge bei grüner CI (derzeit von Hand durch den CvD), bis zu 8 Kollegen, ein Leiter
