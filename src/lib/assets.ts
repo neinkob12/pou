@@ -11,10 +11,23 @@ type SoundMap = Record<string, number>;
 export const budi: AssetMap = {};
 
 // --- Raum: Hintergründe, Lampe, Möbel (P03, P11) ---
-export const room: AssetMap = {};
+// Schlüssel = ID aus docs/ASSETS.md. Fehlt die Datei, zeigt der Slot einen Platzhalter.
+// Datei einhängen: z. B. `h1_day: require('../../assets/images/h1_room_day.png'),`
+export type RoomAssetId = 'h1_day' | 'h2_night' | 'u1_pot' | 'u2_lamp_on' | 'u2_lamp_off';
+export const room: Partial<Record<RoomAssetId, ImageSourcePropType>> = {};
 
 // --- UI: Icons, Münzen, Buttons (P03 und folgende) ---
-export const ui: AssetMap = {};
+export type UiAssetId =
+  | 'u9_coin'
+  | 'u11_water'
+  | 'u11_nutrients'
+  | 'u11_light'
+  | 'u11_mood'
+  | 'u12_minigames'
+  | 'u12_shop'
+  | 'u12_album'
+  | 'u12_settings';
+export const ui: Partial<Record<UiAssetId, ImageSourcePropType>> = {};
 
 // --- Minispiele: Sprites und Hintergründe (P08, P12 bis P14, P22) ---
 export const minigames: AssetMap = {};
