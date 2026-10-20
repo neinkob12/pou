@@ -21,7 +21,8 @@ export interface JumpInput {
 export function useJumpInput(wanted: JumpControl): JumpInput {
   const targetVx = useSharedValue(0);
   const width = useSharedValue(0);
-  const [tiltUnavailable, setTiltUnavailable] = useState(false);
+  // Im Browser (PWEB) kein Neigen: am Rechner fehlt der Sensor, Safari fragt erst nach Erlaubnis.
+  const [tiltUnavailable, setTiltUnavailable] = useState(Platform.OS === 'web');
   const control: JumpControl = wanted === 'tilt' && !tiltUnavailable ? 'tilt' : 'tap';
 
   useEffect(() => {

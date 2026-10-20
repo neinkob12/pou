@@ -146,11 +146,12 @@ Zusätzlich installiert, weil Pflicht-Abhängigkeit der genannten Pakete:
 - `babel-preset-expo` (dev): NativeWind braucht eine eigene `babel.config.js`, die das Preset direkt referenziert.
 - `expo-dev-client`: für den Development Build (Profil `development` in `eas.json`), weil Skia und MMKV nicht in Expo Go laufen.
 - `expo-audio` (P23, ~58.0.9): das Audio-Paket aus "Spiel und Animation". `expo-av` gibt es in SDK 58 nicht mehr. Plugin in `app.json` ohne Mikrofon-Berechtigung und ohne Hintergrund-Wiedergabe (Musik soll im Hintergrund schweigen, keine unnötigen Store-Angaben).
+- `react-native-web` (~0.21.4) und `@expo/metro-runtime` (~58.0.14), Auftrag PWEB: Web-Version zum Testen im Browser (GitHub Pages, `.github/workflows/pages.yml`). Versionen aus `expo/bundledNativeModules.json`. Natives Verhalten bleibt gleich; Web-Abweichungen liegen in `*.web.ts(x)`-Dateien, CanvasKit für Skia bündelt Metro als `.wasm`-Asset (`metro.config.js`, `src/lib/skiaWeb.web.ts`).
 
 Abweichungen bei P01:
 
 - Projekt liegt im Repo-Root (in einem Temp-Ordner erzeugt und verschoben). Vorlagen-Icons liegen unter `assets/icon/`.
-- Expo Router 58: `Tabs` aus `expo-router/js-tabs`, `Stack` aus `expo-router/stack`. Die Tabs sitzen direkt in `app/_layout.tsx` (keine `(tabs)`-Gruppe), damit die Pfade aus `docs/AUFTRAEGE.md` (`app/index.tsx`, `app/shop.tsx` usw.) stimmen. Screens ohne Tab (`debug`, `harvest`, `seed-select`, `onboarding`) sind dort mit `href: null` registriert.
+- Expo Router 58: `Tabs` aus `expo-router/js-tabs`, `Stack` aus `expo-router/stack`. Die Tabs sitzen direkt in `app/_layout.tsx` (keine `(tabs)`-Gruppe), damit die Pfade aus `docs/AUFTRAEGE.md` (`app/index.tsx`, `app/shop.tsx` usw.) stimmen. Screens ohne Tab (`debug`, `harvest`, `seed-select`, `onboarding`) sind dort mit `HIDDEN_TAB_OPTIONS` (`src/lib/hiddenTab.ts`) registriert, nicht mit `href: null` (das leitet in Router 58 auf den Start-Tab um, Fix in PWEB).
 - Fonts nur in den genutzten Schnitten importiert (`@expo-google-fonts/nunito/400Regular` usw.), sonst landen alle Gewichte im Bundle.
 - `npx expo install` braucht hier `EXPO_OFFLINE=1`, weil die Expo-API im Cloud-Container gesperrt ist; die Versionen kommen dann aus `expo/bundledNativeModules.json`.
 
