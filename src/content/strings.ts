@@ -255,6 +255,31 @@ export const album = {
   knowledgeTab: 'Wissen',
 };
 
+export const facts = {
+  progress: (unlocked: number, total: number) => `${unlocked} von ${total} Karten gesammelt`,
+  lockedTitle: 'Noch gesperrt',
+  lockedHint: (phase: string) => `Budi verrät sie in der Phase ${phase}.`,
+  phaseLabel: (phase: string) => `Phase: ${phase}`,
+  sourceLabel: (source: string) => `Quelle: ${source}`,
+  openSource: 'Quelle öffnen',
+  popupTitle: 'Psst, Budi weiß was!',
+  popupIntro: 'Ich hab gerade was Neues über mich gelernt:',
+  popupMore: (count: number) => `Noch ${count} weitere Karte${count === 1 ? '' : 'n'} warten.`,
+  popupNext: 'Nächste Karte',
+};
+
+export const factQuiz = {
+  questionCounter: (n: number, total: number) => `Frage ${n} von ${total}`,
+  correct: 'Richtig! Budi ist stolz auf dich.',
+  wrong: (answer: string) => `Knapp daneben. Richtig wäre: ${answer}`,
+  next: 'Nächste Frage',
+  finish: 'Auswerten',
+  perfectHint: 'Alles richtig: doppelte Münzen!',
+  notEnoughTitle: 'Noch zu wenig Wissen',
+  notEnoughText: (needed: number) =>
+    `Budi braucht mindestens ${needed} Karten fürs Quiz. Pflege ihn weiter, bei jedem Phasenwechsel verrät er dir etwas Neues.`,
+};
+
 export const settings = {
   title: 'Einstellungen',
   aboutTitle: 'Über',
