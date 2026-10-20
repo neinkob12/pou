@@ -564,6 +564,44 @@ export const NOTIFICATION_PRIORITY = {
   phaseChanged: 4,
 } as const;
 
+// Tagesziele (P19)
+
+/**
+ * Alle Tagesziele. `kind` sagt, welches Ereignis zählt: `minigameScore` summiert die Punkte eines
+ * Spiels (`gameId`), `minigameRounds` zählt Runden in beliebigen Spielen, `care` zählt Pflege-
+ * Aktionen aus `careActions`. Sichtbare Texte stehen in strings.ts unter `dailyGoals.goals`.
+ */
+export const DAILY_GOAL_TEMPLATES = {
+  tapHits: { kind: 'minigameScore', gameId: 'tap', target: 40 },
+  smashMites: { kind: 'minigameScore', gameId: 'smash', target: 50 },
+  dropsCatch: { kind: 'minigameScore', gameId: 'drops', target: 30 },
+  jumpHeight: { kind: 'minigameScore', gameId: 'jump', target: 25 },
+  playRounds: { kind: 'minigameRounds', target: 3 },
+  waterTwice: { kind: 'care', careActions: ['water'], target: 2 },
+  petBudi: { kind: 'care', careActions: ['pet'], target: 5 },
+  feedBudi: { kind: 'care', careActions: ['fertilize', 'fertilizeGrow', 'fertilizeBloom'], target: 2 },
+} as const;
+
+export type DailyGoalId = keyof typeof DAILY_GOAL_TEMPLATES;
+
+/**
+ * Ziele, die gerade ausgelost werden, in dieser Reihenfolge reihum (ein Ziel pro Kalendertag).
+ * Spiel- und Pflegeziele wechseln sich ab.
+ */
+export const DAILY_GOAL_POOL: readonly DailyGoalId[] = [
+  'smashMites',
+  'waterTwice',
+  'dropsCatch',
+  'petBudi',
+  'jumpHeight',
+  'feedBudi',
+  'playRounds',
+  'tapHits',
+];
+
+/** Inhalt der Belohnungskiste: Münzen, gleich für jedes Ziel. Feinschliff in P32. */
+export const DAILY_GOAL_CHEST_COINS = 60;
+
 // ---------------------------------------------------------------------------
 // Kosmetik und Saisonpass (Aufträge P25, P33)
 // ---------------------------------------------------------------------------
