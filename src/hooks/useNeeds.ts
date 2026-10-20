@@ -3,7 +3,6 @@
 
 import { useCallback, useMemo } from 'react';
 
-import { DEBUG_SPEED_MULTIPLIER } from '../game/config';
 import type { CareActionId } from '../game/events';
 import { getPlantStatus } from '../game/timeEngine';
 import {
@@ -16,9 +15,7 @@ import {
 import { playCareHaptic } from '../components/room/care/haptics';
 import { useNow } from '../components/room/useNow';
 import { useGameStore } from '../store/gameStore';
-
-// Zeitraffer aus dem Debug-Menü: kommt mit P09 (selectDebugMultiplier). Bis dahin der Standard.
-const debugMultiplier = () => DEBUG_SPEED_MULTIPLIER;
+import { selectDebugMultiplier } from '../store/slices/debug';
 
 /**
  * Pflege jetzt anwenden, mit der Phase zu diesem Zeitpunkt. Ohne Pflanze passiert nichts.
@@ -28,7 +25,7 @@ export function applyCareNow(type: CareActionId, amount?: number): CareFeedback 
   const nowMs = Date.now();
   const state = useGameStore.getState();
   if (!state.plant) return null;
-  const { phase } = getPlantStatus(state.plant, nowMs, debugMultiplier());
+  const { phase } = getPlantStatus(state.plant, nowMs, selectDebugMultiplier(state));
   const before = state.needs;
   const applied = state.care({ type, phase, amount }, nowMs);
   return careFeedback(before, useGameStore.getState().needs, applied);
@@ -38,7 +35,7 @@ export function applyCareNow(type: CareActionId, amount?: number): CareFeedback 
 export function applyMinigameMoodBonus(): void {
   const nowMs = Date.now();
   const state = useGameStore.getState();
-  const phase = state.plant ? getPlantStatus(state.plant, nowMs, debugMultiplier()).phase : null;
+  const phase = state.plant ? getPlantStatus(state.plant, nowMs, selectDebugMultiplier(state)).phase : null;
   const action = moodBonusAction(phase);
   if (action) state.care(action, nowMs);
 }
@@ -51,9 +48,13 @@ export interface UseNeeds extends CareView {
 export function useNeeds(): UseNeeds {
   const plant = useGameStore((s) => s.plant);
   const needs = useGameStore((s) => s.needs);
+  const debugMultiplier = useGameStore(selectDebugMultiplier);
   const now = useNow();
   // Nach einer Pflege ist updatedAtMs neuer als `now`; computeNeeds rechnet dann ohne Abfall.
-  const view = useMemo(() => computeCareView(plant, needs, now, debugMultiplier()), [plant, needs, now]);
+  const view = useMemo(
+    () => computeCareView(plant, needs, now, debugMultiplier),
+    [plant, needs, now, debugMultiplier],
+  );
 
   const care = useCallback((type: CareActionId) => {
     const feedback = applyCareNow(type);
