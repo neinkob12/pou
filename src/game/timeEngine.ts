@@ -180,7 +180,19 @@ export function harvest(plant: PlantRecord, nowMs: number, debugMultiplier = DEB
 /** Turbo-Kauf: ab jetzt doppelte Geschwindigkeit. Bereits vergangene Zeit bleibt unverändert. */
 export function applyTurbo(plant: PlantRecord, nowMs: number): PlantRecord {
   if (currentScale(plant, nowMs) === TURBO_TIME_SCALE) return plant;
-  return { ...plant, scaleSegments: [...plant.scaleSegments, { fromMs: nowMs, scale: TURBO_TIME_SCALE }] };
+  return {
+    ...plant,
+    scaleSegments: [...plant.scaleSegments, { fromMs: segmentStartMs(plant, nowMs), scale: TURBO_TIME_SCALE }],
+  };
+}
+
+/**
+ * Beginn eines neuen Tempo-Segments. Steht die Geräteuhr hinter dem letzten Segment (zurückgestellt),
+ * beginnt das neue Segment am letzten, damit die Liste sortiert bleibt und keine Zeit doppelt zählt.
+ */
+export function segmentStartMs(plant: PlantRecord, nowMs: number): number {
+  const last = plant.scaleSegments[plant.scaleSegments.length - 1];
+  return last ? Math.max(nowMs, last.fromMs) : nowMs;
 }
 
 /** Rewarded Ad: spult die Pflanze vor. */
