@@ -49,6 +49,37 @@ export const room = {
   coinsLabel: (coins: number) => `${coins} Münzen`,
 };
 
+// Licht-Schalter, Tag/Nacht und Phasenwechsel (Auftrag P11).
+export const lightPhase = {
+  schedule: {
+    '18/6': 'Licht 18/6',
+    '12/12': 'Licht 12/12',
+    off: 'Licht aus',
+  },
+  autoflower: 'Autoflower: blüht von selbst',
+  switchLabel: 'Auf 12/12 umschalten',
+  switchLockedFrom: (day: number, now: number) => `Umschalten ab Tag ${day} (jetzt Tag ${now})`,
+  flipTitle: 'Blüte starten?',
+  flipText:
+    'Mit 12 Stunden Licht und 12 Stunden Dunkelheit beginnt Budi zu blühen. Wartest du länger, wächst Budi größer und bringt mehr Ertrag, braucht aber mehr Zeit.',
+  flipConfirm: 'Jetzt umschalten',
+  lampOn: 'Lampe an',
+  lampOff: 'Lampe aus',
+  night: 'Nacht',
+  disturbed: 'Pssst! Budi braucht in der Blüte ungestörte Dunkelheit.',
+  phaseChangedTitle: 'Neue Phase!',
+  phaseChanged: {
+    germination: 'Budi keimt!',
+    seedling: 'Budi ist jetzt ein Sämling!',
+    vegetative: 'Budi wächst jetzt richtig los!',
+    flowering: 'Budi blüht jetzt!',
+    ready: 'Budi ist bereit zur Ernte!',
+    drying: 'Budi hängt jetzt zum Trocknen.',
+    done: 'Budi ist fertig getrocknet!',
+  },
+  puff: 'Puff (Effekt)',
+};
+
 // Pflege-Gesten und Balken im Raum (P10).
 export const care = {
   tools: {

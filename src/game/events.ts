@@ -14,6 +14,8 @@ export interface GameEvents {
   harvested: { strainId: StrainId; yieldUnits: number; stars: number; atMs: number };
   minigameFinished: { gameId: string; score: number; coins: number; atMs: number };
   purchaseCompleted: { productId: string; atMs: number };
+  /** Lampe in der Dunkelphase der Blüte angetippt: Budi wird gestört (Stress, P11). */
+  lightDisturbed: { atMs: number };
 }
 
 export type GameEventName = keyof GameEvents;

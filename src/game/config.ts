@@ -343,6 +343,19 @@ export const SEED_FRAGMENTS_BY_STARS: Record<1 | 2 | 3 | 4 | 5, number> = {
 };
 
 // ---------------------------------------------------------------------------
+// Licht und Phasen: Lichtplan, Tag/Nacht im Raum (Auftrag P11)
+// ---------------------------------------------------------------------------
+
+/** Lichtstunden je Pflanzentag (24 Stunden). Wachstum 18/6, Blüte nach dem Umschalten 12/12. */
+export const LIGHT_HOURS_ON = {
+  vegetative: 18,
+  flowering: 12,
+} as const;
+
+/** Tageszeit, zu der das Licht in jedem Pflanzentag angeht (Stunde 0 bis 23 im Pflanzentag). */
+export const LIGHT_ON_AT_HOUR = 6;
+
+// ---------------------------------------------------------------------------
 // Shop-Upgrades: Topf, LED, Ventilator, Erde, Nützlings-Kit (Auftrag P15)
 // ---------------------------------------------------------------------------
 
