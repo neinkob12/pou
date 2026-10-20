@@ -2,6 +2,7 @@
 // Der Zeitraffer läuft ausschließlich über den debugMultiplier der timeEngine.
 
 import { DEBUG_SPEED_MULTIPLIER, TIME_SCALE, TURBO_TIME_SCALE } from './config';
+import { NEED_IDS, type NeedsState, type NeedValues } from './needs';
 import { addBonusDays, currentScale, plantAgeDays, type PlantRecord } from './timeEngine';
 
 /** Auswahl im Debug-Menü. Kein Balancing, deshalb nicht in config.ts. */
@@ -9,6 +10,7 @@ export const DEBUG_OPTIONS = {
   multipliers: [1, 100, 1000],
   skipPlantDays: [1, 7, 30],
   coinGifts: [100, 1000],
+  needLevels: [0, 10, 50, 100],
 } as const;
 
 /** Im Release-Build gilt immer der Produktionswert, egal was im Spielstand steht. */
@@ -52,4 +54,11 @@ export function formatClock(ms: number): string {
   const m = Math.floor((total % 3600) / 60);
   const s = total % 60;
   return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+/** Setzt alle Balken auf `level` (zum Zeitpunkt `nowMs`). Koma-Uhr und Twists bleiben unverändert. */
+export function setAllNeeds(state: NeedsState, level: number, nowMs: number): NeedsState {
+  const values = {} as NeedValues;
+  for (const id of NEED_IDS) values[id] = level;
+  return { ...state, values, updatedAtMs: nowMs };
 }

@@ -1,5 +1,5 @@
 import type { StrainId } from '../../game/config';
-import { retimeForMultiplier, setTurboScale, skipPlantDays } from '../../game/debug';
+import { retimeForMultiplier, setAllNeeds, setTurboScale, skipPlantDays } from '../../game/debug';
 import { flipLight, harvest, type PlantRecord } from '../../game/timeEngine';
 import { useGameStore } from '../../store/gameStore';
 import { selectDebugMultiplier } from '../../store/slices/debug';
@@ -20,15 +20,23 @@ export function createDebugActions(store = useGameStore, clock: () => number = D
       store.getState().setDebugMultiplier(next);
     },
     skipDays: (days: number) => updatePlant((p) => skipPlantDays(p, days)),
-    plantSeed: () => store.getState().plantSeed(START_STRAIN, clock()),
+    plantSeed: () => {
+      const now = clock();
+      store.getState().plantSeed(START_STRAIN, now);
+      store.getState().resetNeeds(now);
+    },
     flipLight: () => updatePlant((p) => flipLight(p, clock(), multiplier())),
     harvest: () => updatePlant((p) => harvest(p, clock(), multiplier())),
+    setNeeds: (level: number) => store.setState((s) => ({ needs: setAllNeeds(s.needs, level, clock()) })),
     giveCoins: (amount: number) => store.getState().addCoins(amount),
     setTurbo: (on: boolean) => {
       const { plant } = store.getState();
       store.setState({ turbo: on, plant: plant ? setTurboScale(plant, clock(), on) : null });
     },
-    reset: () => store.setState(store.getInitialState(), true),
+    reset: () => {
+      store.setState(store.getInitialState(), true);
+      store.getState().resetNeeds(clock());
+    },
   };
 }
 

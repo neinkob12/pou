@@ -3,6 +3,7 @@ import { Text } from 'react-native';
 import { debug } from '../../content/strings';
 import { PHASE_LABELS } from '../../game/config';
 import { formatClock } from '../../game/debug';
+import { computeNeeds, NEED_IDS, NO_MODIFIERS } from '../../game/needs';
 import { getPlantStatus } from '../../game/timeEngine';
 import { useGameStore } from '../../store/gameStore';
 import { selectDebugMultiplier } from '../../store/slices/debug';
@@ -24,8 +25,11 @@ export function DebugStatus() {
   const plant = useGameStore((s) => s.plant);
   const coins = useGameStore((s) => s.coins);
   const turbo = useGameStore((s) => s.turbo);
+  const needs = useGameStore((s) => s.needs);
   const multiplier = useGameStore(selectDebugMultiplier);
   const status = plant ? getPlantStatus(plant, now, multiplier) : null;
+  const bars = computeNeeds(needs, now, NO_MODIFIERS, status?.phase ?? 'germination');
+  const barsText = NEED_IDS.map((id) => `${debug.needLabels[id]} ${Math.round(bars[id])}`).join(' · ');
 
   return (
     <SettingsSection title={debug.statusTitle}>
@@ -43,7 +47,7 @@ export function DebugStatus() {
       )}
       <Row label={debug.coinsLabel} value={String(coins)} />
       <Row label={debug.turboLabel} value={turbo ? debug.on : debug.off} />
-      <Row label={debug.barsLabel} value={debug.pendingHint} />
+      <Row label={debug.barsLabel} value={barsText} />
     </SettingsSection>
   );
 }

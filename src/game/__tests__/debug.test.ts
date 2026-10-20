@@ -3,10 +3,12 @@ import {
   DEBUG_OPTIONS,
   effectiveDebugMultiplier,
   formatClock,
+  setAllNeeds,
   retimeForMultiplier,
   setTurboScale,
   skipPlantDays,
 } from '../debug';
+import { computeNeeds, createNeeds } from '../needs';
 import { createPlant, currentScale, flipLight, getPlantStatus, harvest, plantAgeDays } from '../timeEngine';
 
 const T0 = Date.UTC(2026, 9, 1, 12, 0, 0);
@@ -77,5 +79,12 @@ describe('debug', () => {
     expect(formatClock(0)).toBe('0:00:00');
     expect(formatClock(-5)).toBe('0:00:00');
     expect(formatClock((3600 + 65) * 1000)).toBe('1:01:05');
+  });
+
+  it('setzt alle Balken auf einen Wert', () => {
+    const state = setAllNeeds(createNeeds(T0), 10, realDays(1));
+    const now = computeNeeds(state, realDays(1), {}, 'vegetative');
+    expect([now.water, now.nutrients, now.mood]).toEqual([10, 10, 10]);
+    expect(state.lastCareAtMs).toBe(T0);
   });
 });

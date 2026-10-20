@@ -64,6 +64,7 @@ export const debug = {
   on: 'an',
   off: 'aus',
   barsLabel: 'Balken',
+  needLabels: { water: 'Wasser', nutrients: 'Dünger', mood: 'Laune' },
   speedTitle: 'Zeitraffer',
   speedHint: 'Läuft über den debugMultiplier der Zeit-Engine.',
   skipTitle: 'Vorspulen',

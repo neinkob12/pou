@@ -3,10 +3,12 @@
 // Objekt `slices` (plus Import). Der Schlüssel ist der Bereichsname.
 
 import { createDebugSlice } from './debug';
+import { createNeedsSlice } from './needs';
 import { createPlantSlice } from './plant';
 
 export const slices = {
   plant: createPlantSlice,
+  needs: createNeedsSlice,
   debug: createDebugSlice,
 };
 

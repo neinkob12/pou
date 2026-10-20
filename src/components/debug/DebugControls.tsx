@@ -49,8 +49,12 @@ export function DebugControls() {
           <DebugButton key={c} label={`+${c}`} onPress={() => actions.giveCoins(c)} />
         ))}
       </Group>
+      <Group title={debug.setBars}>
+        {DEBUG_OPTIONS.needLevels.map((l) => (
+          <DebugButton key={l} label={String(l)} onPress={() => actions.setNeeds(l)} />
+        ))}
+      </Group>
       <Group title={debug.pendingTitle} hint={debug.pendingHint}>
-        <DebugButton label={debug.setBars} disabled />
         <DebugButton label={debug.unlockStrains} disabled />
       </Group>
       <Group title={debug.resetTitle}>

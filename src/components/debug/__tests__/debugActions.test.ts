@@ -60,4 +60,10 @@ describe('Debug-Aktionen', () => {
     const s = useGameStore.getState();
     expect(s.plant && getPlantStatus(s.plant, now, 1).phase).toBe('done');
   });
+
+  it('setzt die Balken', () => {
+    actions.setNeeds(0);
+    expect(useGameStore.getState().needs.values).toEqual({ water: 0, nutrients: 0, mood: 0 });
+    expect(useGameStore.getState().needs.updatedAtMs).toBe(now);
+  });
 });
