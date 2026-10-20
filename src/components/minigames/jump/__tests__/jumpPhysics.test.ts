@@ -1,17 +1,11 @@
 import { BUDI_JUMP } from '../../../../game/config';
-import {
-  advanceWorld,
-  createWorld,
-  fillPlatforms,
-  gapRange,
-  jumpHeight,
-  landsOn,
-  nextRandom,
-  physicsStep,
-  revive,
-  scoreForHeight,
-  type JumpWorld,
-} from '../jumpPhysics';
+import { fillPlatforms, gapRange } from '../jumpLevel';
+import { advanceWorld, jumpHeight, landsOn, physicsStep, revive, scoreForHeight } from '../jumpPhysics';
+import { createWorld, nextRandom, type JumpWorld, type Platform } from '../jumpWorld';
+
+function leaf(x: number, y: number, kind: Platform['kind'] = 'normal'): Platform {
+  return { x, y, kind, broken: false };
+}
 
 const VIEW = 200;
 const STEP = BUDI_JUMP.stepMs;
@@ -34,7 +28,7 @@ describe('nextRandom', () => {
 describe('createWorld', () => {
   it('stellt Budi auf ein Blatt und lässt ihn abspringen', () => {
     const w = createWorld(1);
-    expect(w.platforms).toEqual([{ x: BUDI_JUMP.worldWidth / 2, y: 0 }]);
+    expect(w.platforms).toEqual([leaf(BUDI_JUMP.worldWidth / 2, 0)]);
     expect(w.y - BUDI_JUMP.budiRadius).toBe(0);
     expect(w.vy).toBe(BUDI_JUMP.jumpVelocity);
     expect(w.fallen).toBe(false);
@@ -85,7 +79,7 @@ describe('fillPlatforms', () => {
 });
 
 describe('landsOn', () => {
-  const p = { x: 50, y: 10 };
+  const p = leaf(50, 10);
   it('nur beim Durchqueren der Oberkante von oben und über dem Blatt', () => {
     expect(landsOn(11, 9, 50, p)).toBe(true);
     expect(landsOn(12, 11, 50, p)).toBe(false);
@@ -107,14 +101,14 @@ describe('physicsStep', () => {
 
   it('federt beim Landen ab', () => {
     const r = BUDI_JUMP.budiRadius;
-    const w = physicsStep(world({ y: 20 + r + 0.1, vy: -60, platforms: [{ x: 50, y: 20 }] }), 0, VIEW);
+    const w = physicsStep(world({ y: 20 + r + 0.1, vy: -60, platforms: [leaf(50, 20)] }), 0, VIEW);
     expect(w.y).toBe(20 + r);
     expect(w.vy).toBe(BUDI_JUMP.jumpVelocity);
   });
 
   it('springt von unten durch ein Blatt hindurch', () => {
     const r = BUDI_JUMP.budiRadius;
-    const w = physicsStep(world({ y: 20 + r - 0.1, vy: 60, platforms: [{ x: 50, y: 20 }] }), 0, VIEW);
+    const w = physicsStep(world({ y: 20 + r - 0.1, vy: 60, platforms: [leaf(50, 20)] }), 0, VIEW);
     expect(w.vy).toBeLessThan(60);
     expect(w.y).toBeGreaterThan(20 + r - 0.1);
   });

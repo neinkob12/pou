@@ -207,6 +207,8 @@ export const jumpGame = {
   controlTilt: 'Neigen',
   controlTap: 'Tippen',
   controlsHint: 'Neigen: Handy kippen. Tippen: linke oder rechte Bildschirmhälfte halten.',
+  lights: 'Licht',
+  recordMark: 'Rekord',
 };
 
 export const smashGame = {

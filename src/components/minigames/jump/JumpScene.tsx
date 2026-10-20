@@ -1,12 +1,13 @@
 // Zeichnet Budi Jump mit Skia. Liest nur Shared Values, rendert also ohne React mit 60 fps.
-// Platzhalter: Blätter als grüne Pillen, Budi als grüner Kreis mit Gesicht (Assets M9, M11, B11 fehlen).
+// Platzhalter: Blätter als Pillen je Typ (normal grün, brechend terrakotta, Feder lavendel),
+// Lichtpunkte als gelbe Kreise, Budi als grüner Kreis mit Gesicht (Assets M9, M10, M11, B11 fehlen).
 
-import { Canvas, Circle, Group, Path, Skia } from '@shopify/react-native-skia';
+import { Canvas, Circle, Group, Path, Skia, type SkPath } from '@shopify/react-native-skia';
 import { useDerivedValue, type SharedValue } from 'react-native-reanimated';
 
 import { BUDI_JUMP } from '../../../game/config';
 import { colors } from '../../../lib/theme';
-import type { JumpWorld } from './jumpPhysics';
+import type { JumpWorld, Platform } from './jumpWorld';
 
 interface JumpSceneProps {
   world: SharedValue<JumpWorld>;
@@ -28,24 +29,53 @@ function BudiFigure() {
   );
 }
 
+/** Alle Blätter, die `pick` auswählt, als ein Pfad in Pixeln. */
+function leafPath(w: JumpWorld, width: number, height: number, pick: (p: Platform) => boolean): SkPath {
+  'worklet';
+  const k = width / BUDI_JUMP.worldWidth;
+  const ph = BUDI_JUMP.platformHeight * k;
+  const builder = Skia.PathBuilder.Make();
+  for (const p of w.platforms) {
+    if (!pick(p)) continue;
+    builder.addRRect({
+      rect: {
+        x: (p.x - BUDI_JUMP.platformWidth / 2) * k,
+        y: height - (p.y - w.cameraY) * k,
+        width: BUDI_JUMP.platformWidth * k,
+        height: ph,
+      },
+      rx: ph / 2,
+      ry: ph / 2,
+    });
+  }
+  return builder.detach();
+}
+
 export function JumpScene({ world, size }: JumpSceneProps) {
-  const platforms = useDerivedValue(() => {
+  const normal = useDerivedValue(() => {
+    const { width, height } = size.get();
+    return leafPath(world.get(), width, height, (p) => p.kind === 'normal');
+  });
+  const breaking = useDerivedValue(() => {
+    const { width, height } = size.get();
+    return leafPath(world.get(), width, height, (p) => p.kind === 'breaking' && !p.broken);
+  });
+  const broken = useDerivedValue(() => {
+    const { width, height } = size.get();
+    return leafPath(world.get(), width, height, (p) => p.broken);
+  });
+  const spring = useDerivedValue(() => {
+    const { width, height } = size.get();
+    return leafPath(world.get(), width, height, (p) => p.kind === 'spring');
+  });
+
+  const lights = useDerivedValue(() => {
     const { width, height } = size.get();
     const w = world.get();
     const k = width / BUDI_JUMP.worldWidth;
-    const ph = BUDI_JUMP.platformHeight * k;
     const builder = Skia.PathBuilder.Make();
-    for (const p of w.platforms) {
-      builder.addRRect({
-        rect: {
-          x: (p.x - BUDI_JUMP.platformWidth / 2) * k,
-          y: height - (p.y - w.cameraY) * k,
-          width: BUDI_JUMP.platformWidth * k,
-          height: ph,
-        },
-        rx: ph / 2,
-        ry: ph / 2,
-      });
+    for (const l of w.lights) {
+      builder.addCircle(l.x * k, height - (l.y - w.cameraY) * k, BUDI_JUMP.lightRadius * k);
     }
     return builder.detach();
   });
@@ -68,7 +98,11 @@ export function JumpScene({ world, size }: JumpSceneProps) {
 
   return (
     <Canvas style={{ flex: 1 }} pointerEvents="none">
-      <Path path={platforms} color={colors.plantDark} />
+      <Path path={normal} color={colors.plantDark} />
+      <Path path={breaking} color={colors.terracotta} />
+      <Path path={broken} color={colors.terracotta} opacity={0.4} />
+      <Path path={spring} color={colors.lavender} />
+      <Path path={lights} color={colors.lamp} />
       <Group transform={budi}>
         <BudiFigure />
       </Group>

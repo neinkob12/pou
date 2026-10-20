@@ -1,115 +1,38 @@
-// Regeln von Budi Jump, ohne React. Die 'worklet'-Funktionen laufen im Frame-Callback auf dem
-// UI-Thread. Welt-Einheiten: Breite immer BUDI_JUMP.worldWidth, y zählt nach oben.
-// Die Physik läuft in festen Schritten (stepMs), damit Sprünge auf 60- und 120-Hz-Geräten gleich sind.
+// Physik von Budi Jump, ohne React. Die 'worklet'-Funktionen laufen im Frame-Callback auf dem
+// UI-Thread. Die Physik läuft in festen Schritten (stepMs), damit Sprünge auf 60- und 120-Hz-Geräten gleich sind.
+// Zustand und Startwelt: jumpWorld.ts, Strecke (Blätter, Typen, Lichtpunkte): jumpLevel.ts.
 
 import { BUDI_JUMP } from '../../../game/config';
-
-export type JumpConfig = typeof BUDI_JUMP;
-
-export interface Platform {
-  /** Mitte des Blatts. */
-  x: number;
-  /** Oberkante des Blatts. */
-  y: number;
-}
-
-export interface JumpWorld {
-  /** Budis Mittelpunkt. */
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  platforms: Platform[];
-  /** Unterer Rand des sichtbaren Ausschnitts in Welt-Einheiten. */
-  cameraY: number;
-  /** Oberkante des höchsten erzeugten Blatts. */
-  topPlatformY: number;
-  /** Höchster Punkt, den Budi erreicht hat (für die Punkte). */
-  maxY: number;
-  /** Zustand des Zufallsgenerators, damit jede Runde aus einem Startwert reproduzierbar ist. */
-  seed: number;
-  /** Noch nicht verrechnete Zeit unter einem Physik-Schritt. */
-  restMs: number;
-  /** Budi ist unten rausgefallen. */
-  fallen: boolean;
-}
-
-/** Zufallszahl in [0, 1) und neuer Zustand (mulberry32). */
-export function nextRandom(seed: number): [number, number] {
-  'worklet';
-  const s = (seed + 0x6d2b79f5) | 0;
-  let t = Math.imul(s ^ (s >>> 15), 1 | s);
-  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-  return [((t ^ (t >>> 14)) >>> 0) / 4294967296, s];
-}
-
-/** Startwelt: ein Blatt mittig unter Budi, Budi springt sofort ab. */
-export function createWorld(seed: number, cfg: JumpConfig = BUDI_JUMP): JumpWorld {
-  'worklet';
-  const startX = cfg.worldWidth / 2;
-  return {
-    x: startX,
-    y: cfg.budiRadius,
-    vx: 0,
-    vy: cfg.jumpVelocity,
-    platforms: [{ x: startX, y: 0 }],
-    cameraY: -cfg.budiRadius * 4,
-    topPlatformY: 0,
-    maxY: 0,
-    seed,
-    restMs: 0,
-    fallen: false,
-  };
-}
-
-/** Abstand zum nächsten Blatt: wächst mit der Höhe bis difficultyHeight. */
-export function gapRange(height: number, cfg: JumpConfig = BUDI_JUMP): { min: number; max: number } {
-  'worklet';
-  const t = Math.min(1, Math.max(0, height / cfg.difficultyHeight));
-  return {
-    min: cfg.gapStart.min + (cfg.gapHard.min - cfg.gapStart.min) * t,
-    max: cfg.gapStart.max + (cfg.gapHard.max - cfg.gapStart.max) * t,
-  };
-}
+import { fillPlatforms } from './jumpLevel';
+import type { JumpConfig, JumpWorld, LightPoint, Platform } from './jumpWorld';
 
 /** Höchste Höhe, die ein Sprung erreicht. */
-export function jumpHeight(cfg: JumpConfig = BUDI_JUMP): number {
+export function jumpHeight(cfg: JumpConfig = BUDI_JUMP, velocity: number = cfg.jumpVelocity): number {
   'worklet';
-  return (cfg.jumpVelocity * cfg.jumpVelocity) / (2 * cfg.gravity);
+  return (velocity * velocity) / (2 * cfg.gravity);
 }
 
-/**
- * Erzeugt Blätter bis über den oberen Rand und entfernt die, die unten aus dem Bild sind.
- * Gibt dieselbe Welt zurück, wenn sich nichts ändert (spart Neuzeichnen).
- */
-export function fillPlatforms(world: JumpWorld, viewHeight: number, cfg: JumpConfig = BUDI_JUMP): JumpWorld {
-  'worklet';
-  const top = world.cameraY + viewHeight + cfg.spawnAhead;
-  const bottom = world.cameraY - cfg.platformHeight;
-  const needsNew = world.topPlatformY < top;
-  const needsCleanup = world.platforms.length > 0 && world.platforms[0].y < bottom;
-  if (!needsNew && !needsCleanup) return world;
-
-  const platforms = world.platforms.filter((p) => p.y >= bottom);
-  let seed = world.seed;
-  let y = world.topPlatformY;
-  const half = cfg.platformWidth / 2;
-  while (y < top) {
-    const range = gapRange(y, cfg);
-    const [rGap, s1] = nextRandom(seed);
-    const [rX, s2] = nextRandom(s1);
-    seed = s2;
-    y += range.min + rGap * (range.max - range.min);
-    platforms.push({ x: half + rX * (cfg.worldWidth - cfg.platformWidth), y });
-  }
-  return { ...world, platforms, topPlatformY: y, seed };
-}
-
-/** Landet Budi in diesem Schritt auf einem Blatt? Nur im Fallen und nur von oben. */
+/** Landet Budi in diesem Schritt auf einem Blatt? Nur im Fallen, nur von oben, nicht auf gebrochenen. */
 export function landsOn(prevFeet: number, feet: number, x: number, p: Platform, cfg: JumpConfig = BUDI_JUMP): boolean {
   'worklet';
-  if (prevFeet < p.y || feet > p.y) return false;
+  if (p.broken || prevFeet < p.y || feet > p.y) return false;
   return Math.abs(x - p.x) <= cfg.platformWidth / 2 + cfg.budiRadius * 0.6;
+}
+
+/** Berührt Budi den Lichtpunkt? */
+export function touchesLight(x: number, y: number, light: LightPoint, cfg: JumpConfig = BUDI_JUMP): boolean {
+  'worklet';
+  const reach = cfg.budiRadius + cfg.lightRadius;
+  const dx = x - light.x;
+  const dy = y - light.y;
+  return dx * dx + dy * dy <= reach * reach;
+}
+
+/** Gebrochene Blätter fallen weiter. Ohne gebrochene Blätter bleibt das Array dasselbe. */
+function dropBroken(platforms: Platform[], dt: number, cfg: JumpConfig): Platform[] {
+  'worklet';
+  if (!platforms.some((p) => p.broken)) return platforms;
+  return platforms.map((p) => (p.broken ? { ...p, y: p.y - cfg.brokenFallSpeed * dt } : p));
 }
 
 /** Ein fester Physik-Schritt. `targetVx` kommt aus der Steuerung (Einheiten pro Sekunde). */
@@ -121,6 +44,7 @@ export function physicsStep(world: JumpWorld, targetVx: number, viewHeight: numb
   let vy = world.vy - cfg.gravity * dt;
   let x = world.x + vx * dt;
   let y = world.y + vy * dt;
+  let platforms = dropBroken(world.platforms, dt, cfg);
 
   // Links raus, rechts wieder rein.
   if (x < 0) x += cfg.worldWidth;
@@ -129,19 +53,32 @@ export function physicsStep(world: JumpWorld, targetVx: number, viewHeight: numb
   if (vy <= 0) {
     const prevFeet = world.y - cfg.budiRadius;
     const feet = y - cfg.budiRadius;
-    for (const p of world.platforms) {
+    for (let i = 0; i < platforms.length; i += 1) {
+      const p = platforms[i];
       if (landsOn(prevFeet, feet, x, p, cfg)) {
         y = p.y + cfg.budiRadius;
-        vy = cfg.jumpVelocity;
+        vy = p.kind === 'spring' ? cfg.springVelocity : cfg.jumpVelocity;
+        // Brechendes Blatt trägt genau einmal.
+        if (p.kind === 'breaking') {
+          platforms = platforms.map((q, j) => (j === i ? { ...q, broken: true } : q));
+        }
         break;
       }
     }
   }
 
+  let lights = world.lights;
+  let lightsCollected = world.lightsCollected;
+  if (lights.some((l) => touchesLight(x, y, l, cfg))) {
+    const left = lights.filter((l) => !touchesLight(x, y, l, cfg));
+    lightsCollected += lights.length - left.length;
+    lights = left;
+  }
+
   const maxY = Math.max(world.maxY, y);
   const cameraY = Math.max(world.cameraY, y - viewHeight * cfg.cameraFollow);
   const fallen = y + cfg.budiRadius < cameraY;
-  return { ...world, x, y, vx, vy, maxY, cameraY, fallen };
+  return { ...world, x, y, vx, vy, platforms, lights, lightsCollected, maxY, cameraY, fallen };
 }
 
 /**
@@ -177,7 +114,8 @@ export function revive(world: JumpWorld, viewHeight: number, cfg: JumpConfig = B
   'worklet';
   const y = world.cameraY + viewHeight * 0.1;
   const x = cfg.worldWidth / 2;
-  const platforms = [...world.platforms.filter((p) => p.y > y), { x, y }].sort((a, b) => a.y - b.y);
+  const fresh: Platform = { x, y, kind: 'normal', broken: false };
+  const platforms = [...world.platforms.filter((p) => p.y > y), fresh].sort((a, b) => a.y - b.y);
   return {
     ...world,
     x,
