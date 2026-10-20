@@ -117,7 +117,41 @@ npm install -D eslint eslint-config-expo
 
 Pflicht-Skripte in `package.json`: `typecheck` (`tsc --noEmit`), `lint` (`eslint .`), `test` (`jest`). `bash scripts/check.sh` ruft sie in dieser Reihenfolge auf und ist der einzige Prüfbefehl für Kollegen und CI.
 
-RevenueCat, AdMob und expo-sensors kommen erst in ihren eigenen Sessions dazu.
+RevenueCat und AdMob kommen erst in ihren eigenen Aufträgen dazu (P28, P29). expo-sensors ist seit P01 installiert.
+
+## Installierte Versionen (Stand P01, Expo SDK 58)
+
+| Paket | Version |
+| --- | --- |
+| expo | 58.0.16 |
+| react / react-native | 19.3.0 / 0.88.0 |
+| expo-router | 58.0.24 |
+| nativewind / tailwindcss | 4.2.7 / 3.4.19 |
+| react-native-reanimated / react-native-worklets | 4.7.1 / 0.13.0 |
+| react-native-gesture-handler | 3.3.0 |
+| @shopify/react-native-skia | 2.14.0 |
+| zustand | 5.0.15 |
+| react-native-mmkv / react-native-nitro-modules | 4.3.2 / 0.37.1 |
+| expo-haptics, expo-notifications, expo-sensors, expo-font | SDK-58-Versionen (siehe package.json) |
+| @expo-google-fonts/fredoka, @expo-google-fonts/nunito | 0.4.x |
+| typescript | 6.0.3 |
+| jest / jest-expo | 30.5.2 / 58.0.11 |
+| eslint / eslint-config-expo | 9.39.5 / 58.0.4 |
+
+Zusätzlich installiert, weil Pflicht-Abhängigkeit der genannten Pakete:
+
+- `react-native-worklets`: von Reanimated 4 und Skia benötigt.
+- `react-native-nitro-modules`: von MMKV 4 benötigt.
+- `react-dom`: Peer von Expo Router (sonst bricht `npm install` ab).
+- `babel-preset-expo` (dev): NativeWind braucht eine eigene `babel.config.js`, die das Preset direkt referenziert.
+- `expo-dev-client`: für den Development Build (Profil `development` in `eas.json`), weil Skia und MMKV nicht in Expo Go laufen.
+
+Abweichungen bei P01:
+
+- Projekt liegt im Repo-Root (in einem Temp-Ordner erzeugt und verschoben). Vorlagen-Icons liegen unter `assets/icon/`.
+- Expo Router 58: `Tabs` aus `expo-router/js-tabs`, `Stack` aus `expo-router/stack`. Die Tabs sitzen direkt in `app/_layout.tsx` (keine `(tabs)`-Gruppe), damit die Pfade aus `docs/AUFTRAEGE.md` (`app/index.tsx`, `app/shop.tsx` usw.) stimmen. Screens ohne Tab (`debug`, `harvest`, `seed-select`, `onboarding`) sind dort mit `href: null` registriert.
+- Fonts nur in den genutzten Schnitten importiert (`@expo-google-fonts/nunito/400Regular` usw.), sonst landen alle Gewichte im Bundle.
+- `npx expo install` braucht hier `EXPO_OFFLINE=1`, weil die Expo-API im Cloud-Container gesperrt ist; die Versionen kommen dann aus `expo/bundledNativeModules.json`.
 
 ---
 
