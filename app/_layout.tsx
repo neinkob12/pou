@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { OnboardingGate } from '../src/components/onboarding/OnboardingGate';
 import { TabIcon } from '../src/components/ui/TabIcon';
 import { tabs } from '../src/content/strings';
 import { useAppFonts } from '../src/hooks/useAppFonts';
@@ -52,6 +53,9 @@ export default function RootLayout() {
         <Tabs.Screen name="seed-select" options={hidden} />
         <Tabs.Screen name="onboarding" options={hidden} />
       </Tabs>
+      {/* Onboarding-Weiche (P26): Altersfrage, Tutorial im Zimmer, Consent-Schritt. */}
+      <OnboardingGate />
+      {/* Ende Onboarding-Weiche (P26) */}
     </GestureHandlerRootView>
   );
 }

@@ -329,6 +329,19 @@ export const DRYING_TURNS = {
 } as const;
 
 // ---------------------------------------------------------------------------
+// Licht und Phasen: Lichtplan, Tag/Nacht im Raum (Auftrag P11)
+// ---------------------------------------------------------------------------
+
+/** Lichtstunden je Pflanzentag (24 Stunden). Wachstum 18/6, Blüte nach dem Umschalten 12/12. */
+export const LIGHT_HOURS_ON = {
+  vegetative: 18,
+  flowering: 12,
+} as const;
+
+/** Tageszeit, zu der das Licht in jedem Pflanzentag angeht (Stunde 0 bis 23 im Pflanzentag). */
+export const LIGHT_ON_AT_HOUR = 6;
+
+// ---------------------------------------------------------------------------
 // Shop-Upgrades: Topf, LED, Ventilator, Erde, Nützlings-Kit (Auftrag P15)
 // ---------------------------------------------------------------------------
 
@@ -399,4 +412,25 @@ export const MINIGAME_REWARDS = {
   coinsPerPoint: 0.5,
   maxCoinsPerRound: 50,
   moodPerRound: 15,
+} as const;
+
+/** Gerüst aller Minigames (Auftrag P08). */
+export const MINIGAME_FRAMEWORK = {
+  countdownSeconds: 3,
+  /** Längster Frame-Schritt, der zählt. Schützt vor Zeitsprüngen nach Ruckeln oder Hintergrund. */
+  maxFrameStepMs: 100,
+} as const;
+
+/** Beispielspiel "Tipp den Kreis" (Auftrag P08). */
+export const TAP_CIRCLE = {
+  durationSeconds: 30,
+  pointsPerHit: 1,
+  startRadius: 48,
+  minRadius: 22,
+  /** Radius schrumpft pro Treffer um so viele Pixel, bis minRadius. */
+  shrinkPerHit: 1,
+  /** So lange bleibt ein Kreis stehen, bevor er woanders auftaucht. */
+  lifetimeMs: 1400,
+  /** Treffer zählen auch etwas außerhalb des Kreises (Finger sind dicker als Pixel). */
+  hitSlop: 10,
 } as const;

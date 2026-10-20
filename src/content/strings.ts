@@ -49,6 +49,37 @@ export const room = {
   coinsLabel: (coins: number) => `${coins} Münzen`,
 };
 
+// Licht-Schalter, Tag/Nacht und Phasenwechsel (Auftrag P11).
+export const lightPhase = {
+  schedule: {
+    '18/6': 'Licht 18/6',
+    '12/12': 'Licht 12/12',
+    off: 'Licht aus',
+  },
+  autoflower: 'Autoflower: blüht von selbst',
+  switchLabel: 'Auf 12/12 umschalten',
+  switchLockedFrom: (day: number, now: number) => `Umschalten ab Tag ${day} (jetzt Tag ${now})`,
+  flipTitle: 'Blüte starten?',
+  flipText:
+    'Mit 12 Stunden Licht und 12 Stunden Dunkelheit beginnt Budi zu blühen. Wartest du länger, wächst Budi größer und bringt mehr Ertrag, braucht aber mehr Zeit.',
+  flipConfirm: 'Jetzt umschalten',
+  lampOn: 'Lampe an',
+  lampOff: 'Lampe aus',
+  night: 'Nacht',
+  disturbed: 'Pssst! Budi braucht in der Blüte ungestörte Dunkelheit.',
+  phaseChangedTitle: 'Neue Phase!',
+  phaseChanged: {
+    germination: 'Budi keimt!',
+    seedling: 'Budi ist jetzt ein Sämling!',
+    vegetative: 'Budi wächst jetzt richtig los!',
+    flowering: 'Budi blüht jetzt!',
+    ready: 'Budi ist bereit zur Ernte!',
+    drying: 'Budi hängt jetzt zum Trocknen.',
+    done: 'Budi ist fertig getrocknet!',
+  },
+  puff: 'Puff (Effekt)',
+};
+
 // Pflege-Gesten und Balken im Raum (P10).
 export const care = {
   tools: {
@@ -82,6 +113,28 @@ export const care = {
   },
 };
 
+// Krankheiten im Raum: Schädlinge, Schimmel, Koma (P21).
+export const health = {
+  pests: {
+    spiderMite: 'Spinnmilbe',
+    fungusGnat: 'Trauermücke',
+  },
+  pestPlaceholder: {
+    spiderMite: 'U17',
+    fungusGnat: 'U17',
+  },
+  pestLabel: (name: string) => `${name} wegtippen`,
+  mold: 'Schimmel',
+  moldPlaceholder: 'U17',
+  moldLabel: (coins: number) => `Schimmel behandeln, ${coins} Münzen`,
+  moldTooPoor: 'Zu wenig Münzen gegen den Schimmel',
+  comaTitle: 'Budi liegt im Koma',
+  comaText: 'Zu lange ohne Pflege. Hol Budi zurück!',
+  revive: (coins: number) => `Wiederbeleben · ${coins} Münzen`,
+  reviveTooPoor: 'Zu wenig Münzen',
+  reviveAd: 'Mit Video wiederbeleben (bald)',
+};
+
 export const modal = {
   close: 'Schließen',
 };
@@ -93,6 +146,42 @@ export const minigames = {
   drops: 'Tropfen fangen',
   jump: 'Hüpfen',
   quiz: 'Pflanzen-Quiz',
+};
+
+// Minigame-Gerüst und Auswahl-Karten (Auftrag P08)
+export const minigameFramework = {
+  selectSubtitle: 'Spiel eine Runde, sammle Münzen und mach Budi gute Laune.',
+  highscore: 'Rekord',
+  noHighscore: 'Noch kein Rekord',
+  play: 'Spielen',
+  score: 'Punkte',
+  timeLeft: 'Zeit',
+  pause: 'Pause',
+  paused: 'Pause',
+  resume: 'Weiter',
+  quit: 'Aufhören',
+  gameOver: 'Runde vorbei',
+  newHighscore: 'Neuer Rekord!',
+  coinsEarned: 'Münzen',
+  moodBonus: 'Budi freut sich',
+  playAgain: 'Nochmal',
+  toSelection: 'Zur Auswahl',
+  extraLifeQuestion: 'Noch ein Leben?',
+  extraLifeAccept: 'Extra-Leben holen',
+  extraLifeDecline: 'Nein, Runde beenden',
+};
+
+export const minigameCards = {
+  tap: 'Tippe die Kreise, bevor sie verschwinden.',
+  smash: 'Klatsch die Schädlinge vom Blatt, aber verschone die Marienkäfer.',
+  drops: 'Fang Wasser- und Düngertropfen mit dem Topf.',
+  jump: 'Hüpf mit Budi von Blatt zu Blatt nach oben.',
+  quiz: 'Was weißt du über Pflanzen?',
+};
+
+export const tapGame = {
+  title: 'Tipp den Kreis',
+  circleLabel: 'Kreis',
 };
 
 export const shop = {
@@ -145,10 +234,10 @@ export const debug = {
   resetTitle: 'Spielstand',
   reset: 'Spielstand zurücksetzen',
   resetConfirm: 'Nochmal tippen zum Bestätigen',
-  pendingTitle: 'Kommt später',
   setBars: 'Balken setzen',
+  strainsTitle: 'Sorten',
   unlockStrains: 'Alle Sorten freischalten',
-  pendingHint: 'Wartet auf den zuständigen Auftrag.',
+  unlockEventStrain: 'Kölsche Knospe freischalten',
 };
 
 /** Ernte-Ablauf (P24): Lupe, Schere, Trocknen, Abschluss. */
@@ -244,8 +333,59 @@ export const strainsAlbum = {
   },
 };
 
+// Erststart (P26): Altersfrage und Tutorial. Vorschlag des Auftrags, Chef kann umformulieren.
 export const onboarding = {
   title: 'Willkommen',
+  age: {
+    title: 'Willkommen bei PotPou',
+    intro: 'PotPou ist ein Pflanzenspiel für Erwachsene. Du pflegst Budi vom Samen bis zur Ernte.',
+    question: 'Bist du mindestens 18 Jahre alt?',
+    yes: 'Ja, ich bin 18 oder älter',
+    no: 'Nein',
+  },
+  declined: {
+    title: 'Bis bald!',
+    text: 'PotPou gibt es erst ab 18. Budi wünscht dir bis dahin alles Gute und viel Sonne.',
+  },
+  tutorial: {
+    stepCounter: (step: number, total: number) => `${step} von ${total}`,
+    next: 'Weiter',
+    skip: 'Überspringen',
+    done: "Los geht's",
+    steps: {
+      plant: {
+        title: 'Dein erster Samen',
+        text: 'Pflanz einen Samen in den Topf. Daraus wächst Budi, in Echtzeit.',
+        action: 'Samen pflanzen',
+      },
+      water: {
+        title: 'Gießen',
+        text: 'Zieh die Gießkanne unten zu Budi und lass es regnen. Probier es gleich aus.',
+      },
+      bars: {
+        title: 'Die Balken',
+        text: 'Oben siehst du Wasser, Nährstoffe, Licht und Laune. Sinkt ein Balken, braucht Budi dich. Budi wächst auch weiter, wenn die App zu ist.',
+      },
+      minigames: {
+        title: 'Minigames',
+        text: 'Unter "Spiele" sammelst du Münzen und machst Budi gute Laune.',
+        action: 'Zeig mal',
+      },
+    },
+  },
+};
+
+// Rechtliche Links in den Einstellungen (P26).
+export const legal = {
+  title: 'Rechtliches',
+  imprint: 'Impressum',
+  privacy: 'Datenschutz',
+};
+
+/** Platzhalter, bis der Chef die echten Adressen liefert (P26, siehe docs/progress/p26.md). */
+export const legalUrls = {
+  imprint: 'https://example.com/potpou/impressum',
+  privacy: 'https://example.com/potpou/datenschutz',
 };
 
 // Benachrichtigungen (P18): Texte in Budis Stimme und der Einstellungs-Abschnitt.

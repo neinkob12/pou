@@ -8,9 +8,11 @@ import { BudiStage } from './BudiStage';
 import { CareStageProvider } from './care/CareStage';
 import { useMinigameMoodBonus } from './care/useMinigameMoodBonus';
 import { CoinDisplay } from './CoinDisplay';
+import { HealthWatch } from './health/useHealthCheck';
 import { Lamp } from './Lamp';
 import { NeedBars } from './NeedBars';
 import { PhaseHeader } from './PhaseHeader';
+import { PhaseChangePopup } from './phase/PhaseChangePopup';
 import { RoomBackground } from './RoomBackground';
 
 // Hauptraum: nur Komposition der Slots. Besitzer je Welle siehe docs/AUFTRAEGE.md
@@ -31,9 +33,11 @@ export function RoomScreen() {
         </SafeAreaView>
         <Lamp />
         <BudiStage />
+        <HealthWatch />
         <ActionTray />
         <View className="h-3" />
         <BottomNav />
+        <PhaseChangePopup />
       </View>
     </CareStageProvider>
   );
