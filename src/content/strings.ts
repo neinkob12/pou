@@ -184,6 +184,47 @@ export const minigameFramework = {
   extraLifeDecline: 'Nein, Runde beenden',
 };
 
+// Spielgefühl der Minigames: Countdown, Kombo, Sterne, Tipps zum Nochmal (Auftrag 40, WEB-2)
+export const minigameFeel = {
+  go: 'Los!',
+  combo: (n: number) => `${n}er Kombo`,
+  multiplier: (m: number) => `x${m} Punkte`,
+  starsLabel: (n: number) => `${n} von 3 Sternen`,
+  nextStar: (points: number) => `Noch ${points} Punkte bis zum nächsten Stern`,
+  allStars: 'Alle Sterne geholt!',
+  tipTitle: 'Tipp',
+  keyboardHint: 'Am Rechner: Pfeiltasten oder A/D, Esc für Pause',
+  quizKeysHint: 'Am Rechner: Tasten 1 bis 3, Enter für weiter',
+  dropsSalt: 'Salz!',
+  tips: {
+    tap: [
+      'Der Ring zeigt, wie lange die Knospe noch bleibt. Tipp sie, bevor er leer ist.',
+      'Die Knospen werden kleiner. Schau schon dorthin, wo die nächste auftaucht.',
+      'Schnelle Treffer in Folge zählen als Kombo.',
+    ],
+    smash: [
+      'Schnelle Treffer hintereinander steigern den Multiplikator bis x3.',
+      'Marienkäfer sind Nützlinge. Einer kostet dich die Kombo und Punkte.',
+      'Gegen Ende wird es schneller. Bleib mit dem Finger nah an der Mitte.',
+    ],
+    drops: [
+      'Salz hat Kanten und glitzert. Lass es einfach vorbeifallen.',
+      'Am Rechner lenkst du den Topf mit den Pfeiltasten oder A und D.',
+      'Bleib in der Mitte, dann erreichst du beide Ränder schnell.',
+    ],
+    jump: [
+      'Lavendel-Blätter sind Federn und schießen Budi weit nach oben.',
+      'Braune Blätter tragen nur einmal. Spring schnell weiter.',
+      'Budi kann links aus dem Bild hüpfen und kommt rechts wieder rein.',
+    ],
+    quiz: [
+      'Neue Fakten bekommst du bei jedem Phasenwechsel von Budi.',
+      'Alles richtig gibt doppelte Münzen.',
+      'Im Album kannst du alle Fakten-Karten nachlesen.',
+    ],
+  } as Record<string, readonly string[]>,
+};
+
 export const minigameCards = {
   tap: 'Tippe die Kreise, bevor sie verschwinden.',
   smash: 'Klatsch die Schädlinge vom Blatt, aber verschone die Marienkäfer.',

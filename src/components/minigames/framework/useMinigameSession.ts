@@ -8,6 +8,7 @@ import { useFrameCallback, useSharedValue, type SharedValue } from 'react-native
 import { scheduleOnRN } from 'react-native-worklets';
 
 import { canOfferExtraLife, requestExtraLife } from './extraLife';
+import { consumeHitStop } from './fx/fxLogic';
 import { finishRound, type RoundResult } from './finishRound';
 import {
   countdownDisplay,
@@ -48,6 +49,8 @@ export interface MinigameSession {
   declineExtraLife: () => void;
   /** Das Spiel meldet, was bei einem Extra-Leben passieren soll (z. B. ein Leben zurück). */
   setExtraLifeHandler: (handler: (() => void) | null) => void;
+  /** Hält die Spielzeit kurz an (Treffer-Gefühl). Auch aus Worklets aufrufbar. */
+  hitStop: (ms: number) => void;
 }
 
 export function useMinigameSession({
@@ -58,6 +61,7 @@ export function useMinigameSession({
   const durationMs = durationSeconds === null ? null : durationSeconds * 1000;
   const [initial] = useState(createClock);
   const clock = useSharedValue<MinigameClock>(initial);
+  const hitStopLeft = useSharedValue(0);
 
   const [phase, setPhase] = useState<MinigamePhase>(initial.phase);
   const [countdown, setCountdown] = useState(countdownDisplay(initial));
@@ -95,7 +99,9 @@ export function useMinigameSession({
     'worklet';
     const before = clock.get();
     if (before.phase !== 'countdown' && before.phase !== 'playing') return;
-    const next = stepClock(before, frame.timeSincePreviousFrame ?? 0, durationMs);
+    const held = consumeHitStop(hitStopLeft.get(), frame.timeSincePreviousFrame ?? 0);
+    if (held.leftMs !== hitStopLeft.get()) hitStopLeft.set(held.leftMs);
+    const next = stepClock(before, held.dtMs, durationMs);
     clock.set(next);
     const cd = countdownDisplay(next);
     if (cd !== countdownDisplay(before)) scheduleOnRN(setCountdown, cd);
@@ -112,6 +118,14 @@ export function useMinigameSession({
       setScore(scoreRef.current);
     },
     [clock],
+  );
+
+  const hitStop = useCallback(
+    (ms: number) => {
+      'worklet';
+      hitStopLeft.set(Math.max(hitStopLeft.get(), ms));
+    },
+    [hitStopLeft],
   );
 
   const pause = useCallback(() => {
@@ -168,5 +182,6 @@ export function useMinigameSession({
     acceptExtraLife,
     declineExtraLife: finalize,
     setExtraLifeHandler,
+    hitStop,
   };
 }

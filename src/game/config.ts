@@ -670,6 +670,49 @@ export const MINIGAME_FRAMEWORK = {
   maxFrameStepMs: 100,
 } as const;
 
+/**
+ * Spielgefühl der Minigames (Auftrag 40, WEB-2): Treffer-Effekte, Sterne, Spielfeld im Browser.
+ * Ändert keine Punkte und keine Münzen. Sterne-Grenzen gemessen mit dem Bot (docs/progress/web2.md).
+ */
+export const MINIGAME_FEEL = {
+  /** Spielfeld höchstens so breit (dp), damit Spiele am Rechner nicht in die Breite laufen. */
+  playfieldMaxWidth: 520,
+  /** Enter startet am Rechner erst so lange nach dem Ergebnis neu. */
+  restartKeyDelayMs: 700,
+  /** "Los!" nach dem Countdown so lange zeigen. */
+  goFlashMs: 650,
+  /** Kurzes Anhalten der Spielzeit bei einem Treffer. */
+  hitStopMs: 55,
+  /** Kamera-Wackeln: Dauer und Ausschlag (dp) bei Treffer und bei Fehler. */
+  shakeHitMs: 120,
+  shakeHitPx: 3,
+  shakeFailMs: 260,
+  shakeFailPx: 9,
+  /** Partikel: Lebensdauer, Startgeschwindigkeit (dp pro Sekunde), Schwerkraft (dp pro s²), Obergrenze. */
+  particleLifeMs: 520,
+  particleSpeed: 260,
+  particleGravity: 620,
+  particleSize: 5,
+  maxParticles: 160,
+  /** Punkte-Popup steigt so weit (dp) und bleibt so lange. */
+  popupRise: 46,
+  popupMs: 700,
+  /** Ab so vielen Treffern in Folge zeigt der Kombo-Zähler. */
+  comboShowFrom: 3,
+  /** Treffer innerhalb dieser Zeit nach dem letzten zählen zur Kombo (Spiele ohne eigene Kombo). */
+  comboWindowMs: 1000,
+  /** Tastatur am Rechner: Tropfen-Topf fährt so schnell (dp pro Sekunde). */
+  keyboardPotSpeed: 620,
+  /** Punkte für 1, 2 und 3 Sterne je Spiel. */
+  stars: {
+    tap: [15, 35, 50],
+    smash: [20, 50, 70],
+    drops: [20, 45, 80],
+    jump: [80, 250, 600],
+    quiz: [10, 20, 60],
+  } as Record<string, readonly [number, number, number]>,
+} as const;
+
 /** Beispielspiel "Tipp den Kreis" (Auftrag P08). */
 export const TAP_CIRCLE = {
   durationSeconds: 30,
@@ -680,6 +723,8 @@ export const TAP_CIRCLE = {
   shrinkPerHit: 1,
   /** So lange bleibt ein Kreis stehen, bevor er woanders auftaucht. */
   lifetimeMs: 1400,
+  /** Am Rundenende bleibt er nur noch so lange (dazwischen linear, Auftrag 40). */
+  lifetimeEndMs: 850,
   /** Treffer zählen auch etwas außerhalb des Kreises (Finger sind dicker als Pixel). */
   hitSlop: 10,
 } as const;
