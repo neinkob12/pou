@@ -2,7 +2,7 @@
 
 Branch: `claude/auftrag-36-pweb-web-version-fuer-den-ersten-test` · PR: siehe Auftrag a36 · Kollege: Session a36
 
-**URL: https://neinkob12.github.io/pou-/**
+**URL: https://neinkob12.github.io/pou/**
 
 ## Einmalig für den Chef
 
@@ -10,9 +10,9 @@ GitHub Pages einschalten: Repo **Settings > Pages > Build and deployment > Sourc
 
 ## Fertig
 
-- Web-Support: `react-native-web` (~0.21.4) und `@expo/metro-runtime` (~58.0.14) installiert (SDK-58-Versionen, `react-dom` war schon da). `app.json`: `web.output: single`, `experiments.baseUrl: /pou-`.
+- Web-Support: `react-native-web` (~0.21.4) und `@expo/metro-runtime` (~58.0.14) installiert (SDK-58-Versionen, `react-dom` war schon da). `app.json`: `web.output: single`, `experiments.baseUrl: /pou`.
 - `npx expo export --platform web` baut fehlerfrei nach `dist/`.
-- Skia im Web: `src/lib/skiaWeb.web.ts` lädt CanvasKit (WebAssembly), `app/_layout.tsx` wartet darauf wie auf die Fonts. Die `.wasm`-Datei bündelt Metro als Asset (`metro.config.js`: `wasm` in `assetExts`), sie liegt damit automatisch unter `/pou-/`. Nativ liefert `src/lib/skiaWeb.ts` sofort `true`.
+- Skia im Web: `src/lib/skiaWeb.web.ts` lädt CanvasKit (WebAssembly), `app/_layout.tsx` wartet darauf wie auf die Fonts. Die `.wasm`-Datei bündelt Metro als Asset (`metro.config.js`: `wasm` in `assetExts`), sie liegt damit automatisch unter `/pou/`. Nativ liefert `src/lib/skiaWeb.ts` sofort `true`.
 - Speicher: MMKV 4 hat eine eingebaute Web-Variante auf `localStorage`. Kein eigener Code nötig, der Spielstand bleibt nach Neuladen und nach Browser-Neustart erhalten (geprüft: Altersfrage, Pflanze, 56 Münzen nach Ernte).
 - Stillgelegt im Web (je eine `.web`-Datei, nativ unverändert):
   - Benachrichtigungen: `src/hooks/useNotificationScheduler.web.ts` (leer), `src/components/settings/NotificationsSection.web.tsx` (nur Hinweis, Text in `strings.ts` unter `webVersion`).
@@ -75,7 +75,7 @@ Keine Fehler in der Konsole auf Startseite, Tabs, Spielen, Debug und Ernte. Ausn
 
 ## Handy-Test (3 bis 5 Punkte für den Chef)
 
-1. Pages einschalten, nach dem nächsten Merge https://neinkob12.github.io/pou-/ auf dem Handy öffnen: Altersfrage erscheint, "Ja" führt ins Zimmer mit Tutorial.
+1. Pages einschalten, nach dem nächsten Merge https://neinkob12.github.io/pou/ auf dem Handy öffnen: Altersfrage erscheint, "Ja" führt ins Zimmer mit Tutorial.
 2. Samen pflanzen, Tabs durchtippen, ein Spiel (Schädlinge klatschen) spielen: Münzen kommen an.
 3. Einstellungen > Debug-Menü öffnen > x1000 und Vorspulen bis "Erntebereit", dann Ernten bis "Ernte fertig".
 4. Seite neu laden: Münzen und Spielstand sind noch da.

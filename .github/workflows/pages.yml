@@ -1,7 +1,7 @@
 name: Pages
 
 # Web-Version zum Testen (Auftrag PWEB): baut main für den Browser und veröffentlicht sie auf
-# GitHub Pages unter https://neinkob12.github.io/pou-/. Einmalig nötig: Settings > Pages >
+# GitHub Pages unter https://neinkob12.github.io/pou/. Einmalig nötig: Settings > Pages >
 # Source: GitHub Actions.
 
 on:
@@ -29,7 +29,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Web exportieren (baseUrl /pou-)
+      - name: Web exportieren (baseUrl /pou)
         run: npx expo export --platform web
         env:
           CI: '1'
