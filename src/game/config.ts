@@ -574,10 +574,21 @@ export const NOTIFICATION_PRIORITY = {
 // Minigames
 // ---------------------------------------------------------------------------
 
+/**
+ * Münzen aus Minigames (Balancing P23, Rechnung in docs/progress/p23.md): Ziel sind 3 Runden am Tag
+ * für ungefähr ein Shop-Upgrade pro Zyklus. Zyklus ≈ 10 echte Tage (TIME_SCALE), also 30 Runden;
+ * ein Upgrade kostet im Schnitt 129 Münzen (UPGRADES, 900 Münzen für 7 Stufen). Typische Runden
+ * (Smash 30, Tropfen 28, Jump 100+ Punkte) bringen 4, 3 und 8 Münzen, zusammen rund 150 pro Zyklus.
+ * Die Obergrenze bremst Jump (Punkte = Höhe / 10, viel höhere Zahlen). Sie muss mindestens die
+ * volle Quiz-Runde tragen (60 Punkte = 8 Münzen = 2 × 4, FACT_QUIZ.perfectMultiplier).
+ */
 export const MINIGAME_REWARDS = {
-  coinsPerPoint: 0.5,
-  maxCoinsPerRound: 50,
+  coinsPerPoint: 0.14,
+  maxCoinsPerRound: 8,
   moodPerRound: 15,
+  /** Annahmen für die Rechnung oben, nur für den Balancing-Test (P32 ersetzt sie durch Messwerte). */
+  plannedRoundsPerDay: 3,
+  typicalScores: { smash: 30, drops: 28, jump: 100 },
 } as const;
 
 /** Gerüst aller Minigames (Auftrag P08). */

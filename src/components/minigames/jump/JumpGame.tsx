@@ -8,6 +8,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 
 import { jumpGame } from '../../../content/strings';
 import { BUDI_JUMP, MINIGAME_FRAMEWORK } from '../../../game/config';
+import { cue, useMinigameAudio } from '../../../lib/audio';
 import { useGameStore } from '../../../store/gameStore';
 import type { MinigameSession } from '../framework/useMinigameSession';
 import { JumpScene } from './JumpScene';
@@ -20,7 +21,7 @@ import { RecordMark } from './RecordMark';
 import { useJumpInput } from './useJumpInput';
 
 export function JumpGame({ session }: { session: MinigameSession }) {
-  const { clock, addScore, endGame, setExtraLifeHandler, phase } = session;
+  const { clock, addScore, endGame, setExtraLifeHandler, phase, result } = session;
   const input = useJumpInput(useGameStore((s) => s.jumpControl));
   const { targetVx } = input;
   const [seed] = useState(() => Math.floor(Math.random() * 2 ** 31));
@@ -30,10 +31,12 @@ export function JumpGame({ session }: { session: MinigameSession }) {
   const reportedLights = useSharedValue(0);
   const [lights, setLights] = useState(0);
   const lightsRef = useRef(0);
+  useMinigameAudio(phase, result?.coins ?? null);
   // Rekord zu Rundenbeginn: die Marke bleibt stehen, auch wenn Budi sie überholt.
   const [recordY] = useState(() => recordHeight(useGameStore.getState().minigameHighscores[JUMP_GAME_ID] ?? 0));
 
   const onLights = useCallback((count: number) => {
+    cue('collect');
     lightsRef.current = count;
     setLights(count);
   }, []);
@@ -53,6 +56,8 @@ export function JumpGame({ session }: { session: MinigameSession }) {
     const dt = Math.min(frame.timeSincePreviousFrame ?? 0, MINIGAME_FRAMEWORK.maxFrameStepMs);
     const next = advanceWorld(before, dt, targetVx.get(), viewHeight);
     world.set(next);
+    // Schwerkraft senkt vy nur; steigt es, ist Budi von einem Blatt abgesprungen.
+    if (next.vy > before.vy && !next.fallen) scheduleOnRN(cue, 'jump');
     const score = scoreForHeight(next.maxY);
     if (score > reported.get()) {
       scheduleOnRN(addScore, score - reported.get());
@@ -62,7 +67,10 @@ export function JumpGame({ session }: { session: MinigameSession }) {
       reportedLights.set(next.lightsCollected);
       scheduleOnRN(onLights, next.lightsCollected);
     }
-    if (next.fallen && !before.fallen) scheduleOnRN(endGame);
+    if (next.fallen && !before.fallen) {
+      scheduleOnRN(cue, 'fail');
+      scheduleOnRN(endGame);
+    }
   });
 
   // Lichtbonus für Budi, sobald das Framework das Rundenende meldet (minigameFinished).
