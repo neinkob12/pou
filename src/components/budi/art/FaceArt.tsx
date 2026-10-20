@@ -1,12 +1,12 @@
 import { Circle, Group, Oval, Path } from '@shopify/react-native-skia';
 import type { ReactNode } from 'react';
-import { useDerivedValue, type SharedValue } from 'react-native-reanimated';
 
 import type { BudiFaceId } from '../../../lib/assets';
 import { artColors } from '../../../lib/theme';
 
 // Gesicht auf dem Topf (DESIGN_GUIDE D4), Budi-Leinwand 100 × 100. Augen groß und weit auseinander.
-const EYE_Y = 79.5;
+/** Augenhöhe in Budi-Einheiten: um diese Linie klappen die Lider (useBudiMotion). */
+export const EYE_Y = 79.5;
 const EYE_X = [39.5, 60.5] as const;
 const EYE_RX = 4.3;
 const EYE_RY = 5.1;
@@ -68,17 +68,14 @@ function OpenEye({ cx, big }: { cx: number; big: boolean }) {
   );
 }
 
-function Eyes({ kind, lid, gaze }: { kind: EyeKind; lid: SharedValue<number>; gaze: SharedValue<number> }) {
-  const blinkTransform = useDerivedValue(() => [{ translateX: gaze.value }, { scaleY: Math.max(0.08, lid.value) }]);
+function Eyes({ kind }: { kind: EyeKind }) {
   switch (kind) {
     case 'open':
     case 'big':
       return (
         <>
           {EYE_X.map((cx) => (
-            <Group key={cx} origin={{ x: cx, y: EYE_Y }} transform={blinkTransform}>
-              <OpenEye cx={cx} big={kind === 'big'} />
-            </Group>
+            <OpenEye key={cx} cx={cx} big={kind === 'big'} />
           ))}
         </>
       );
@@ -241,21 +238,22 @@ function ExtraPart({ kind }: { kind: Extra }): ReactNode {
 
 interface FaceArtProps {
   face: BudiFaceId;
-  /** Augenlid: 1 offen, 0 zu (Blinzeln). Wirkt nur auf offene Augen. */
-  lid: SharedValue<number>;
-  /** Blickrichtung in Leinwand-Einheiten (links negativ). */
-  gaze: SharedValue<number>;
+  /**
+   * 'eyes' nur die Augen, 'rest' alles andere. Getrennt, damit Blinzeln und Blick als
+   * View-Transform laufen und keine Leinwand neu zeichnen muss.
+   */
+  part: 'eyes' | 'rest';
 }
 
 /** Budis Gesicht je Zustand (B10), gezeichnet statt Bild-Ebene. */
-export function FaceArt({ face, lid, gaze }: FaceArtProps) {
+export function FaceArt({ face, part }: FaceArtProps) {
   const spec = FACES[face];
+  if (part === 'eyes') return <Eyes kind={spec.eyes} />;
   return (
     <Group>
       {spec.extras.map((e) => (
         <ExtraPart key={e} kind={e} />
       ))}
-      <Eyes kind={spec.eyes} lid={lid} gaze={gaze} />
       <Mouth kind={spec.mouth} />
     </Group>
   );

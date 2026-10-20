@@ -35,7 +35,7 @@ export function MoldSpot({ canvasSize }: { canvasSize: number }) {
         top: canvasSize * MOLD_SPOT.y - size / 2,
       }}
     >
-      <AssetImage source={healthAssets.u17_mold} label={healthText.moldPlaceholder} color="plantLight" size={size} round />
+      <AssetImage source={healthAssets.u17_mold} label={healthText.moldPlaceholder} color="plantLight" size={size} round icon="mold" />
     </Pressable>
   );
 }

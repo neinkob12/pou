@@ -3,9 +3,9 @@ import Animated, { type SharedValue } from 'react-native-reanimated';
 
 import type { Condition } from '../../game/needs';
 import type { CareReaction } from '../room/care/CareStage';
-import { ArtCanvas } from './art/ArtCanvas';
+import { ArtCanvas } from '../ui/ArtCanvas';
 import { CareFx } from './art/CareFx';
-import { FaceArt } from './art/FaceArt';
+import { EYE_Y, FaceArt } from './art/FaceArt';
 import { PLANT_H } from './art/geometry';
 import { HarvestArt } from './art/HarvestArt';
 import { plantPalette } from './art/palette';
@@ -37,15 +37,15 @@ interface BudiProps {
 
 /**
  * Budi als Vektorgrafik (Skia): Pflanze je Phase, Topf, Gesicht je Zustand, Accessoire.
- * Zwei Leinwände: Die Pflanze ändert sich nur mit der Phase (einmal gerendert, wippt per
- * View-Transform), der Topf mit Gesicht zeichnet nur beim Blinzeln neu.
+ * Pflanze und Topf ändern sich nur mit der Phase (einmal gerendert, wippen per View-Transform).
+ * Blinzeln und Blick bewegen die Augen-Ebene per View-Transform: keine Leinwand zeichnet laufend neu.
  */
 export function Budi({ condition, reaction, hovering, accessory, size = BUDI_SIZE }: BudiProps) {
   const look = useBudiLook(condition, reaction, hovering);
   const asleep = look.face === 'b10_face_snoring';
   const idle = look.pot !== null && look.face !== 'b10_face_coma';
   const eyesOpen = look.face !== null && canBlink(look.face);
-  const motion = useBudiMotion(idle, eyesOpen, asleep, reaction, hovering);
+  const motion = useBudiMotion(idle, eyesOpen, asleep, reaction, hovering, size);
   const { plant } = look;
   const palette = plantPalette(plant?.tint ?? null, look.ripe);
   const harvested = plant !== null && look.pot === null;
@@ -76,10 +76,21 @@ export function Budi({ condition, reaction, hovering, accessory, size = BUDI_SIZ
           </View>
         ) : null}
         {look.pot ? (
-          <ArtCanvas width={size} height={size} style={StyleSheet.absoluteFill}>
+          <ArtCanvas width={size} height={size} style={StyleSheet.absoluteFill} still>
             <PotArt />
-            {look.face ? <FaceArt face={look.face} lid={motion.lid} gaze={motion.gaze} /> : null}
           </ArtCanvas>
+        ) : null}
+        {look.pot && look.face ? (
+          <>
+            <ArtCanvas width={size} height={size} style={StyleSheet.absoluteFill} still>
+              <FaceArt face={look.face} part="rest" />
+            </ArtCanvas>
+            <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.eyes, motion.eyeStyle]}>
+              <ArtCanvas width={size} height={size} still>
+                <FaceArt face={look.face} part="eyes" />
+              </ArtCanvas>
+            </Animated.View>
+          </>
         ) : null}
         {accessory && look.pot ? <BudiLayer source={accessory} /> : null}
       </Animated.View>
@@ -92,5 +103,7 @@ export function Budi({ condition, reaction, hovering, accessory, size = BUDI_SIZ
 const styles = StyleSheet.create({
   // Topfboden unten mittig: Wippen und Squash drehen und stauchen um diesen Punkt.
   origin: { transformOrigin: 'bottom' },
+  // Lider klappen um die Augenlinie.
+  eyes: { transformOrigin: `50% ${EYE_Y}%` },
   plantBox: { position: 'absolute', left: 0, right: 0, top: 0, transformOrigin: 'bottom' },
 });

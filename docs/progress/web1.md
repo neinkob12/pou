@@ -1,16 +1,20 @@
 # WEB-1: Web-Version, Grafik von Budi und Zimmer
 
-Branch: `claude/auftrag-39-web-1-web-version-grafik-von-budi-und-zi` · PRs: Teil 1 Budi (dieser), Teil 2 Zimmer, Teil 3 Balken und Knöpfe · Kollege: Session a39
+Branch: `claude/auftrag-39-web-1-web-version-grafik-von-budi-und-zi` · PR: #46 · Kollege: Session a39
 
-Gearbeitet in kleinen PRs, damit jeder Stand gleich auf Pages sichtbar ist.
+Drei Teile als eigene Commits (Budi, Zimmer, Balken und Knöpfe). Geplant waren drei PRs, aber der Auftrag hat nur einen Branch und #46 war beim Push von Teil 2 noch nicht gemergt, also liegen alle drei in #46.
 
 ## Vorher und nachher
 
-| Vorher | Nachher (Budi, Teil 1) |
-| --- | --- |
-| ![](web1/vorher-zimmer.png) | ![](web1/budi-galerie.png) |
+| Vorher | Nachher Tag | Nachher Nacht |
+| --- | --- | --- |
+| ![](web1/vorher-zimmer.png) | ![](web1/nachher-tag.png) | ![](web1/nachher-nacht.png) |
 
-Budi im Zimmer (Browser, 390 x 844): Blüte nachts schlafend, Gießkanne schwebt (überrascht), gestresst, beleidigt, erntereif mit bernsteinfarbenen Härchen.
+| Ohne Samen | Alle Phasen, Gesichter, Ernte |
+| --- | --- |
+| ![](web1/nachher-leer.png) | ![](web1/budi-galerie.png) |
+
+Zwischenstand nach Teil 1, Zimmer noch Platzhalter: Blüte nachts schlafend, Gießkanne schwebt (überrascht), gestresst, beleidigt, erntereif mit bernsteinfarbenen Härchen.
 
 ![](web1/budi-zimmer.png)
 
@@ -31,16 +35,34 @@ Budi im Zimmer (Browser, 390 x 844): Blüte nachts schlafend, Gießkanne schwebt
 - Animation (`useBudiMotion.ts`): Atmen (im Schlaf langsamer und tiefer), Wippen der Pflanze, Blinzeln, ab und zu ein Blick zur Seite, Squash-and-Stretch nach Pflege, Wackeln beim Streicheln, Kopfschütteln bei falscher Pflege, Wachsen beim Schweben eines Werkzeugs.
 - Farben der Zeichnung: eigener Abschnitt `artColors` in `src/lib/theme.ts`.
 
-### Leistung im Browser
+### Teil 2: Zimmer
 
-- Zwei Leinwände je Budi: Die Pflanze wird einmal gerendert und wippt per View-Transform. Topf und Gesicht zeichnen nur neu, wenn Budi blinzelt oder schaut (Timer statt Dauer-Animation).
-- Statische Leinwände (`ArtCanvas still`) geben im Browser ihren WebGL-Kontext sofort wieder frei. Chrome erlaubt nur 16 gleichzeitig, mit Minispielen und Shop wäre das sonst knapp.
+- `src/components/room/art/RoomArt.tsx`: Wand mit Verlauf und Tapetenstreifen, Fußleiste, Fenster mit Vorhängen (Tag: Sonne, Wolke, Sonnenlicht auf dem Boden; Nacht: Mond, Sterne), Regal mit Büchern, Mini-Kaktus und Bilderrahmen, Holzboden, Teppich mit Schatten unter Budi.
+- `roomLayout.ts`: Lage der Möbel. Der Boden hängt am unteren Rand (dort steht Budi), Fenster und Regal am oberen. Getestet für 320 x 568 bis 430 x 932.
+- `RoomBackground.tsx`: zeichnet das Zimmer; liegt später ein Bild H1/H2 in `assets.ts`, gewinnt das Bild.
+- `Lamp.tsx` mit `art/LampArt.tsx`: Pendel-Pflanzenlampe, LEDs leuchten bei Tag, weicher Lichtkegel nach unten. Tippfläche mindestens 44 hoch.
+- `useBudiLook` liest die Zeit im gleichen Takt wie das Zimmer (`usePlantClock`): Budi wacht auf, wenn die Lampe angeht, auch im Zeitraffer.
+
+### Teil 3: Balken, Icons, Knöpfe
+
+- `src/components/ui/icons/`: 15 gezeichnete Icons im Budi-Stil (Wasser, Nährstoffe, Licht, Laune, Münze, Gießkanne, zwei Dünger, Spiele, Shop, Album, Einstellungen, Spinnmilbe, Trauermücke, Schimmel).
+- `AssetImage` hat die Option `icon`: fehlt die Bilddatei, kommt das gezeichnete Icon statt des Platzhalters. Benutzt in Balken, Münze, Werkzeugen, Navigation, Schädlingen und Schimmel.
+- `ArtCanvas` liegt jetzt in `src/components/ui/` (gemeinsam für Budi, Zimmer, Icons).
+- Balken (`Bar`, `AnimatedBar`): 12 hoch, cremefarbene Spur, runde Füllung mit Glanzkante.
+- `Button`: Kontur und Kante unten, sinkt beim Drücken ein, mindestens 48 hoch.
+- Balkenleiste als Karte, Münz-Pille mit Kontur (44 hoch), Navigation mit Icon-Kacheln (48 x 48).
+
+### Leistung im Browser (Chromium, 390 x 844, 4-fache CPU-Drosselung, 15 s gemessen)
+
+- Budi wach bei Tag: 58,6 fps; Budi schläft: 59 bis 59,6 fps. Ausreißer sind einzelne Frames mit 33 ms.
+- Keine Leinwand zeichnet laufend: Pflanze, Topf, Gesicht, Zimmer und Icons rendern einmal und geben im Browser ihren WebGL-Kontext sofort frei (Chrome erlaubt 16). Atmen, Wippen, Blinzeln und Blick laufen als View-Transform. Erste Fassung hat beim Blinzeln die Leinwand neu gezeichnet: 34 lange Frames in 15 s, jetzt 6 bis 15.
+- Keine Konsolenfehler im Zimmer, Shop und Spiele-Tab.
 
 ## Offen
 
-- Teil 2: Zimmer (Hintergrund mit Tiefe, Fenster mit Tag und Nacht, Regal, Lampe).
-- Teil 3: Balken, Icons und Knöpfe einheitlich.
 - Accessoires (Hüte, Brille) sind weiter Platzhalter-PNGs auf Budi.
+- Die Tab-Leiste auf Shop, Spiele, Album, Einstellungen hat noch Punkt-Icons (`TabIcon`, gesetzt in `app/_layout.tsx`). Die Icons dafür gibt es jetzt (`GameIcon`), einhängen ist eine Zeile je Tab.
+- Shop-Karten, Ernte-Screens und Minispiele nutzen noch Platzhalter. Ernte und Minispiele gehören WEB-3 und WEB-2, daher nicht angefasst.
 
 ## Fehlende Assets
 
@@ -56,7 +78,7 @@ Budi im Zimmer (Browser, 390 x 844): Blüte nachts schlafend, Gießkanne schwebt
 2. Debug-Menü, +7 Tage mehrmals: Die Pflanze wächst sichtbar je Phase, in der Blüte kommen Knospen.
 3. Über Budi wischen: Herzen steigen auf, Budi wackelt und lacht.
 4. Gießkanne über Budi halten: Er schaut überrascht und wird größer. Loslassen: Tropfen steigen auf.
-5. Nachts (Lichtplan): Budi schläft mit Zs und atmet langsam.
+5. Nachts (Lichtplan): Budi schläft mit Zs und atmet langsam, das Fenster zeigt Mond und Sterne. Bei Tag leuchtet die Lampe mit Lichtkegel.
 
 ## Entscheidungen
 

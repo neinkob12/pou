@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { lightPhase, room } from '../../content/strings';
 import { gameEvents } from '../../game/events';
 import { room as roomAssets } from '../../lib/assets';
-import { ArtCanvas } from '../budi/art/ArtCanvas';
+import { ArtCanvas } from '../ui/ArtCanvas';
 import { AssetImage } from '../ui/AssetImage';
 import { LampArt, LightCone } from './art/LampArt';
 import { lampTapOutcome } from './phase/lightCycle';

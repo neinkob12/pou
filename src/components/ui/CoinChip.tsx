@@ -13,9 +13,9 @@ export function CoinChip({ coins, accessibilityLabel }: CoinChipProps) {
   return (
     <View
       accessibilityLabel={accessibilityLabel}
-      className="flex-row items-center gap-2 rounded-full bg-white px-3 py-1"
+      className="min-h-11 flex-row items-center gap-2 rounded-full border-2 border-plantDark bg-white px-3 py-1"
     >
-      <AssetImage source={ui.u9_coin} label="U9" color="coral" size={22} round />
+      <AssetImage source={ui.u9_coin} label="U9" color="coral" size={24} round icon="coin" />
       <Text className="font-body-bold text-base text-ink">{coins}</Text>
     </View>
   );

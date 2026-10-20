@@ -5,7 +5,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-na
 
 import { artColors, colors } from '../../../lib/theme';
 import type { CareReaction } from '../../room/care/CareStage';
-import { ArtCanvas } from './ArtCanvas';
+import { ArtCanvas } from '../../ui/ArtCanvas';
 
 const FX_MS = 1100;
 /** Wie weit die Teilchen in Budi-Höhen aufsteigen. */

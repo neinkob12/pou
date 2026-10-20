@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 import Animated, { cancelAnimation, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 
 import { artColors } from '../../../lib/theme';
-import { ArtCanvas } from './ArtCanvas';
+import { ArtCanvas } from '../../ui/ArtCanvas';
 
 const FLOAT_MS = 2400;
 /** Größe der Z-Leinwand relativ zu Budi. */

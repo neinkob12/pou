@@ -8,12 +8,15 @@ import { playPickupHaptic } from '../room/care/haptics';
 import { pestSpots } from '../room/health/healthLogic';
 import { MoldSpot } from '../room/health/MoldSpot';
 import { AssetImage } from '../ui/AssetImage';
+import type { GameIconId } from '../ui/icons/iconArt';
 import { BUDI_SIZE } from './Budi';
 
 /** Größe eines Schädlings als Anteil der Budi-Leinwand. Klein, aber gut zu treffen. */
 const PEST_SIZE = 0.13;
 /** Extra Trefferfläche rundum in Punkten. */
 const PEST_HIT_SLOP = 10;
+
+const PEST_ART: Record<PestKind, GameIconId> = { spiderMite: 'mite', fungusGnat: 'gnat' };
 
 const PEST_ASSET: Record<PestKind, HealthAssetId> = {
   spiderMite: 'u17_spider_mite',
@@ -47,6 +50,7 @@ export function Pests({ size = BUDI_SIZE }: { size?: number }) {
             color={pest.kind === 'spiderMite' ? 'coral' : 'night'}
             size={pestSize}
             round
+            icon={PEST_ART[pest.kind]}
           />
         </Pressable>
       ))}

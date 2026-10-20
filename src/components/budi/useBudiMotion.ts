@@ -42,15 +42,13 @@ const WIGGLE_MS = 110;
 interface BudiMotion {
   bodyStyle: ReturnType<typeof useAnimatedStyle>;
   plantStyle: ReturnType<typeof useAnimatedStyle>;
-  /** Augenlid fürs Gesicht (1 offen, 0 zu). */
-  lid: SharedValue<number>;
-  /** Blickrichtung fürs Gesicht. */
-  gaze: SharedValue<number>;
+  /** Augen-Ebene: Blinzeln (scaleY) und Blick zur Seite. */
+  eyeStyle: ReturnType<typeof useAnimatedStyle>;
 }
 
 /**
- * Blinzeln und Blick per Timer statt Dauer-Animation: Die Gesichts-Leinwand zeichnet nur neu,
- * wenn sich wirklich etwas bewegt. Das hält den Browser bei 60 fps.
+ * Blinzeln und Blick per Timer statt Dauer-Animation: Es läuft nur etwas, wenn sich die Augen
+ * wirklich bewegen. Das hält den Browser bei 60 fps.
  */
 function useEyeLife(active: boolean): { lid: SharedValue<number>; gaze: SharedValue<number> } {
   const lid = useSharedValue(1);
@@ -98,6 +96,7 @@ export function useBudiMotion(
   asleep: boolean,
   reaction: CareReaction | null,
   hovering: SharedValue<number>,
+  size: number,
 ): BudiMotion {
   const breath = useSharedValue(0);
   const sway = useSharedValue(0);
@@ -171,5 +170,9 @@ export function useBudiMotion(
   });
   const plantStyle = useAnimatedStyle(() => ({ transform: [{ rotate: `${sway.value * SWAY_DEG}deg` }] }));
 
-  return { bodyStyle, plantStyle, lid, gaze };
+  const eyeStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: (gaze.value * size) / 100 }, { scaleY: Math.max(0.08, lid.value) }],
+  }));
+
+  return { bodyStyle, plantStyle, eyeStyle };
 }

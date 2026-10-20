@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ImageBackground, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 
 import { room as roomAssets } from '../../lib/assets';
-import { ArtCanvas } from '../budi/art/ArtCanvas';
+import { ArtCanvas } from '../ui/ArtCanvas';
 import { RoomArt } from './art/RoomArt';
 import { usePlantStatus } from './phase/usePlantStatus';
 

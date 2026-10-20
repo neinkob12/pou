@@ -110,4 +110,5 @@ export const artColors = {
   glowFade: 'rgba(255,212,92,0)',
   metal: '#5B6B7A',
   metalLight: '#8B9CAB',
+  mold: '#E8E6D9',
 } as const;
