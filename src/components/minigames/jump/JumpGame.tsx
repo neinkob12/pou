@@ -1,7 +1,7 @@
 // Budi Jump: Budi springt automatisch von Blatt zu Blatt nach oben, gelenkt per Neigen oder Tippen.
 // Physik läuft im Frame-Callback auf dem UI-Thread; React bekommt nur Punkte und das Spielende.
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Text, View, type LayoutChangeEvent } from 'react-native';
 import { useFrameCallback, useSharedValue } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
@@ -11,7 +11,12 @@ import { BUDI_JUMP, MINIGAME_FRAMEWORK } from '../../../game/config';
 import { useGameStore } from '../../../store/gameStore';
 import type { MinigameSession } from '../framework/useMinigameSession';
 import { JumpScene } from './JumpScene';
-import { advanceWorld, createWorld, fillPlatforms, revive, scoreForHeight, type JumpWorld } from './jumpPhysics';
+import { fillPlatforms } from './jumpLevel';
+import { listenForJumpLightBonus } from './jumpLightBonus';
+import { advanceWorld, revive, scoreForHeight } from './jumpPhysics';
+import { JUMP_GAME_ID, recordHeight } from './jumpReward';
+import { createWorld, type JumpWorld } from './jumpWorld';
+import { RecordMark } from './RecordMark';
 import { useJumpInput } from './useJumpInput';
 
 export function JumpGame({ session }: { session: MinigameSession }) {
@@ -22,6 +27,16 @@ export function JumpGame({ session }: { session: MinigameSession }) {
   const world = useSharedValue<JumpWorld>(createWorld(seed));
   const size = useSharedValue({ width: 0, height: 0 });
   const reported = useSharedValue(0);
+  const reportedLights = useSharedValue(0);
+  const [lights, setLights] = useState(0);
+  const lightsRef = useRef(0);
+  // Rekord zu Rundenbeginn: die Marke bleibt stehen, auch wenn Budi sie überholt.
+  const [recordY] = useState(() => recordHeight(useGameStore.getState().minigameHighscores[JUMP_GAME_ID] ?? 0));
+
+  const onLights = useCallback((count: number) => {
+    lightsRef.current = count;
+    setLights(count);
+  }, []);
 
   useFrameCallback((frame) => {
     'worklet';
@@ -43,8 +58,15 @@ export function JumpGame({ session }: { session: MinigameSession }) {
       scheduleOnRN(addScore, score - reported.get());
       reported.set(score);
     }
+    if (next.lightsCollected > reportedLights.get()) {
+      reportedLights.set(next.lightsCollected);
+      scheduleOnRN(onLights, next.lightsCollected);
+    }
     if (next.fallen && !before.fallen) scheduleOnRN(endGame);
   });
+
+  // Lichtbonus für Budi, sobald das Framework das Rundenende meldet (minigameFinished).
+  useEffect(() => listenForJumpLightBonus(() => lightsRef.current), []);
 
   // Extra-Leben (P29): Budi bekommt ein frisches Blatt unten im Bild.
   useEffect(() => {
@@ -71,6 +93,12 @@ export function JumpGame({ session }: { session: MinigameSession }) {
       onTouchCancel={input.onTouch}
     >
       <JumpScene world={world} size={size} />
+      {recordY !== null && <RecordMark height={recordY} world={world} size={size} />}
+      <View className="absolute left-3 top-2 rounded-full bg-white px-3 py-1" pointerEvents="none">
+        <Text className="font-body-bold text-sm text-ink">
+          {jumpGame.lights}: {lights}
+        </Text>
+      </View>
       {phase === 'countdown' && (
         <View className="absolute inset-x-0 bottom-6 items-center gap-1 px-6" pointerEvents="none">
           <Text className="text-center font-body text-base text-ink">

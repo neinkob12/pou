@@ -303,6 +303,26 @@ export const BUDI_JUMP = {
   tiltDeadZone: 0.04,
   /** Takt des Beschleunigungssensors in ms. */
   sensorIntervalMs: 16,
+  // Feinschliff (Auftrag P22): Plattform-Typen, Lichtpunkte, Lichtbonus.
+  /** Absprung von einem Feder-Blatt. Sprunghöhe ≈ 2,3 × normal (≈ 136). */
+  springVelocity: 266,
+  /** Anteil brechender Blätter: am Start und ab difficultyHeight (dazwischen linear). */
+  breakingChance: { start: 0, hard: 0.35 },
+  /** Anteil Feder-Blätter: am Start und ab difficultyHeight. */
+  springChance: { start: 0.1, hard: 0.05 },
+  /** So schnell fällt ein gebrochenes Blatt nach unten (Einheiten pro Sekunde). */
+  brokenFallSpeed: 120,
+  /** Chance je Blatt, dass darüber ein Lichtpunkt schwebt. */
+  lightChance: 0.3,
+  /** Lichtpunkt so weit über dem Blatt (unter der Sprunghöhe, also erreichbar). */
+  lightLift: { min: 12, max: 40 },
+  lightRadius: 3,
+  /** Lichtbonus für Budi je gesammeltem Lichtpunkt (Licht-Balken 0 bis 100). */
+  lightBonusPerPoint: 2,
+  /** Höchster Lichtbonus pro Runde. */
+  lightBonusMaxPerRound: 30,
+  /** Höchstes Licht-Guthaben, bis der Licht-Balken es abholt. */
+  lightBankMax: 100,
 } as const;
 
 // ---------------------------------------------------------------------------
