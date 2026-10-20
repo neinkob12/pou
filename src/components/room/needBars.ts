@@ -3,6 +3,7 @@
 
 import type { ColorName } from '../../lib/theme';
 import type { UiAssetId } from '../../lib/assets';
+import type { GameIconId } from '../ui/icons/iconArt';
 
 export type NeedBarId = 'water' | 'nutrients' | 'light' | 'mood';
 
@@ -10,13 +11,15 @@ export interface NeedBarDef {
   id: NeedBarId;
   color: ColorName;
   icon: UiAssetId;
+  /** Gezeichnetes Icon, solange `icon` keine Datei hat (WEB-1). */
+  art: GameIconId;
 }
 
 export const NEED_BARS: readonly NeedBarDef[] = [
-  { id: 'water', color: 'night', icon: 'u11_water' },
-  { id: 'nutrients', color: 'plantLight', icon: 'u11_nutrients' },
-  { id: 'light', color: 'lamp', icon: 'u11_light' },
-  { id: 'mood', color: 'coral', icon: 'u11_mood' },
+  { id: 'water', color: 'night', icon: 'u11_water', art: 'water' },
+  { id: 'nutrients', color: 'plantLight', icon: 'u11_nutrients', art: 'nutrients' },
+  { id: 'light', color: 'lamp', icon: 'u11_light', art: 'light' },
+  { id: 'mood', color: 'coral', icon: 'u11_mood', art: 'mood' },
 ];
 
 /** Füllstand je Balken, 0 bis 100. */
