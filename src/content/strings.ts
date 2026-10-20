@@ -18,6 +18,37 @@ export const tabs = {
 
 export const room = {
   title: 'Budis Zimmer',
+  background: 'Hintergrund (H1)',
+  lamp: 'Lampe (U2)',
+  pot: 'Topf (U1)',
+  plant: 'Budi',
+  noPlant: 'Noch kein Samen gepflanzt',
+  remainingHours: (hours: number) => `noch ${hours} Std.`,
+  remainingLessThanHour: 'noch unter 1 Std.',
+  openEnd: 'Du entscheidest',
+  readyToHarvest: 'Bereit zur Ernte',
+  needs: {
+    water: 'Wasser',
+    nutrients: 'Nährstoffe',
+    light: 'Licht',
+    mood: 'Laune',
+  },
+  actions: {
+    water: 'Gießen',
+    fertilize: 'Düngen',
+    pet: 'Streicheln',
+  },
+  nav: {
+    minigames: 'Spiele',
+    shop: 'Shop',
+    album: 'Album',
+    settings: 'Einstellungen',
+  },
+  coinsLabel: (coins: number) => `${coins} Münzen`,
+};
+
+export const modal = {
+  close: 'Schließen',
 };
 
 export const minigames = {
