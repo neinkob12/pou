@@ -3,6 +3,7 @@
 // Objekt `slices` (plus Import). Der Schlüssel ist der Bereichsname.
 
 import { createDebugSlice } from './debug';
+import { createHarvestSlice } from './harvest';
 import { createHealthSlice } from './health';
 import { createMinigamesSlice } from './minigames';
 import { createNeedsSlice } from './needs';
@@ -18,6 +19,7 @@ export const slices = {
   debug: createDebugSlice,
   onboarding: createOnboardingSlice,
   minigames: createMinigamesSlice,
+  harvest: createHarvestSlice,
 };
 
 type UnionToIntersection<U> = (U extends unknown ? (arg: U) => void : never) extends (
