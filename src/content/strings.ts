@@ -157,6 +157,44 @@ export const harvestScreen = {
 
 export const seedSelect = {
   title: 'Samen wählen',
+  intro: 'Welcher Samen kommt in den Topf?',
+  plant: 'Pflanzen',
+  potBusy: 'Budi ist noch nicht fertig. Erst ernten und trocknen, dann kommt ein neuer Samen.',
+};
+
+/** Sorten-Album und Level (P16). */
+export const strainsAlbum = {
+  level: (level: number) => `Level ${level}`,
+  xp: (into: number, needed: number) => `${into} / ${needed} XP`,
+  maxLevel: 'Höchstes Level erreicht',
+  seedFragments: (count: number) => `${count} Samen-Fragmente`,
+  harvests: (count: number) => `${count} Ernten`,
+  locked: 'Gesperrt',
+  unlocked: 'Freigeschaltet',
+  floweringWeeks: (weeks: number) => `${weeks} Wochen Blüte`,
+  autoflower: 'Autoflower',
+  portrait: (name: string) => `${name} (U15)`,
+  rarity: {
+    common: 'Gewöhnlich',
+    rare: 'Selten',
+    epic: 'Episch',
+    speed: 'Schnell',
+    legendary: 'Legendär',
+  },
+  special: {
+    gustav: 'Pflegeleicht und gutmütig. Perfekt für den Anfang.',
+    lotte: 'Färbt sich in der Blüte lila und bringt mehr Münzen.',
+    sascha: 'Wird riesig und braucht lange, dafür viel Ertrag.',
+    anton: 'Blüht von selbst, ganz ohne Lichtwechsel. Kleiner, aber flott.',
+    koelsch: 'Spricht Kölsch und ist besonders wertvoll.',
+  },
+  unlockHint: {
+    start: 'Von Anfang an dabei',
+    harvests: (current: number, target: number) => `Freischalten: ${current} / ${target} Ernten`,
+    seedFragments: (current: number, target: number) => `Freischalten: ${current} / ${target} Samen-Fragmente`,
+    level: (target: number) => `Freischalten: ab Level ${target}`,
+    event: 'Freischalten: nur bei einem besonderen Ereignis',
+  },
 };
 
 export const onboarding = {
