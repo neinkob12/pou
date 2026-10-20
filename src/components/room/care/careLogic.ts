@@ -75,6 +75,14 @@ export function moodBonusAction(phase: PhaseId | null): CareAction | null {
   return { type: 'pet', phase, amount: MINIGAME_REWARDS.moodPerRound };
 }
 
+/** Phasen mit geschützter Dunkelphase (12/12, wie lightSchedule aus P11). Nur hier stört die Lampe. */
+const DARK_DISTURB_PHASES: readonly PhaseId[] = ['flowering', 'ready'];
+
+/** Kostet das Antippen der Lampe nachts Laune? Nur in der Blüte. */
+export function isDarkDisturbPhase(phase: PhaseId | null): phase is PhaseId {
+  return phase !== null && DARK_DISTURB_PHASES.includes(phase);
+}
+
 export interface Rect {
   x: number;
   y: number;

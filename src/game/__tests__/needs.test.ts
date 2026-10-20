@@ -12,6 +12,7 @@ import {
 } from '../config';
 import {
   applyCare,
+  applyMoodPenalty,
   computeNeeds,
   createNeeds,
   deriveCondition,
@@ -179,6 +180,31 @@ describe('needs: Koma', () => {
   it('Pflege kurz vor der Schwelle verhindert das Koma', () => {
     const cared = applyCare(createNeeds(T0), { type: 'pet', phase: VEG }, hours(23));
     expect(isInComa(cared, hours(30))).toBe(false);
+  });
+});
+
+describe('needs: applyMoodPenalty', () => {
+  it('senkt nur die Laune, zählt nicht als Pflege', () => {
+    const s = createNeeds(T0);
+    const after = applyMoodPenalty(s, 10, 'flowering', hours(1));
+    const n = computeNeeds(after, hours(1), NO_MODIFIERS, 'flowering');
+    expect(n.mood).toBeCloseTo(NEED_START.mood - NEED_DECAY_PER_REAL_HOUR.mood - 10);
+    expect(n.water).toBeCloseTo(NEED_START.water - NEED_DECAY_PER_REAL_HOUR.water);
+    expect(after.lastCareAtMs).toBe(T0);
+    expect(after.updatedAtMs).toBe(hours(1));
+    expect(s.values.mood).toBe(NEED_START.mood);
+  });
+
+  it('schützt nicht vor dem Koma und wirkt im Koma nicht', () => {
+    const after = applyMoodPenalty(createNeeds(T0), 10, 'flowering', hours(23));
+    expect(isInComa(after, hours(COMA_AFTER_REAL_HOURS))).toBe(true);
+    const comatose = createNeeds(T0);
+    expect(applyMoodPenalty(comatose, 10, 'flowering', hours(COMA_AFTER_REAL_HOURS))).toBe(comatose);
+  });
+
+  it('Laune fällt nicht unter 0', () => {
+    const after = applyMoodPenalty(createNeeds(T0), 500, 'flowering', T0);
+    expect(after.values.mood).toBe(0);
   });
 });
 

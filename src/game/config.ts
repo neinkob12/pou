@@ -238,6 +238,9 @@ export const BLOOM_FERTILIZER_PHASES: readonly PhaseId[] = ['flowering', 'ready'
 /** Füllstand aller Balken nach dem Wiederbeleben aus dem Koma (Kosten regelt P05). */
 export const COMA_REVIVE_NEED_LEVEL = 50;
 
+/** Laune-Abzug, wenn die Lampe in der Dunkelphase der Blüte angetippt wird (P10b). Vorläufig, Chef bestätigt, P32 prüft. */
+export const DARK_DISTURB_MOOD_PENALTY = 10;
+
 // ---------------------------------------------------------------------------
 // Ertrag und Wirtschaft
 // ---------------------------------------------------------------------------

@@ -8,6 +8,7 @@ import { getPlantStatus } from '../game/timeEngine';
 import {
   careFeedback,
   computeCareView,
+  isDarkDisturbPhase,
   moodBonusAction,
   type CareFeedback,
   type CareView,
@@ -40,6 +41,18 @@ export function applyMinigameMoodBonus(): void {
   const phase = state.plant ? getPlantStatus(state.plant, nowMs, selectDebugMultiplier(state)).phase : null;
   const action = moodBonusAction(phase);
   if (action) state.care(action, nowMs, selectUpgradeEffects(state).needModifiers);
+}
+
+/**
+ * Dunkelphase gestört (Ereignis lightDisturbed, P11): Laune sinkt über disturbMood, nur in der Blüte.
+ * Rückgabe: ob es gewirkt hat (nicht ohne Pflanze, außerhalb der Blüte oder im Koma).
+ */
+export function applyLightDisturbance(nowMs: number = clock.now()): boolean {
+  const state = useGameStore.getState();
+  if (!state.plant) return false;
+  const { phase } = getPlantStatus(state.plant, nowMs, selectDebugMultiplier(state));
+  if (!isDarkDisturbPhase(phase)) return false;
+  return state.disturbMood(phase, nowMs);
 }
 
 export interface UseNeeds extends CareView {
