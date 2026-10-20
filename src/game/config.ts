@@ -242,6 +242,35 @@ export const COMA_REVIVE_NEED_LEVEL = 50;
 export const DARK_DISTURB_MOOD_PENALTY = 10;
 
 // ---------------------------------------------------------------------------
+// Minigames: Tropfen-Fang (Auftrag P13)
+// ---------------------------------------------------------------------------
+
+/** Tropfen-Fang: Topf unten fängt Wasser und Dünger, Salz kostet ein Leben. Längen in Punkten (dp). */
+export const DROPS_GAME = {
+  lives: 3,
+  /** Höchstens so viel füllt eine Runde je Balken auf (Wasser und Nährstoffe getrennt). */
+  maxBarGainPerRound: 40,
+  /** So viel füllt ein gefangener Tropfen auf seinen Balken. */
+  barGainPerDrop: 4,
+  pointsPerDrop: 1,
+  /** Fallgeschwindigkeit (dp pro Sekunde): Start, Zuwachs pro Spielsekunde, Obergrenze. */
+  startFallSpeed: 160,
+  fallSpeedPerSecond: 6,
+  maxFallSpeed: 520,
+  /** Abstand zwischen zwei neuen Tropfen (ms): Start, Abnahme pro Spielsekunde, Untergrenze. */
+  startSpawnIntervalMs: 1100,
+  spawnIntervalDecreasePerSecond: 12,
+  minSpawnIntervalMs: 420,
+  /** Anteile der Tropfenarten (Summe 1). */
+  spawnWeights: { water: 0.45, fertilizer: 0.3, salt: 0.25 },
+  dropRadius: 14,
+  potWidth: 96,
+  potHeight: 56,
+  /** Abstand des Topfs vom unteren Rand. */
+  potBottomMargin: 16,
+} as const;
+
+// ---------------------------------------------------------------------------
 // Ertrag und Wirtschaft
 // ---------------------------------------------------------------------------
 
@@ -303,6 +332,26 @@ export const BUDI_JUMP = {
   tiltDeadZone: 0.04,
   /** Takt des Beschleunigungssensors in ms. */
   sensorIntervalMs: 16,
+  // Feinschliff (Auftrag P22): Plattform-Typen, Lichtpunkte, Lichtbonus.
+  /** Absprung von einem Feder-Blatt. Sprunghöhe ≈ 2,3 × normal (≈ 136). */
+  springVelocity: 266,
+  /** Anteil brechender Blätter: am Start und ab difficultyHeight (dazwischen linear). */
+  breakingChance: { start: 0, hard: 0.35 },
+  /** Anteil Feder-Blätter: am Start und ab difficultyHeight. */
+  springChance: { start: 0.1, hard: 0.05 },
+  /** So schnell fällt ein gebrochenes Blatt nach unten (Einheiten pro Sekunde). */
+  brokenFallSpeed: 120,
+  /** Chance je Blatt, dass darüber ein Lichtpunkt schwebt. */
+  lightChance: 0.3,
+  /** Lichtpunkt so weit über dem Blatt (unter der Sprunghöhe, also erreichbar). */
+  lightLift: { min: 12, max: 40 },
+  lightRadius: 3,
+  /** Lichtbonus für Budi je gesammeltem Lichtpunkt (Licht-Balken 0 bis 100). */
+  lightBonusPerPoint: 2,
+  /** Höchster Lichtbonus pro Runde. */
+  lightBonusMaxPerRound: 30,
+  /** Höchstes Licht-Guthaben, bis der Licht-Balken es abholt. */
+  lightBankMax: 100,
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -546,10 +595,21 @@ export const COSMETIC_ITEMS: Record<CosmeticId, CosmeticItem> = {
 // Minigames
 // ---------------------------------------------------------------------------
 
+/**
+ * Münzen aus Minigames (Balancing P23, Rechnung in docs/progress/p23.md): Ziel sind 3 Runden am Tag
+ * für ungefähr ein Shop-Upgrade pro Zyklus. Zyklus ≈ 10 echte Tage (TIME_SCALE), also 30 Runden;
+ * ein Upgrade kostet im Schnitt 129 Münzen (UPGRADES, 900 Münzen für 7 Stufen). Typische Runden
+ * (Smash 30, Tropfen 28, Jump 100+ Punkte) bringen 4, 3 und 8 Münzen, zusammen rund 150 pro Zyklus.
+ * Die Obergrenze bremst Jump (Punkte = Höhe / 10, viel höhere Zahlen). Sie muss mindestens die
+ * volle Quiz-Runde tragen (60 Punkte = 8 Münzen = 2 × 4, FACT_QUIZ.perfectMultiplier).
+ */
 export const MINIGAME_REWARDS = {
-  coinsPerPoint: 0.5,
-  maxCoinsPerRound: 50,
+  coinsPerPoint: 0.14,
+  maxCoinsPerRound: 8,
   moodPerRound: 15,
+  /** Annahmen für die Rechnung oben, nur für den Balancing-Test (P32 ersetzt sie durch Messwerte). */
+  plannedRoundsPerDay: 3,
+  typicalScores: { smash: 30, drops: 28, jump: 100 },
 } as const;
 
 /** Gerüst aller Minigames (Auftrag P08). */
@@ -571,4 +631,13 @@ export const TAP_CIRCLE = {
   lifetimeMs: 1400,
   /** Treffer zählen auch etwas außerhalb des Kreises (Finger sind dicker als Pixel). */
   hitSlop: 10,
+} as const;
+
+/** Fakten-Quiz (Auftrag P17). Punkte × coinsPerPoint ergibt die Münzen (P08). */
+export const FACT_QUIZ = {
+  questionsPerRound: 3,
+  pointsPerCorrect: 10,
+  /** Bei voller Punktzahl werden die Punkte und damit die Münzen mit diesem Faktor multipliziert. */
+  perfectMultiplier: 2,
+  durationSeconds: 45,
 } as const;

@@ -1,7 +1,7 @@
 // Steuerung von Budi Jump, ohne React: Neigung oder Tippen wird zur Ziel-Geschwindigkeit.
 
 import { BUDI_JUMP } from '../../../game/config';
-import type { JumpConfig } from './jumpPhysics';
+import type { JumpConfig } from './jumpWorld';
 
 export type JumpControl = 'tilt' | 'tap';
 

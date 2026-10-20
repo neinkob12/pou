@@ -127,8 +127,19 @@ export const cosmetics: Record<CosmeticId, ImageSourcePropType> = {
 // --- Minispiele: Sprites und Hintergründe (P08, P12 bis P14, P22) ---
 export const minigames: AssetMap = {};
 
-// --- Sounds und Musik (P30) ---
-export const sounds: SoundMap = {};
+// --- Sounds und Musik (P23, P30 erweitert) ---
+// Schlüssel = ID aus docs/ASSETS.md plus Kurzname. Die Dateien in assets/sounds/ sind bis zur
+// Lieferung stille Platzhalter unter den endgültigen Namen: echten Sound einfach drüberkopieren.
+// Abgespielt wird nur über src/lib/audio.ts.
+export type SoundId = 's3_tap' | 's4_coins' | 's5_smash_hit' | 's6_jump' | 's11_music_minigames' | 's12_ouch';
+export const sounds: Record<SoundId, number> & SoundMap = {
+  s3_tap: require('../../assets/sounds/s3_tap.m4a'),
+  s4_coins: require('../../assets/sounds/s4_coins.m4a'),
+  s5_smash_hit: require('../../assets/sounds/s5_smash_hit.m4a'),
+  s6_jump: require('../../assets/sounds/s6_jump.m4a'),
+  s11_music_minigames: require('../../assets/sounds/s11_music_minigames.m4a'),
+  s12_ouch: require('../../assets/sounds/s12_ouch.m4a'),
+};
 
 // --- App-Icon und Splash ---
 export const icon = {

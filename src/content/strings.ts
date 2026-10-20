@@ -184,6 +184,20 @@ export const tapGame = {
   circleLabel: 'Kreis',
 };
 
+// Tropfen fangen (Auftrag P13)
+export const dropsGame = {
+  lives: 'Leben',
+  water: 'Wasser',
+  nutrients: 'Nährstoffe',
+  hint: 'Wisch den Topf hin und her. Fang Wasser und Dünger, meide Salz!',
+  rewardTitle: 'Budis Balken',
+  noReward: 'Ohne Pflanze, im Trocknen oder im Koma füllen sich keine Balken.',
+  waterLabel: 'Wassertropfen',
+  fertilizerLabel: 'Dünger',
+  saltLabel: 'Salz',
+  potLabel: 'Topf',
+};
+
 // Budi Jump (Auftrag P14)
 export const jumpGame = {
   hintTilt: 'Neig das Handy, damit Budi zur Seite hüpft.',
@@ -193,6 +207,8 @@ export const jumpGame = {
   controlTilt: 'Neigen',
   controlTap: 'Tippen',
   controlsHint: 'Neigen: Handy kippen. Tippen: linke oder rechte Bildschirmhälfte halten.',
+  lights: 'Licht',
+  recordMark: 'Rekord',
 };
 
 export const smashGame = {
@@ -274,12 +290,46 @@ export const album = {
   knowledgeTab: 'Wissen',
 };
 
+export const facts = {
+  progress: (unlocked: number, total: number) => `${unlocked} von ${total} Karten gesammelt`,
+  lockedTitle: 'Noch gesperrt',
+  lockedHint: (phase: string) => `Budi verrät sie in der Phase ${phase}.`,
+  phaseLabel: (phase: string) => `Phase: ${phase}`,
+  sourceLabel: (source: string) => `Quelle: ${source}`,
+  openSource: 'Quelle öffnen',
+  popupTitle: 'Psst, Budi weiß was!',
+  popupIntro: 'Ich hab gerade was Neues über mich gelernt:',
+  popupMore: (count: number) => `Noch ${count} weitere Karte${count === 1 ? '' : 'n'} warten.`,
+  popupNext: 'Nächste Karte',
+};
+
+export const factQuiz = {
+  questionCounter: (n: number, total: number) => `Frage ${n} von ${total}`,
+  correct: 'Richtig! Budi ist stolz auf dich.',
+  wrong: (answer: string) => `Knapp daneben. Richtig wäre: ${answer}`,
+  next: 'Nächste Frage',
+  finish: 'Auswerten',
+  perfectHint: 'Alles richtig: doppelte Münzen!',
+  notEnoughTitle: 'Noch zu wenig Wissen',
+  notEnoughText: (needed: number) =>
+    `Budi braucht mindestens ${needed} Karten fürs Quiz. Pflege ihn weiter, bei jedem Phasenwechsel verrät er dir etwas Neues.`,
+};
+
 export const settings = {
   title: 'Einstellungen',
   aboutTitle: 'Über',
   aboutText: 'PotPou: Pflege Budi vom Samen bis zur Ernte.',
   versionLabel: 'Version',
   devTitle: 'Entwicklung',
+};
+
+// Ton und Vibration in den Einstellungen (Auftrag P23)
+export const soundSettings = {
+  title: 'Ton und Vibration',
+  music: 'Musik',
+  effects: 'Soundeffekte',
+  haptics: 'Vibration',
+  hint: 'Der Stummschalter deines Handys gilt immer. Andere Apps spielen weiter.',
 };
 
 export const debug = {

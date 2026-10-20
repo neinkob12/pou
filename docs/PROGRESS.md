@@ -2,135 +2,165 @@
 
 Wird vom Leiter (Abteilungsleiter PotPou) nach jedem Merge aus `docs/progress/pNN.md` zusammengeführt. Kollegen schreiben nur ihre eigene Notiz. Du kannst hier selbst Notizen ergänzen.
 
-Stand: 12 von 33 Aufträgen gemergt. Welle 1 fast fertig (P08 offen), Welle 2 und 3 laufen parallel. Plan: `docs/AUFTRAEGE.md`.
+Stand: 24 Aufträge gemergt (inkl. Nacharbeiten P09b, P10b, P27b). Welle 1 und 2 fast fertig, Welle 3 läuft. Plan: `docs/AUFTRAEGE.md`.
 
 ## Auftragsstatus
 
 | Auftrag | Status | PR | Handy-Test offen |
 | --- | --- | --- | --- |
-| P01 Projekt-Setup, CI, Gerüste | gemergt | #2 | ja (Tabs, Routen, Einstellungen) |
-| P02 Spielstand und Persistenz | gemergt | #10 | ja (über Debug-Menü) |
+| P01 Projekt-Setup, CI, Gerüste | gemergt | #2 | ja |
+| P02 Spielstand und Persistenz | gemergt | #10 | ja |
 | P03 Hauptraum-Layout | gemergt | #7 | ja |
 | P04 Bedürfnis-Logik | gemergt | #6 | über P10 |
-| P05 Gesundheits-Logik | gemergt | #8 | erst mit P21 |
-| P06 Ernte-Logik | gemergt | #5 | erst mit P24 |
+| P05 Gesundheits-Logik | gemergt | #8 | über P21 |
+| P06 Ernte-Logik | gemergt | #5 | über P24 |
 | P07 Inhalte: Fakten-Karten, Sprüche | gemergt | #4 | Texte gegenlesen |
-| P08 Minigame-Framework | PR offen (Konflikt mit main) | #12 | |
+| P08 Minigame-Framework | gemergt | #12 | ja |
 | P09 Debug-Menü | gemergt | #9 | ja |
-| P09b Debug: Sorten freischalten | in Arbeit | | |
-| P10 Pflege-Gesten und Balken | gemergt | #15 | ja (Gefühl der Gesten) |
-| P11 Licht, Tag/Nacht, Phasen | PR offen | #14 | |
-| P15 Shop und Upgrades | PR offen | #16 | |
+| P09b Debug: Sorten freischalten | gemergt | #21 | ja |
+| P10 Pflege-Gesten und Balken | gemergt | #15 | ja |
+| P10b Laune-Abzug nachts in der Blüte | gemergt | #31 | ja |
+| P11 Licht, Tag/Nacht, Phasen | gemergt | #14 | ja |
+| P12 Schädlings-Smash | gemergt | #28 | ja |
+| P13 Tropfen-Fang | PR offen | #29 | |
+| P14 Budi Jump, Grundmechanik | gemergt | #30 | ja |
+| P15 Shop und Upgrades | gemergt | #16 | ja |
 | P16 Sorten, Level, Album | gemergt | #17 | ja |
 | P17 Fakten-Karten im UI, Quiz | PR offen | #13 | |
-| P18 Benachrichtigungen | gemergt | #18 | ja (geschlossene App) |
-| P20 Budi-Grafik | in Arbeit | | |
-| P24 Ernte-UI | in Arbeit | | |
-| P26 Onboarding, Altersabfrage | in Arbeit | | |
-| P27 Zeit-Robustheit | gemergt | #19 | erst nach P27b |
-| P12, P13, P14, P19 | wartet auf P08 | | |
+| P18 Benachrichtigungen | gemergt | #18 | ja |
+| P19 Tagesziele | PR offen | #27 | |
+| P20 Budi-Grafik | gemergt | #24 | ja |
+| P21 Krankheiten im UI | gemergt | #25 | ja |
+| P22 Budi Jump, Feinschliff | in Arbeit | | |
+| P24 Ernte-UI | gemergt | #23 | ja |
+| P25 Kosmetik gegen Münzen | in Arbeit | | |
+| P26 Onboarding, Altersabfrage | gemergt | #22 | ja |
+| P27 Zeit-Robustheit | gemergt | #19 | ja |
+| P27b Monotone Uhr eingehängt | gemergt | #26 | ja |
+| P23, P30, P31, P32, P33 | warten auf Vorgänger | | |
+| P28, P29 | warten auf deine Konten | | |
 
 ## Fertig
 
-- Starter-Paket: CLAUDE.md, TECH_STACK.md, Konzept, Sessions, Asset-Liste, Design-Leitfaden, Launch-Checkliste
-- Büro-Betrieb: `docs/AUFTRAEGE.md` (35 Aufträge in 6 Wellen), CI, Prüfskript `scripts/check.sh`, Inhalts-Check, Progress-Notizen je Auftrag
-- P01 (#2): Expo SDK 58 im Repo-Root, alle Pakete, fünf Tabs und alle Platzhalter-Routen, Slice-Store, Event-Bus, Theme, Assets, Strings, Einstellungs-Abschnitte, Album-Tabs, `eas.json`
-- P02 (#10): Persistenz (MMKV) um den Slice-Store, `SAVE_VERSION` und `MIGRATIONS`, Hydration-Status, `harvestsTotal`
-- P03 (#7): Hauptraum aus acht Slots, UI-Bausteine (Button, Bar, Modal, CoinChip, AssetImage), Raum mit eigener unterer Leiste
-- P04 (#6): `src/game/needs.ts` (`computeNeeds`, `applyCare`, `deriveCondition`, Koma), Needs-Slice
-- P05 (#8): `src/game/health.ts` (Schädlinge, Schimmel, Schutzzeit, Koma, Qualitätsmalus in Sternen), Health-Slice, seedbarer Zufall
-- P06 (#5): `src/game/harvest.ts` (`computeYield`, `computeQualityStars`, `harvestRewards`)
-- P07 (#4): `src/content/facts.ts` (10 Fakten-Karten), `src/content/quotes.ts` (Budi-Sprüche je Anlass und Sorte)
-- P09 (#9): Debug-Menü (nur Dev-Build) mit Zeitraffer, Vorspulen, Balken, Münzen, Turbo, Reset
-- P10 (#15): Gießkanne, zwei Dünger, Streicheln mit Haptik und Animation, echte Balken, `useNeeds()`
-- P16 (#17): Sorten-Freischaltung, Level, Album-Tab "Sorten", Samenauswahl
-- P18 (#18): Lokale Benachrichtigungen (max. 3 am Tag, Ruhezeit 22 bis 9 Uhr), Erlaubnis erst nach der ersten Pflege, Schalter in den Einstellungen
-- P27 (#19): Monotone Uhr `src/game/clock.ts` (Alter sinkt nie), Tests für Zeitumstellung, zurückgestellte Uhr, Wochen Abwesenheit
+- Starter-Paket, Büro-Betrieb (Plan, CI, Prüfskript, Inhalts-Check)
+- P01 (#2): Expo SDK 58, Router mit fünf Tabs und allen Platzhalter-Routen, Slice-Store, Event-Bus, Theme, Assets, Strings, `eas.json`
+- P02 (#10): Persistenz (MMKV), Spielstand-Version, Migrationen
+- P03 (#7): Hauptraum aus acht Slots, UI-Bausteine
+- P04 (#6), P05 (#8), P06 (#5): Logik für Bedürfnisse, Gesundheit, Ernte, mit Tests
+- P07 (#4): 10 Fakten-Karten, Budi-Sprüche je Anlass und Sorte
+- P08 (#12): Minigame-Framework (Countdown, Pause, Punkte, Münzen, Rekord), Beispielspiel "Tipp den Kreis", Auswahl-Screen
+- P09 (#9), P09b (#21): Debug-Menü mit Zeitraffer, Vorspulen, Balken, Münzen, Sorten freischalten
+- P10 (#15), P10b (#31): Gießen, zwei Dünger, Streicheln mit Haptik; Laune sinkt, wenn man nachts in der Blüte die Lampe antippt
+- P11 (#14): Licht-Schalter 18/6 auf 12/12, Tag/Nacht im Raum, Phasenwechsel mit "Puff" und Popup
+- P12 (#28): Schädlings-Smash (45 s, Kombo, 24 h Schädlingsschutz)
+- P14 (#30): Budi Jump Grundmechanik, Neigen oder Tippen
+- P15 (#16): Shop mit Upgrades, Effekte auf Abfall, Schädlinge, Schimmel und Ertrag
+- P16 (#17): Sorten, Level, Album, Samenauswahl
+- P18 (#18): Lokale Benachrichtigungen in Budis Stimme
+- P20 (#24): Budi aus Ebenen, Atmen, Blinzeln, Reaktionen, Gesicht folgt Zustand, Accessoire-Slot
+- P21 (#25): Schädlinge wegtippen, Schimmel behandeln, Koma mit Wiederbeleben gegen 30 Münzen
+- P24 (#23): Ernte mit Lupe, Schere, Trocknen, Abschluss, neue Sorte freigeschaltet
+- P26 (#22): Altersfrage 18+, Tutorial im Raum, rechtliche Links
+- P27 (#19), P27b (#26): Monotone Uhr, überall eingehängt (Alter sinkt nie bei zurückgestellter Uhr)
 
 ## Offen
 
-- P08 (#12) hat einen Konflikt mit main und blockiert P12, P13, P14, P19 und das Quiz in P17
-- P27: Die neue Uhr ist noch nicht eingehängt, alle Aufrufer nutzen `Date.now()`. Folge-Auftrag P27b nach Merge von P11
-- P05: Niemand ruft `checkHealth` regelmäßig auf. Gehört in P21 (beim Öffnen und im Vordergrund, `resetHealth` bei neuer Pflanze)
-- P10/P11: Laune-Abzug beim Antippen der Lampe nachts in der Blüte (`lightDisturbed`) fehlt. Folge-Auftrag P10b nach Merge von P11
-- P04/P10: Licht-Balken sinkt nie (kein Abfallwert in `config.ts`), siehe "Braucht dich"
-- P07: Nur 10 Fakten-Karten für 5 Phasen, Sämling und Erntebereit ohne Karte. Mehr Karten wären ein eigener Inhalts-Auftrag mit Quellenrecherche
-- P10: Universaldünger hat kein Werkzeug (Konzept nennt zwei Sorten)
-- P18: Shop-Upgrades fließen noch nicht in die Durst-Planung ein (Meldungen kommen etwas zu früh)
-- Für P31 gesammelt: `PHASE_LABELS` von `config.ts` nach `strings.ts`; `needBars.ts` (P03) wird nicht mehr genutzt; `useNow` liegt in `src/components/room/` statt `src/hooks/`; P11-Logik (`lightCycle`, `phaseWatch`) liegt unter `src/components/` statt `src/game/`
+- Offene PRs: P13 (#29), P17 (#13), P19 (#27)
+- Folge-Auftrag P19b: Minigame-Ziele (Smash, Tropfen, Hüpfen) in den Tagesziel-Pool, sobald P13 und P19 gemergt sind
+- Licht-Balken sinkt nie (kein Abfallwert), siehe "Braucht dich"
+- P07: Nur 10 Fakten-Karten für 5 Phasen, Sämling und Erntebereit ohne Karte
+- P10: Universaldünger hat kein Werkzeug
+- P18: Shop-Upgrades fließen noch nicht in die Durst-Planung ein
+- Für P31 gesammelt: `PHASE_LABELS` nach `strings.ts`; `needBars.ts` (P03) ungenutzt; `useNow` liegt in `src/components/room/`; P11-Logik liegt unter `src/components/`; P24 rechnet nur minütlich neu (Trocknungsbalken springt im Zeitraffer); P26: Raum ist beim ersten Start kurz vor der Altersfrage zu sehen
 - Kein Auftrag ist bisher auf einem echten Handy geprüft, nur Android-Bundle-Builds und Tests
 
 ## Braucht dich (gesammelt vom Leiter)
 
 1. Development Build auf dem Handy installieren: Anleitung in `docs/progress/p01.md`. Danach die `projectId` aus `eas init` an den Leiter geben.
-2. Licht-Balken: Wie schnell soll er pro echter Stunde sinken? (Wasser 5, Nährstoffe 3, Laune 4.) Ohne Wert bleibt er stehen, und das LED-Upgrade aus P15 wirkt nicht.
-3. Wasserfarbe: Die Palette in `DESIGN_GUIDE.md` hat kein Blau, der Wasserbalken ist dunkel (`night`). Blau ergänzen?
-4. Bundle-ID festlegen (vorläufig `app.potpou`), spätestens vor P34.
-5. OK für eine Zeile `expo-env.d.ts` in `.gitignore`.
-6. Optional: D1 bis D3 in `docs/DESIGN_GUIDE.md`, sonst gelten die Empfehlungen.
-7. Für P26: Impressum- und Datenschutz-URLs (bis dahin Platzhalter).
+2. Balancing: Licht-Balken, wie viele Punkte pro echter Stunde? (Wasser 5, Nährstoffe 3, Laune 4.) Ohne Wert sinkt er nie, LED-Upgrade wirkt nicht.
+3. Balancing: Laune-Abzug, wenn Budi nachts in der Blüte gestört wird, ist vorläufig 10 (`DARK_DISTURB_MOOD_PENALTY`). Bestätigen oder ändern.
+4. Wasserfarbe: Palette hat kein Blau, Wasserbalken ist dunkel. Blau ergänzen?
+5. Bundle-ID festlegen (vorläufig `app.potpou`), OK für `expo-env.d.ts` in `.gitignore`, Impressum- und Datenschutz-URLs.
+6. Vorlauf Welle 4: Apple-, Google- und RevenueCat-Konten mit Produkt `turbo` (P28), AdMob-Konto mit Freigabe des Themas (P29).
+7. Assets: Budi (B1 bis B8, B10 Gesichter, B12 Blinzeln, U1 Topf) zuerst, dann Raum (H1 bis H3), Pflege (U3, U4), Minigames (M1 bis M11), Shop (U1, U2, U4 bis U6), Krankheit (U17), Ernte (U7, U8, B7, B8). Liste in `docs/ASSETS.md`. Echte Budi-Dateien nur über die vorhandenen Dateinamen in `assets/budi/` tauschen (dann P20b).
 
 ## Handy-Tests für dich
 
-Alle erst nach Installation des Development Builds.
+Alle erst nach Installation des Development Builds. Pro Auftrag die wichtigsten Punkte, alle Details in `docs/progress/pNN.md`.
 
-P01:
-1. Unten fünf Tabs, jeder zeigt einen Platzhalter mit Fredoka-Überschrift.
-2. Spiele: Links öffnen je einen Platzhalter, "Zurück" führt zur Auswahl.
-3. Album: zwischen "Sorten" und "Wissen" umschalten.
+Start und Raum (P01, P03, P26):
+1. Frische Installation: Altersfrage. "Nein" sperrt, "Ja" führt ins Zimmer mit Tutorial "Dein erster Samen".
+2. Tutorial: Samen pflanzen, gießen, Balken, Minigames. "Überspringen" beendet es dauerhaft.
+3. Raum: oben vier Balken und Münzen, Phasenkopf, Lampe, Budi auf dem Topf, unten runde Knöpfe.
 
-P03 und P10 (Raum):
-1. Oben vier Balken und Münzen, darunter der Phasenkopf, in der Mitte Lampe, Budi (grüner Kreis auf Topf), unten runde Knöpfe zu Spiele, Shop, Album, Einstellungen.
-2. Debug-Menü: Samen pflanzen. Gießkanne ziehen und über Budi loslassen: Vibration, Budi hüpft, Wasserbalken steigt.
-3. Gleich nochmal gießen in der Keimung: Warn-Vibration, "Budi ist gestresst".
-4. Blütendünger in der Keimung: nur wenig Nährstoffe. Über Budi wischen: Laune steigt.
+Budi und Pflege (P10, P20, P10b):
+1. Gießkanne über Budi halten und loslassen: Vibration, Budi hüpft, Wasser steigt. Nochmal gießen in der Keimung: Budi schüttelt sich, "gestresst".
+2. Budi atmet, blinzelt alle paar Sekunden, Streicheln gibt ein sehr glückliches Gesicht.
+3. Nachts in der Blüte Lampe antippen: "Pssst!", Laune sinkt um 10.
 
-P02 und P09 (Debug-Menü und Speichern):
-1. Einstellungen > Debug > Debug-Menü öffnen. "Samen pflanzen", dann "x1000": Phase wechselt nach rund einer Minute.
-2. "+1000" Münzen, App ganz schließen, neu öffnen: Münzen sind noch da.
-3. Kompletter Zyklus: "+30 Tage" zweimal, "Licht auf 12/12", "+30 Tage" zweimal, "Ernten", "+7 Tage": Phase "Fertig".
+Licht und Phasen (P11):
+1. Debug: pflanzen, Zeitraffer x1000. "Puff" und Popup "Budi ist jetzt ein Sämling!", Raum wird regelmäßig dunkel.
+2. Im Wachstum "Auf 12/12 umschalten", Dialog bestätigen, Blüte beginnt. Auto-Anton hat keinen Schalter.
 
-P16:
-1. Album, Tab "Sorten": Level 1, nur Gurken-Gustav frei, die anderen grau mit Bedingung.
-2. Einstellungen > Entwicklung > "Samen wählen": Gurken-Gustav pflanzen, Raum zeigt Keimung, Balken voll.
+Krankheit (P21):
+1. Balken auf 0, einen Tag vorspulen: Budi grau im Koma. Mit Münzen "Wiederbeleben" (30 Münzen).
+2. Ungepflegt laufen lassen: Schädlinge sitzen auf Budi, Antippen entfernt sie.
 
-P18:
-1. Frische Installation: keine Frage nach Benachrichtigungen. Einmal gießen: jetzt kommt die Frage. Erlauben.
-2. Gießen, App wegwischen: Am nächsten Tag zwischen 9 und 22 Uhr meldet sich Budi, nie nachts.
-3. Einstellungen, "Budi darf sich melden" aus: nichts kommt mehr.
+Ernte (P24):
+1. Bis "Erntebereit" vorspulen, "Ernten": Lupe, Schere quer über den Stiel, Trocknen mit "Zweige wenden", "Einsammeln".
+2. Abschluss mit Sternen, Münzen, Fragmenten, danach Samenauswahl. Nach 3 Ernten "Neue Sorte freigeschaltet".
 
-P07 (ohne Handy, nur lesen):
-1. Sprüche in `src/content/quotes.ts`: passt der Ton (frech, albern, nie Konsum)?
-2. Kölsche Knospe spricht Kölsch: stimmen die drei Sätze?
-3. Karten-Texte in `src/content/facts.ts`: passen sie als Budi-Popup?
+Minigames (P08, P12, P14):
+1. Spiele-Tab: Karten mit Rekord. "Tipp den Kreis": Countdown, 30 s, Pause, Spielende mit Münzen, Rekord bleibt nach Neustart.
+2. Schädlings-Smash: schneller werdend, Kombo ab schnellen Treffern, Marienkäfer kostet Punkte, ab 10 Punkten 24 h Schädlingsschutz.
+3. Budi Jump: Handy kippen lenkt (falls verkehrt herum: melden), Fallen beendet das Spiel. In den Einstellungen auf "Tippen" umstellbar.
+
+Shop und Sorten (P15, P16, P09b):
+1. Shop: Upgrade kaufen, Münzen sinken, Upgrade steht im Raum unter der Lampe, bleibt nach Neustart.
+2. Album "Sorten": nur Gurken-Gustav frei. Debug "Alle Sorten freischalten": alle frei, Samenauswahl erlaubt alle.
+
+Speichern, Zeit, Benachrichtigungen (P02, P27, P18):
+1. Münzen geben, App ganz schließen, neu öffnen: Münzen sind noch da.
+2. Gerätezeit einen Tag zurückstellen: Alter und Phase springen nicht zurück.
+3. Einmal gießen: erst jetzt kommt die Frage nach Benachrichtigungen. App schließen: Budi meldet sich tagsüber, nie nachts.
+
+Texte (P07, ohne Handy):
+1. Sprüche in `src/content/quotes.ts` und Karten in `src/content/facts.ts` gegenlesen (Ton, nie Konsum, Kölsch der Kölschen Knospe).
 
 ## Fehlende Assets
 
-- Alle Assets aus `docs/ASSETS.md`. Gebaut sind überall erkennbare Platzhalter.
-- P01: Tab-Icons, App-Icon und Splash (Expo-Vorlagenbilder)
-- P03: H1 Raum, U1 Topf, U2 Lampe, B3 Budi, U9 Münze, U11 Balken-Icons, U12 Navigations-Icons
-- P10: U3 Gießkanne, U4 Dünger Wachstum und Blüte
-- P16: U15 Sortenkarten-Bilder
-- P18: eigenes einfarbiges Benachrichtigungs-Icon für Android (später)
+Überall sind erkennbare Platzhalter gebaut, die Dateinamen stehen in `docs/ASSETS.md` und in `src/lib/assets.ts`.
+
+- Budi (P20): B1 bis B8, B10 (12 Gesichter), B12, U1 Topf. Platzhalter liegen schon unter den endgültigen Namen in `assets/budi/`
+- Raum (P03, P11): H1 Tag, H2 Nacht, U2 Lampe an/aus, U9 Münze, U11 Balken-Icons, U12 Navigations-Icons, Puff-Wolke (keine ID)
+- Pflege (P10): U3 Gießkanne, U4 Dünger Wachstum und Blüte
+- Minigames (P08, P12, P14): Kartenbilder, M1 bis M4 (Smash), M9, M11, B11 (Jump)
+- Shop (P15): U1 Topf-Stufen, U2 LED, U4 Spezialdünger, U5 Ventilator, U6 Entfeuchter, Nützlings-Kit (keine ID)
+- Krankheit (P21): U17 Spinnmilbe, Trauermücke, Schimmel
+- Ernte (P24): U7 Lupe, U8 Schere, B7, B8, H3 Trockenraum
+- Sorten (P16): U15 Sortenkarten
+- App (P01): Tab-Icons, App-Icon, Splash; Benachrichtigungs-Icon Android (P18)
 
 ## Bekannte Bugs
 
-- P27: Uhr vorstellen bleibt ein Trick (einmal vorgestellt, gilt der Höchststand). Ohne Serverzeit nicht lösbar, nach dem Launch.
-- P18: Wird die App hart beendet, ohne dass das System "Hintergrund" meldet (z. B. Absturz), wird keine Benachrichtigung geplant.
+- P24: Ernte-Ansicht rechnet nur minütlich neu; im Zeitraffer springt der Trocknungsbalken, "Einsammeln" erscheint bis zu einer Minute zu spät
+- P26: Beim allerersten Start ist der Raum einen Augenblick zu sehen, bevor die Altersfrage kommt
+- P27: Uhr vorstellen bleibt ein Trick (Höchststand gilt). Ohne Serverzeit nicht lösbar, nach dem Launch
+- P18: Wird die App hart beendet, ohne dass das System "Hintergrund" meldet, wird keine Benachrichtigung geplant
 
 ## Entscheidungen
 
 - Zyklus ca. 10 echte Tage (TIME_SCALE 10), Turbo 9,99 € halbiert auf ca. 5 Tage
-- Budi im MVP als PNG-Ebenen, Gesicht auf dem Topf (Empfehlung, siehe DESIGN_GUIDE.md D4)
+- Budi im MVP als PNG-Ebenen, Gesicht auf dem Topf
 - Spielstand nur lokal, kein Login
-- P01: Tabs direkt in `app/_layout.tsx` (keine `(tabs)`-Gruppe), Einstellungs-Abschnitte in `src/components/settings/sections.ts`, Slices sehen nur ihren eigenen Zustand
-- P02: Neue Slices werden automatisch gespeichert. Formänderung am Spielstand: `SAVE_VERSION` erhöhen, Schritt in `MIGRATIONS`, Test. `__mocks__/react-native-nitro-modules.ts` im Root ist vom Leiter akzeptiert (Test-Infrastruktur)
-- P04: `computeNeeds(state, nowMs, modifiers, phase)`; `applyCare(state, { type, phase, amount? }, nowMs, modifiers?)`; im Koma wirkt Pflege nicht
-- P05: Wiederbeleben = erst `reviveBudi(now, spendCoins)` (P05, zahlt), dann `reviveFromComa(now)` (P04). Schädlingsschutz "1 Spieltag" = 24 echte Stunden
-- P06: Krankheitsmalus kommt als Zahl in Sternen; Samen-Fragmente 0/1/1/2/3 je nach Sternen
-- P09: Zeitraffer wirkt nur, wenn `getPlantStatus`/`flipLight`/`harvest` mit `selectDebugMultiplier(state)` aufgerufen werden
-- P10: `useNeeds()` ist der Einstieg für alle Bedürfnis-Anzeigen im Raum
-- P16: Nach der Ernte nur das Ereignis `harvested` auslösen, Level und Fragmente zählt der Progression-Slice selbst
-- P18: eine markierte Zeile `useNotificationScheduler()` in `app/_layout.tsx` (Ausnahme vom Leiter erlaubt); P26 muss sie beim Einbau der Onboarding-Weiche erhalten
-- `config.ts`-Abschnitte für Aufträge ohne eigenen Abschnitt (Leiter): P11 "Licht und Phasen" vor "Shop-Upgrades", P12 vor "Sorten", P13 vor "Ertrag und Wirtschaft", P14 vor "Gesundheit", P17 vor "Bedürfnisse"; P18 oben und P19 unten im Abschnitt Tagesziele/Benachrichtigungen
-- Büro-Betrieb: Merge bei grüner CI (derzeit von Hand durch den CvD, GitHub-Auto-Merge ist aus), bis zu 8 Kollegen, ein Leiter. Grün heißt: Typen, Lint, Tests, Inhalts-Check.
+- P01: Tabs direkt in `app/_layout.tsx`, Einstellungs-Abschnitte in `src/components/settings/sections.ts`, Slices sehen nur ihren eigenen Zustand
+- P02: Neue Slices werden automatisch gespeichert; Formänderung über `SAVE_VERSION` und `MIGRATIONS` mit Test
+- P04: `computeNeeds(state, nowMs, modifiers, phase)`, `applyCare(state, { type, phase, amount? }, nowMs, modifiers?)`; im Koma wirkt Pflege nicht. P10b ergänzt `applyMoodPenalty` (zählt nicht als Pflege, verhindert kein Koma)
+- P05: Wiederbeleben = `reviveBudi` (zahlt) dann `reviveFromComa`; Schädlingsschutz "1 Spieltag" = 24 echte Stunden
+- P06: Krankheitsmalus in Sternen; Samen-Fragmente 0/1/1/2/3 je nach Sternen
+- P09: Zeitraffer über `selectDebugMultiplier(state)`
+- P16: Nach der Ernte nur `harvested` auslösen, Level und Fragmente zählt der Progression-Slice
+- P18: eine markierte Zeile `useNotificationScheduler()` in `app/_layout.tsx`; P26 hat seine Weiche daneben als markierten Block
+- P27b: Spielzeit kommt überall aus der geteilten Uhr `src/lib/clock.ts`, nicht aus `Date.now()`
+- `config.ts`-Abschnitte, vom Leiter zugewiesen: P11 "Licht und Phasen" vor "Shop-Upgrades", P12 vor "Sorten", P13 vor "Ertrag und Wirtschaft", P14/P22 vor "Gesundheit", P17 im Minigame-Abschnitt am Dateiende; P18 oben und P19 unten im Abschnitt Tagesziele/Benachrichtigungen; P25 oben im Abschnitt Kosmetik
+- Büro-Betrieb: Merge bei grüner CI (derzeit von Hand durch den CvD), bis zu 8 Kollegen, ein Leiter

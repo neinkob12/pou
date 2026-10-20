@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { FactUnlockPopup } from '../facts/FactUnlockPopup';
 import { HarvestEntry } from '../harvest/HarvestEntry';
 import { ActionTray } from './ActionTray';
 import { BottomNav } from './BottomNav';
@@ -39,6 +40,7 @@ export function RoomScreen() {
         <ActionTray />
         <View className="h-3" />
         <BottomNav />
+        <FactUnlockPopup />
         <PhaseChangePopup />
       </View>
     </CareStageProvider>

@@ -9,6 +9,7 @@ import { useDerivedValue, useFrameCallback, useSharedValue } from 'react-native-
 import { scheduleOnRN, scheduleOnUI } from 'react-native-worklets';
 
 import { PEST_SMASH } from '../../../game/config';
+import { cue, useMinigameAudio } from '../../../lib/audio';
 import { colors } from '../../../lib/theme';
 import type { MinigameSession } from '../framework/useMinigameSession';
 import { CritterSlot } from './CritterSlot';
@@ -21,11 +22,12 @@ const LEAF_RADIUS = 48;
 const HOLES = Array.from({ length: holeCount(PEST_SMASH) }, (_, i) => i);
 
 export function SmashGame({ session }: { session: MinigameSession }) {
-  const { clock, addScore, result } = session;
+  const { clock, addScore, result, phase } = session;
   const size = useSharedValue({ width: 0, height: 0 });
   const state = useSharedValue(createSmashState());
   const score = useSharedValue(0);
   const [combo, setCombo] = useState(0);
+  useMinigameAudio(phase, result?.coins ?? null);
 
   useFrameCallback(() => {
     'worklet';
@@ -38,7 +40,8 @@ export function SmashGame({ session }: { session: MinigameSession }) {
     if (next.combo !== before.combo) scheduleOnRN(setCombo, next.combo);
   });
 
-  const onPoints = (points: number, nextCombo: number) => {
+  const onPoints = (points: number, nextCombo: number, friendlyHit: boolean) => {
+    cue(friendlyHit ? 'ouch' : 'hit');
     addScore(points);
     setCombo(nextCombo);
   };
@@ -54,7 +57,7 @@ export function SmashGame({ session }: { session: MinigameSession }) {
     if (outcome.kind === null) return;
     state.set(outcome.state);
     score.set(score.get() + outcome.points);
-    scheduleOnRN(onPoints, outcome.points, outcome.state.combo);
+    scheduleOnRN(onPoints, outcome.points, outcome.state.combo, outcome.kind === 'ladybug');
   };
 
   const onTouchStart = (e: GestureResponderEvent) => {
