@@ -533,7 +533,7 @@ export const dailyGoals = {
   title: 'Tagesziel',
   goals: {
     tapHits: (n: number) => `Triff ${n} Kreise`,
-    smashMites: (n: number) => `Smashe ${n} Milben`,
+    smashMites: (n: number) => `Hol ${n} Punkte beim Schädlings-Smash`,
     dropsCatch: (n: number) => `Fang ${n} Tropfen`,
     jumpHeight: (n: number) => `Hol ${n} Punkte beim Hüpfen`,
     playRounds: (n: number) => `Spiel ${n} Runden Minigames`,

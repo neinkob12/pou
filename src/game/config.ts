@@ -586,9 +586,18 @@ export type DailyGoalId = keyof typeof DAILY_GOAL_TEMPLATES;
 
 /**
  * Ziele, die gerade ausgelost werden, in dieser Reihenfolge reihum (ein Ziel pro Kalendertag).
- * smashMites, dropsCatch und jumpHeight kommen dazu, sobald die Spiele stehen (P12, P13, P14).
+ * Spiel- und Pflegeziele wechseln sich ab.
  */
-export const DAILY_GOAL_POOL: readonly DailyGoalId[] = ['playRounds', 'waterTwice', 'tapHits', 'petBudi', 'feedBudi'];
+export const DAILY_GOAL_POOL: readonly DailyGoalId[] = [
+  'smashMites',
+  'waterTwice',
+  'dropsCatch',
+  'petBudi',
+  'jumpHeight',
+  'feedBudi',
+  'playRounds',
+  'tapHits',
+];
 
 /** Inhalt der Belohnungskiste: Münzen, gleich für jedes Ziel. Feinschliff in P32. */
 export const DAILY_GOAL_CHEST_COINS = 60;
