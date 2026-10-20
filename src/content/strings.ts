@@ -197,8 +197,59 @@ export const strainsAlbum = {
   },
 };
 
+// Erststart (P26): Altersfrage und Tutorial. Vorschlag des Auftrags, Chef kann umformulieren.
 export const onboarding = {
   title: 'Willkommen',
+  age: {
+    title: 'Willkommen bei PotPou',
+    intro: 'PotPou ist ein Pflanzenspiel für Erwachsene. Du pflegst Budi vom Samen bis zur Ernte.',
+    question: 'Bist du mindestens 18 Jahre alt?',
+    yes: 'Ja, ich bin 18 oder älter',
+    no: 'Nein',
+  },
+  declined: {
+    title: 'Bis bald!',
+    text: 'PotPou gibt es erst ab 18. Budi wünscht dir bis dahin alles Gute und viel Sonne.',
+  },
+  tutorial: {
+    stepCounter: (step: number, total: number) => `${step} von ${total}`,
+    next: 'Weiter',
+    skip: 'Überspringen',
+    done: "Los geht's",
+    steps: {
+      plant: {
+        title: 'Dein erster Samen',
+        text: 'Pflanz einen Samen in den Topf. Daraus wächst Budi, in Echtzeit.',
+        action: 'Samen pflanzen',
+      },
+      water: {
+        title: 'Gießen',
+        text: 'Zieh die Gießkanne unten zu Budi und lass es regnen. Probier es gleich aus.',
+      },
+      bars: {
+        title: 'Die Balken',
+        text: 'Oben siehst du Wasser, Nährstoffe, Licht und Laune. Sinkt ein Balken, braucht Budi dich. Budi wächst auch weiter, wenn die App zu ist.',
+      },
+      minigames: {
+        title: 'Minigames',
+        text: 'Unter "Spiele" sammelst du Münzen und machst Budi gute Laune.',
+        action: 'Zeig mal',
+      },
+    },
+  },
+};
+
+// Rechtliche Links in den Einstellungen (P26).
+export const legal = {
+  title: 'Rechtliches',
+  imprint: 'Impressum',
+  privacy: 'Datenschutz',
+};
+
+/** Platzhalter, bis der Chef die echten Adressen liefert (P26, siehe docs/progress/p26.md). */
+export const legalUrls = {
+  imprint: 'https://example.com/potpou/impressum',
+  privacy: 'https://example.com/potpou/datenschutz',
 };
 
 // Benachrichtigungen (P18): Texte in Budis Stimme und der Einstellungs-Abschnitt.
