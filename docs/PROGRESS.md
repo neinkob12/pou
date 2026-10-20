@@ -2,7 +2,7 @@
 
 Wird vom Leiter (Abteilungsleiter PotPou) nach jedem Merge aus `docs/progress/pNN.md` zusammengeführt. Kollegen schreiben nur ihre eigene Notiz. Du kannst hier selbst Notizen ergänzen.
 
-Stand: 24 Aufträge gemergt (inkl. Nacharbeiten P09b, P10b, P27b). Welle 1 und 2 fast fertig, Welle 3 läuft. Plan: `docs/AUFTRAEGE.md`.
+Stand: 28 Aufträge gemergt (25 aus dem Plan, dazu die Nacharbeiten P09b, P10b, P27b). Welle 1 fertig, Welle 2 bis auf P19 fertig, Welle 3 läuft. Plan: `docs/AUFTRAEGE.md`.
 
 ## Auftragsstatus
 
@@ -22,22 +22,24 @@ Stand: 24 Aufträge gemergt (inkl. Nacharbeiten P09b, P10b, P27b). Welle 1 und 2
 | P10b Laune-Abzug nachts in der Blüte | gemergt | #31 | ja |
 | P11 Licht, Tag/Nacht, Phasen | gemergt | #14 | ja |
 | P12 Schädlings-Smash | gemergt | #28 | ja |
-| P13 Tropfen-Fang | PR offen | #29 | |
+| P13 Tropfen-Fang | gemergt | #29 | ja |
 | P14 Budi Jump, Grundmechanik | gemergt | #30 | ja |
 | P15 Shop und Upgrades | gemergt | #16 | ja |
 | P16 Sorten, Level, Album | gemergt | #17 | ja |
-| P17 Fakten-Karten im UI, Quiz | PR offen | #13 | |
+| P17 Fakten-Karten im UI, Quiz | gemergt | #13 | ja |
 | P18 Benachrichtigungen | gemergt | #18 | ja |
 | P19 Tagesziele | PR offen | #27 | |
 | P20 Budi-Grafik | gemergt | #24 | ja |
 | P21 Krankheiten im UI | gemergt | #25 | ja |
-| P22 Budi Jump, Feinschliff | in Arbeit | | |
+| P22 Budi Jump, Feinschliff | gemergt | #34 | ja |
+| P23 Minigame-Polish, Sound-Grundlage | gemergt | #35 | ja |
 | P24 Ernte-UI | gemergt | #23 | ja |
-| P25 Kosmetik gegen Münzen | in Arbeit | | |
+| P25 Kosmetik gegen Münzen | PR offen | #33 | |
 | P26 Onboarding, Altersabfrage | gemergt | #22 | ja |
 | P27 Zeit-Robustheit | gemergt | #19 | ja |
 | P27b Monotone Uhr eingehängt | gemergt | #26 | ja |
-| P23, P30, P31, P32, P33 | warten auf Vorgänger | | |
+| P30 Audio: Musik, Effekte, Budi-Stimme | in Arbeit | | |
+| P31, P32, P33 | warten auf Vorgänger | | |
 | P28, P29 | warten auf deine Konten | | |
 
 ## Fertig
@@ -53,10 +55,13 @@ Stand: 24 Aufträge gemergt (inkl. Nacharbeiten P09b, P10b, P27b). Welle 1 und 2
 - P10 (#15), P10b (#31): Gießen, zwei Dünger, Streicheln mit Haptik; Laune sinkt, wenn man nachts in der Blüte die Lampe antippt
 - P11 (#14): Licht-Schalter 18/6 auf 12/12, Tag/Nacht im Raum, Phasenwechsel mit "Puff" und Popup
 - P12 (#28): Schädlings-Smash (45 s, Kombo, 24 h Schädlingsschutz)
-- P14 (#30): Budi Jump Grundmechanik, Neigen oder Tippen
+- P13 (#29): Tropfen-Fang, gefangenes Wasser und Dünger füllen die Balken (je höchstens +40, nie Überwässerung)
+- P14 (#30), P22 (#34): Budi Jump mit Neigen oder Tippen, brechende Blätter, Federn, Lichtpunkte, Rekordmarke
 - P15 (#16): Shop mit Upgrades, Effekte auf Abfall, Schädlinge, Schimmel und Ertrag
 - P16 (#17): Sorten, Level, Album, Samenauswahl
+- P17 (#13): Fakten-Karten werden je Phase freigeschaltet (Popup in Budis Stimme), Album "Wissen", Pflanzen-Quiz
 - P18 (#18): Lokale Benachrichtigungen in Budis Stimme
+- P23 (#35): Sound- und Vibrations-Grundlage in allen Minigames, Schalter für Musik, Effekte und Vibration, Minigame-Münzen neu balanciert
 - P20 (#24): Budi aus Ebenen, Atmen, Blinzeln, Reaktionen, Gesicht folgt Zustand, Accessoire-Slot
 - P21 (#25): Schädlinge wegtippen, Schimmel behandeln, Koma mit Wiederbeleben gegen 30 Münzen
 - P24 (#23): Ernte mit Lupe, Schere, Trocknen, Abschluss, neue Sorte freigeschaltet
@@ -65,9 +70,11 @@ Stand: 24 Aufträge gemergt (inkl. Nacharbeiten P09b, P10b, P27b). Welle 1 und 2
 
 ## Offen
 
-- Offene PRs: P13 (#29), P17 (#13), P19 (#27)
-- Folge-Auftrag P19b: Minigame-Ziele (Smash, Tropfen, Hüpfen) in den Tagesziel-Pool, sobald P13 und P19 gemergt sind
-- Licht-Balken sinkt nie (kein Abfallwert), siehe "Braucht dich"
+- Offene PRs: P19 (#27), P25 (#33). In Arbeit: P30
+- Folge-Auftrag P19b: Minigame-Ziele (Smash, Tropfen, Hüpfen) in den Tagesziel-Pool, sobald P19 gemergt ist
+- Licht-Balken sinkt nie (kein Abfallwert), siehe "Braucht dich". Der Lichtbonus aus Budi Jump (P22) sammelt sich bis dahin in einem Guthaben
+- Für P32 (Balancing-Simulation): Minigames haben sehr unterschiedliche Punkteskalen, Jump landet fast immer an der Münz-Obergrenze; Vorschlag aus P23: ein Kurs je Spiel, mit echten Punktzahlen vom Handy
+- Spielende-Screen (P08) zeigt nur Punkte und Münzen, kein "+n Licht" (P22) und kein Hochzählen der Münzen (P23)
 - P07: Nur 10 Fakten-Karten für 5 Phasen, Sämling und Erntebereit ohne Karte
 - P10: Universaldünger hat kein Werkzeug
 - P18: Shop-Upgrades fließen noch nicht in die Durst-Planung ein
@@ -76,13 +83,15 @@ Stand: 24 Aufträge gemergt (inkl. Nacharbeiten P09b, P10b, P27b). Welle 1 und 2
 
 ## Braucht dich (gesammelt vom Leiter)
 
-1. Development Build auf dem Handy installieren: Anleitung in `docs/progress/p01.md`. Danach die `projectId` aus `eas init` an den Leiter geben.
+1. Development Build auf dem Handy installieren: Anleitung in `docs/progress/p01.md`. Danach die `projectId` aus `eas init` an den Leiter geben. Seit P23 ist `expo-audio` dabei: ein schon installierter Build muss neu gebaut werden.
 2. Balancing: Licht-Balken, wie viele Punkte pro echter Stunde? (Wasser 5, Nährstoffe 3, Laune 4.) Ohne Wert sinkt er nie, LED-Upgrade wirkt nicht.
 3. Balancing: Laune-Abzug, wenn Budi nachts in der Blüte gestört wird, ist vorläufig 10 (`DARK_DISTURB_MOOD_PENALTY`). Bestätigen oder ändern.
-4. Wasserfarbe: Palette hat kein Blau, Wasserbalken ist dunkel. Blau ergänzen?
+4. Wasserfarbe: Palette hat kein Blau, Wasserbalken und Wassertropfen (P13) sind dunkel. Blau ergänzen?
 5. Bundle-ID festlegen (vorläufig `app.potpou`), OK für `expo-env.d.ts` in `.gitignore`, Impressum- und Datenschutz-URLs.
 6. Vorlauf Welle 4: Apple-, Google- und RevenueCat-Konten mit Produkt `turbo` (P28), AdMob-Konto mit Freigabe des Themas (P29).
 7. Assets: Budi (B1 bis B8, B10 Gesichter, B12 Blinzeln, U1 Topf) zuerst, dann Raum (H1 bis H3), Pflege (U3, U4), Minigames (M1 bis M11), Shop (U1, U2, U4 bis U6), Krankheit (U17), Ernte (U7, U8, B7, B8). Liste in `docs/ASSETS.md`. Echte Budi-Dateien nur über die vorhandenen Dateinamen in `assets/budi/` tauschen (dann P20b).
+8. Zur Info, beim Handy-Test prüfen: P23 hat die Minigame-Münzen gesenkt, von bis zu 50 auf höchstens 8 pro Runde (3 Runden am Tag ergeben etwa ein Upgrade pro Zyklus, Rechnung in `docs/progress/p23.md`). Vorher waren nach gut einem Zyklus alle Upgrades gekauft. Feinabstimmung mit echten Punktzahlen in P32.
+9. Sounds S1 bis S12 (Liste in `docs/ASSETS.md`). Stille Platzhalter liegen unter den endgültigen Namen in `assets/sounds/`, einfach drüberkopieren.
 
 ## Handy-Tests für dich
 
@@ -113,7 +122,13 @@ Ernte (P24):
 Minigames (P08, P12, P14):
 1. Spiele-Tab: Karten mit Rekord. "Tipp den Kreis": Countdown, 30 s, Pause, Spielende mit Münzen, Rekord bleibt nach Neustart.
 2. Schädlings-Smash: schneller werdend, Kombo ab schnellen Treffern, Marienkäfer kostet Punkte, ab 10 Punkten 24 h Schädlingsschutz.
-3. Budi Jump: Handy kippen lenkt (falls verkehrt herum: melden), Fallen beendet das Spiel. In den Einstellungen auf "Tippen" umstellbar.
+3. Budi Jump: Handy kippen lenkt (falls verkehrt herum: melden), Fallen beendet das Spiel. In den Einstellungen auf "Tippen" umstellbar. Lila Blätter federn hoch, orange brechen nach einem Sprung, gelbe Punkte zählen "Licht", ab Runde 2 gestrichelte Rekordlinie.
+4. Tropfen fangen (P13): Topf per Wischen, blaue und grüne Tropfen füllen Wasser und Nährstoffe (je höchstens +40), drei Salzklumpen beenden die Runde.
+5. Ton und Vibration (P23): Smash-Treffer vibrieren, Einstellungen "Ton und Vibration" schalten Musik, Effekte und Vibration einzeln. Münzen am Rundenende etwa 3 bis 8.
+
+Fakten-Karten (P17):
+1. Samen pflanzen, Raum: Popup "Psst, Budi weiß was!" mit zwei Keimungs-Karten. Album > Wissen: freigeschaltete Karten bunt, Quelle öffnet den Browser.
+2. Spiele > Pflanzen-Quiz (ab 3 Karten): alles richtig zahlt doppelte Münzen.
 
 Shop und Sorten (P15, P16, P09b):
 1. Shop: Upgrade kaufen, Münzen sinken, Upgrade steht im Raum unter der Lampe, bleibt nach Neustart.
@@ -134,7 +149,9 @@ Texte (P07, ohne Handy):
 - Budi (P20): B1 bis B8, B10 (12 Gesichter), B12, U1 Topf. Platzhalter liegen schon unter den endgültigen Namen in `assets/budi/`
 - Raum (P03, P11): H1 Tag, H2 Nacht, U2 Lampe an/aus, U9 Münze, U11 Balken-Icons, U12 Navigations-Icons, Puff-Wolke (keine ID)
 - Pflege (P10): U3 Gießkanne, U4 Dünger Wachstum und Blüte
-- Minigames (P08, P12, P14): Kartenbilder, M1 bis M4 (Smash), M9, M11, B11 (Jump)
+- Minigames (P08, P12, P13, P14, P22): Kartenbilder, M1 bis M4 (Smash), M5 bis M8 (Tropfen), M9 je Blatt-Typ, M10 Lichtpunkte, M11, B11 (Jump)
+- Fakten (P17): U14 Kartenrahmen
+- Sounds (P23): S3 bis S6, S11, S12 als stille Platzhalter in `assets/sounds/`
 - Shop (P15): U1 Topf-Stufen, U2 LED, U4 Spezialdünger, U5 Ventilator, U6 Entfeuchter, Nützlings-Kit (keine ID)
 - Krankheit (P21): U17 Spinnmilbe, Trauermücke, Schimmel
 - Ernte (P24): U7 Lupe, U8 Schere, B7, B8, H3 Trockenraum
@@ -162,5 +179,9 @@ Texte (P07, ohne Handy):
 - P16: Nach der Ernte nur `harvested` auslösen, Level und Fragmente zählt der Progression-Slice
 - P18: eine markierte Zeile `useNotificationScheduler()` in `app/_layout.tsx`; P26 hat seine Weiche daneben als markierten Block
 - P27b: Spielzeit kommt überall aus der geteilten Uhr `src/lib/clock.ts`, nicht aus `Date.now()`
-- `config.ts`-Abschnitte, vom Leiter zugewiesen: P11 "Licht und Phasen" vor "Shop-Upgrades", P12 vor "Sorten", P13 vor "Ertrag und Wirtschaft", P14/P22 vor "Gesundheit", P17 im Minigame-Abschnitt am Dateiende; P18 oben und P19 unten im Abschnitt Tagesziele/Benachrichtigungen; P25 oben im Abschnitt Kosmetik
+- P13: Tropfen-Fang füllt die Balken einmal am Rundenende, je Balken höchstens +40, nie über die Überwässerungs-Grenze, Dünger zählt als Universaldünger
+- P17: Ein Phasenwechsel schaltet alle Karten dieser Phase frei; volle Quiz-Punktzahl verdoppelt die Punkte statt eines Sonderwegs bei den Münzen
+- P22: Brechende Blätter tragen einmal (Strecke bleibt immer erreichbar); Lichtbonus als Guthaben `jumpLightBank`, der künftige Licht-Balken holt es mit `takeJumpLight()` ab
+- P23: Sound-Schalter sind Geräte-Einstellungen (nicht im Spielstand), Vibration hat einen eigenen Schalter; `MINIGAME_REWARDS` 0,14 Münzen je Punkt, höchstens 8 pro Runde; neue Töne als Eintrag in `CUES` (`src/lib/audio.ts`)
+- `config.ts`-Abschnitte, vom Leiter zugewiesen: P11 "Licht und Phasen" vor "Shop-Upgrades", P12 vor "Sorten", P13 vor "Ertrag und Wirtschaft", P14/P22 vor "Gesundheit", P17 im Minigame-Abschnitt am Dateiende; P18 oben und P19 unten im Abschnitt Tagesziele/Benachrichtigungen; P25 oben im Abschnitt Kosmetik; P30 als Block "Audio (P30)" direkt vor dem Minigame-Abschnitt
 - Büro-Betrieb: Merge bei grüner CI (derzeit von Hand durch den CvD), bis zu 8 Kollegen, ein Leiter
