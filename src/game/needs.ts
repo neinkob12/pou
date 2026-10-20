@@ -156,6 +156,23 @@ export function applyCare(
   return { values, updatedAtMs: nowMs, lastCareAtMs: nowMs, overwateredUntilMs, wrongFertilizerUntilMs };
 }
 
+/**
+ * Senkt die Laune um `amount` (z. B. Störung der Dunkelphase). Keine Pflege: `lastCareAtMs` bleibt,
+ * damit es nicht vor dem Koma schützt. Im Koma passiert nichts (Rückgabe ist derselbe Zustand).
+ */
+export function applyMoodPenalty(
+  state: NeedsState,
+  amount: number,
+  phase: PhaseId,
+  nowMs: number,
+  modifiers: NeedModifiers = NO_MODIFIERS,
+): NeedsState {
+  if (isInComa(state, nowMs)) return state;
+  const now = computeNeeds(state, nowMs, modifiers, phase);
+  const values: NeedValues = { water: now.water, nutrients: now.nutrients, mood: clamp(now.mood - amount) };
+  return { ...state, values, updatedAtMs: nowMs };
+}
+
 /** Holt Budi aus dem Koma: alle Balken auf COMA_REVIVE_NEED_LEVEL, Stress weg. Kosten regelt P05. */
 export function reviveNeeds(nowMs: number): NeedsState {
   const level = clamp(COMA_REVIVE_NEED_LEVEL);

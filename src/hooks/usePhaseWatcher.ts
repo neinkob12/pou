@@ -4,6 +4,7 @@ import type { PhaseId } from '../game/config';
 import { gameEvents } from '../game/events';
 import { storage } from '../lib/storage';
 import { parseSeenPhase, phaseTransitions } from '../components/room/phase/phaseWatch';
+import { clock } from '../lib/clock';
 
 /** Eigener MMKV-Schlüssel, damit Phasenwechsel auch nach Tagen im Hintergrund erkannt werden. */
 export const PHASE_SEEN_KEY = 'potpou-phase-seen';
@@ -19,7 +20,7 @@ export function usePhaseWatcher(plantedAtMs: number | null, phase: PhaseId | nul
     const seen = parseSeenPhase(storage.getString(PHASE_SEEN_KEY));
     const steps = phaseTransitions(seen, plantedAtMs, phase);
     storage.set(PHASE_SEEN_KEY, JSON.stringify({ plantedAtMs, phase }));
-    const atMs = Date.now();
+    const atMs = clock.now();
     for (const step of steps) gameEvents.emit('phaseChanged', { ...step, atMs });
   }, [plantedAtMs, phase]);
 }

@@ -8,6 +8,7 @@ import { AppState } from 'react-native';
 import { useGameStore } from '../../../store/gameStore';
 import { useNow } from '../useNow';
 import { syncHealth } from './healthLogic';
+import { clock } from '../../../lib/clock';
 
 export function useHealthCheck(): void {
   const now = useNow();
@@ -16,12 +17,12 @@ export function useHealthCheck(): void {
 
   // `now` tickt jede Minute und löst den Check aus; gerechnet wird mit der echten Uhrzeit.
   useEffect(() => {
-    if (hydrated && plantedAtMs !== null) syncHealth(useGameStore.getState(), Math.max(now, Date.now()));
+    if (hydrated && plantedAtMs !== null) syncHealth(useGameStore.getState(), Math.max(now, clock.now()));
   }, [hydrated, now, plantedAtMs]);
 
   useEffect(() => {
     const sub = AppState.addEventListener('change', (state) => {
-      if (state === 'active') syncHealth(useGameStore.getState(), Date.now());
+      if (state === 'active') syncHealth(useGameStore.getState(), clock.now());
     });
     return () => sub.remove();
   }, []);

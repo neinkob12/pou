@@ -95,6 +95,25 @@ export const care: Partial<Record<CareAssetId, ImageSourcePropType>> = {};
 export type HealthAssetId = 'u17_spider_mite' | 'u17_fungus_gnat' | 'u17_mold';
 export const health: Partial<Record<HealthAssetId, ImageSourcePropType>> = {};
 
+// --- Ernte: Lupe, Schere, Trocknen, Erntekiste (P24) ---
+// Schlüssel = ID aus docs/ASSETS.md. Fehlt die Datei, zeigt der Ernte-Screen einen Platzhalter.
+export type HarvestAssetId = 'u7_lupe' | 'u8_scissors' | 'b7_drying' | 'b8_crate' | 'h3_drying_room';
+export const harvest: Partial<Record<HarvestAssetId, ImageSourcePropType>> = {};
+
+// --- Shop-Upgrades: Bilder im Shop und im Raum (P15) ---
+// Topf-Stufen U1, LED U2, Ventilator U5, Entfeuchter U6, Spezialdünger U4. Das Nützlings-Kit hat
+// noch keine ID in docs/ASSETS.md und bleibt Platzhalter.
+export type UpgradeAssetId =
+  | 'u1_pot_1'
+  | 'u1_pot_2'
+  | 'u1_pot_3'
+  | 'u2_led_on'
+  | 'u4_special'
+  | 'u5_fan'
+  | 'u6_dehumidifier'
+  | 'beneficials';
+export const upgrades: Partial<Record<UpgradeAssetId, ImageSourcePropType>> = {};
+
 // --- Minispiele: Sprites und Hintergründe (P08, P12 bis P14, P22) ---
 export const minigames: AssetMap = {};
 
@@ -107,4 +126,4 @@ export const icon = {
   splash: require('../../assets/icon/splash-icon.png'),
 } satisfies AssetMap;
 
-export const assets = { budi, room, ui, minigames, sounds, icon };
+export const assets = { budi, room, ui, upgrades, minigames, sounds, icon };

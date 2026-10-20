@@ -53,6 +53,42 @@ export const BASE_PHASES = {
 export const READY_GRACE_DAYS = 7;
 
 // ---------------------------------------------------------------------------
+// Minigames: Schädlings-Smash (Auftrag P12)
+// ---------------------------------------------------------------------------
+
+/** Whack-a-Mole auf dem Blatt. Zeiten in Spiel-Millisekunden, Tempo steigt linear bis Rundenende. */
+export const PEST_SMASH = {
+  durationSeconds: 45,
+  /** Löcher auf dem Blatt: Spalten mal Reihen. */
+  gridCols: 3,
+  gridRows: 4,
+  /** Abstand zwischen zwei Tieren am Anfang und am Ende der Runde. */
+  spawnIntervalStartMs: 900,
+  spawnIntervalEndMs: 380,
+  /** So lange bleibt ein Tier sichtbar, am Anfang und am Ende der Runde. */
+  lifetimeStartMs: 1500,
+  lifetimeEndMs: 700,
+  /** Anteil Marienkäfer unter allen Tieren. Rest teilen sich Spinnmilbe und Trauermücke. */
+  ladybugChance: 0.2,
+  /** Anteil Spinnmilben unter den Schädlingen. */
+  miteShareOfPests: 0.5,
+  pointsPerPest: 1,
+  /** Marienkäfer getroffen: so viele Punkte weg (nie unter 0) und Kombo vorbei. */
+  ladybugPenalty: 3,
+  /** Treffer innerhalb dieser Zeit nach dem letzten zählen zur Kombo. */
+  comboWindowMs: 900,
+  /** Alle so viele Treffer in Folge steigt der Multiplikator um 1. */
+  comboStep: 5,
+  maxComboMultiplier: 3,
+  /** Getroffenes Tier bleibt so lange als "getroffen" stehen. */
+  hitShowMs: 250,
+  /** Tipp zählt im Umkreis von so viel Prozent der Lochbreite um die Lochmitte. */
+  hitRadiusFactor: 0.45,
+  /** Ab so vielen Punkten gibt es den Schädlingsschutz (PEST_PROTECTION_REAL_HOURS) dazu. */
+  protectionMinScore: 10,
+} as const;
+
+// ---------------------------------------------------------------------------
 // Sorten
 // ---------------------------------------------------------------------------
 
@@ -202,6 +238,9 @@ export const BLOOM_FERTILIZER_PHASES: readonly PhaseId[] = ['flowering', 'ready'
 /** Füllstand aller Balken nach dem Wiederbeleben aus dem Koma (Kosten regelt P05). */
 export const COMA_REVIVE_NEED_LEVEL = 50;
 
+/** Laune-Abzug, wenn die Lampe in der Dunkelphase der Blüte angetippt wird (P10b). Vorläufig, Chef bestätigt, P32 prüft. */
+export const DARK_DISTURB_MOOD_PENALTY = 10;
+
 // ---------------------------------------------------------------------------
 // Minigames: Tropfen-Fang (Auftrag P13)
 // ---------------------------------------------------------------------------
@@ -251,6 +290,48 @@ export const PRICES_EUR = {
   cosmeticPackSmall: 0.99,
   cosmeticPackLarge: 2.99,
   seasonPass: 2.99,
+} as const;
+
+// ---------------------------------------------------------------------------
+// Minigames: Budi Jump (Auftrag P14)
+// ---------------------------------------------------------------------------
+
+/**
+ * Budi Jump: Endlos-Springer nach oben. Welt-Einheiten: die Bildschirmbreite ist immer 100,
+ * damit das Spiel auf jedem Handy gleich schwer ist. y zählt nach oben.
+ */
+export const BUDI_JUMP = {
+  worldWidth: 100,
+  /** Fallbeschleunigung in Einheiten pro Sekunde². */
+  gravity: 260,
+  /** Absprung-Geschwindigkeit bei Landung auf einem Blatt. Sprunghöhe = v² / (2 · gravity) ≈ 59. */
+  jumpVelocity: 175,
+  /** Höchste Seitwärts-Geschwindigkeit (Einheiten pro Sekunde). */
+  maxSideSpeed: 95,
+  /** Wie schnell Budi die Ziel-Geschwindigkeit erreicht (Anteil pro Sekunde, höher = direkter). */
+  sideResponse: 12,
+  /** Fester Physik-Schritt in ms (120 Hz), unabhängig von der Bildrate. */
+  stepMs: 1000 / 120,
+  budiRadius: 6,
+  platformWidth: 20,
+  platformHeight: 3,
+  /** Abstand der Blätter: am Start und ab difficultyHeight. Max bleibt unter der Sprunghöhe. */
+  gapStart: { min: 14, max: 24 },
+  gapHard: { min: 28, max: 46 },
+  /** Ab dieser Höhe gelten die schweren Abstände voll. */
+  difficultyHeight: 3000,
+  /** Budi bleibt höchstens so weit (Anteil der Sichthöhe) über dem unteren Rand, dann zieht die Kamera mit. */
+  cameraFollow: 0.45,
+  /** So weit über dem sichtbaren oberen Rand werden schon Blätter erzeugt. */
+  spawnAhead: 40,
+  /** Höhe in Einheiten pro Punkt. */
+  heightPerPoint: 10,
+  /** Neigung in g, ab der Budi volle Geschwindigkeit hat. */
+  tiltFullAt: 0.35,
+  /** Neigungen darunter zählen nicht (Zittern der Hand). */
+  tiltDeadZone: 0.04,
+  /** Takt des Beschleunigungssensors in ms. */
+  sensorIntervalMs: 16,
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -329,6 +410,34 @@ export const SEED_FRAGMENTS_BY_STARS: Record<1 | 2 | 3 | 4 | 5, number> = {
   5: 3,
 };
 
+/**
+ * Trichom-Lupe (P24): Erkennungsspiel in der Phase "ready". Der Spieler tippt die milchigen
+ * Köpfchen an. Mit jedem Pflanzentag in "ready" werden mehr Köpfchen bernsteinfarben;
+ * nach READY_GRACE_DAYS sinkt der Lupen-Wert je Tag um latePenaltyPerDay.
+ */
+export const TRICHOME_LUPE = {
+  heads: 12,
+  clearHeads: 2,
+  /** Bernstein-Anteil am Anfang von "ready" und Zuwachs je Pflanzentag, gedeckelt bei maxAmberShare. */
+  amberShareStart: 0.1,
+  amberSharePerDay: 0.04,
+  maxAmberShare: 0.6,
+  /** Abzug vom Lupen-Wert (0 bis 1) je falsch getipptem Köpfchen. */
+  wrongTapPenalty: 0.2,
+  latePenaltyPerDay: 0.1,
+  /** Lupen-Wert, wenn ohne Lupe geerntet wurde (z. B. über das Debug-Menü). */
+  skippedScore: 0.5,
+} as const;
+
+/**
+ * Trocknen (P24): Die Trockenzeit ist in Fenster geteilt, je Fenster zählt einmal Wenden.
+ * Trocknungswert = baseScore + (1 − baseScore) × gewendete Fenster / Fenster.
+ */
+export const DRYING_TURNS = {
+  windows: 3,
+  baseScore: 0.4,
+} as const;
+
 // ---------------------------------------------------------------------------
 // Licht und Phasen: Lichtplan, Tag/Nacht im Raum (Auftrag P11)
 // ---------------------------------------------------------------------------
@@ -346,7 +455,43 @@ export const LIGHT_ON_AT_HOUR = 6;
 // Shop-Upgrades: Topf, LED, Ventilator, Erde, Nützlings-Kit (Auftrag P15)
 // ---------------------------------------------------------------------------
 
-// Werte hier einfügen, z. B. UPGRADES mit Preis und Effekt-Multiplikatoren.
+export type UpgradeId = 'pot' | 'led' | 'fanDehumidifier' | 'bioSoil' | 'beneficials';
+
+/** Wirkung einer Upgrade-Stufe. Fehlt ein Wert, ändert die Stufe daran nichts. */
+export interface UpgradeEffect {
+  /** Abfall-Multiplikator je Balken (0.8 = 20 % langsamer), geht als modifiers an computeNeeds. */
+  needDecay?: Partial<Record<keyof typeof NEED_DECAY_PER_REAL_HOUR, number>>;
+  /** Abfall-Multiplikator für den Lichtbalken (P11). */
+  lightDecay?: number;
+  /** Multiplikator auf den Ertrag (P24 reicht ihn an die Ernte). */
+  yieldMultiplier?: number;
+  /** Multiplikator auf die Schädlingschance (HealthCheckOptions.pestChanceMultiplier). */
+  pestChance?: number;
+  /** Trocknen mit Entfeuchter: kein Schimmel (HealthCheckOptions.hasDehumidifier). */
+  dehumidifier?: boolean;
+}
+
+export interface UpgradeLevel {
+  /** Preis in Münzen. */
+  price: number;
+  /** Gesamtwirkung dieser Stufe (nicht zusätzlich zur Stufe davor). */
+  effect: UpgradeEffect;
+}
+
+/** Reihenfolge im Shop. Mehrstufig: Topf (3 Stufen, Asset U1). */
+export const UPGRADE_IDS: readonly UpgradeId[] = ['pot', 'led', 'fanDehumidifier', 'bioSoil', 'beneficials'];
+
+export const UPGRADES: Record<UpgradeId, readonly UpgradeLevel[]> = {
+  pot: [
+    { price: 60, effect: { needDecay: { water: 0.85 }, yieldMultiplier: 1.1 } },
+    { price: 150, effect: { needDecay: { water: 0.75 }, yieldMultiplier: 1.2 } },
+    { price: 300, effect: { needDecay: { water: 0.65 }, yieldMultiplier: 1.3 } },
+  ],
+  led: [{ price: 120, effect: { lightDecay: 0.7 } }],
+  fanDehumidifier: [{ price: 100, effect: { dehumidifier: true } }],
+  bioSoil: [{ price: 80, effect: { needDecay: { nutrients: 0.75 } } }],
+  beneficials: [{ price: 90, effect: { pestChance: 0.5 } }],
+};
 
 // ---------------------------------------------------------------------------
 // Level und Freischaltungen (Auftrag P16)

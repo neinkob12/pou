@@ -8,6 +8,7 @@ import { AssetImage } from '../ui/AssetImage';
 import { lampTapOutcome } from './phase/lightCycle';
 import { LightFlipDialog } from './phase/LightFlipDialog';
 import { usePlantStatus } from './phase/usePlantStatus';
+import { clock } from '../../lib/clock';
 
 const LAMP_WIDTH = 140;
 const LAMP_HEIGHT = 60;
@@ -31,7 +32,7 @@ export function Lamp() {
     if (!view.status || !view.light) return;
     const outcome = lampTapOutcome(view.status, view.light);
     if (outcome === 'disturb') {
-      gameEvents.emit('lightDisturbed', { atMs: Date.now() });
+      gameEvents.emit('lightDisturbed', { atMs: clock.now() });
       setHint(true);
     } else if (outcome === 'confirmFlip') {
       setDialog(true);

@@ -198,8 +198,69 @@ export const dropsGame = {
   potLabel: 'Topf',
 };
 
+// Budi Jump (Auftrag P14)
+export const jumpGame = {
+  hintTilt: 'Neig das Handy, damit Budi zur Seite hüpft.',
+  hintTap: 'Halt links oder rechts gedrückt, damit Budi zur Seite hüpft.',
+  tiltUnavailable: 'Kein Bewegungssensor gefunden. Budi hört aufs Tippen.',
+  controlsTitle: 'Steuerung bei Budi Jump',
+  controlTilt: 'Neigen',
+  controlTap: 'Tippen',
+  controlsHint: 'Neigen: Handy kippen. Tippen: linke oder rechte Bildschirmhälfte halten.',
+};
+
+export const smashGame = {
+  title: 'Schädlings-Smash',
+  mite: 'Spinnmilbe',
+  gnat: 'Trauermücke',
+  ladybug: 'Marienkäfer: verschonen!',
+  combo: 'Kombo',
+  protectionHint: (minScore: number) => `Ab ${minScore} Punkten: Schädlingsschutz für Budi`,
+  protectionEarned: 'Budi ist jetzt einen Tag vor Schädlingen geschützt!',
+  leafLabel: 'Blatt',
+};
+
 export const shop = {
   title: 'Shop',
+  upgradesTab: 'Upgrades',
+  cosmeticsTab: 'Kosmetik',
+  cosmeticsEmpty: 'Hüte, Brillen und Topf-Skins für Budi kommen bald.',
+  coinsLabel: (coins: number) => `${coins} Münzen`,
+  buy: (price: number) => `Kaufen: ${price}`,
+  upgradeTo: (level: number, price: number) => `Stufe ${level}: ${price}`,
+  owned: 'Gekauft',
+  level: (level: number, max: number) => `Stufe ${level} von ${max}`,
+  notEnoughCoins: 'Zu wenig Münzen',
+  upgrades: {
+    pot: {
+      name: 'Größerer Topf',
+      text: 'Mehr Platz für die Wurzeln: Wasser sinkt langsamer, mehr Ertrag.',
+    },
+    led: {
+      name: 'LED-Lampe',
+      text: 'Spart Strom: der Lichtbalken sinkt langsamer.',
+    },
+    fanDehumidifier: {
+      name: 'Ventilator und Entfeuchter',
+      text: 'Trockene Luft beim Trocknen: kein Schimmel.',
+    },
+    bioSoil: {
+      name: 'Bio-Erde und Spezialdünger',
+      text: 'Lockere Erde hält Nährstoffe länger.',
+    },
+    beneficials: {
+      name: 'Nützlings-Kit',
+      text: 'Raubmilben fressen Schädlinge: weniger Plagegeister.',
+    },
+  },
+  /** Kurzlabel im Raum, solange Grafiken fehlen. */
+  roomLabels: {
+    pot: (level: number) => `Topf ${level}`,
+    led: 'LED',
+    fanDehumidifier: 'Lüfter',
+    bioSoil: 'Bio-Erde',
+    beneficials: 'Nützlinge',
+  },
 };
 
 export const album = {
@@ -254,8 +315,55 @@ export const debug = {
   unlockEventStrain: 'Kölsche Knospe freischalten',
 };
 
+/** Ernte-Ablauf (P24): Lupe, Schere, Trocknen, Abschluss. */
 export const harvestScreen = {
   title: 'Ernte',
+  noPlant: 'Der Topf ist leer.',
+  toSeedSelect: 'Samen wählen',
+  notReady: 'Budi ist noch nicht erntereif. Schau wieder vorbei, wenn er "Erntebereit" ist.',
+  toRoom: 'Zurück zu Budi',
+  lupeTitle: 'Trichom-Lupe',
+  lupeIntro: 'Unter der Lupe glitzern kleine Köpfchen. Tippe alle milchigen an, dann weißt du, ob Budi reif ist.',
+  lupeLegendClear: 'klar: noch zu früh',
+  lupeLegendMilky: 'milchig: genau richtig',
+  lupeLegendAmber: 'bernstein: schon spät',
+  lupeLabel: 'Lupe (U7)',
+  lupeHeadLabel: (n: number) => `Köpfchen ${n}`,
+  lupeDone: 'Fertig geschaut',
+  lupeSkip: 'Ohne Lupe weiter',
+  lupeResult: (percent: number) => `Lupen-Ergebnis: ${percent} %`,
+  lupeLate: 'Budi wartet schon lange. Viele Köpfchen sind bernsteinfarben.',
+  cutTitle: 'Schere ansetzen',
+  cutIntro: 'Wisch mit der Schere quer über den Stiel.',
+  cutScissors: 'Schere (U8)',
+  cutStem: 'Budis Stiel',
+  dryingTitle: 'Trocknen',
+  dryingIntro: 'Budis Zweige hängen kopfüber im Trockenraum. Wende sie ab und zu, dann trocknen sie gleichmäßig.',
+  dryingRoom: 'Trockenraum (H3)',
+  dryingBranches: 'Zweige an der Leine (B7)',
+  dryingTurn: 'Zweige wenden',
+  dryingTurned: 'In diesem Abschnitt schon gewendet',
+  dryingTurns: (done: number, total: number) => `Gewendet: ${done} von ${total}`,
+  dryingDone: 'Fertig getrocknet!',
+  collect: 'Einsammeln',
+  summaryTitle: 'Ernte fertig!',
+  summaryCrate: 'Erntekiste (B8)',
+  summaryStars: (stars: number) => `${stars} von 5 Sternen`,
+  starFull: '★',
+  starEmpty: '☆',
+  summaryYield: (units: number) => `${units} Ertragseinheiten`,
+  summaryMarket: 'Der Kräutermarkt zahlt',
+  summaryCoins: (coins: number) => `${coins} Münzen`,
+  summaryFragments: (n: number) => (n === 1 ? '1 Samen-Fragment' : `${n} Samen-Fragmente`),
+  summaryNoFragments: 'Keine Samen-Fragmente, beim nächsten Mal mehr Sterne holen.',
+  summaryNewStrain: (name: string) => `Neue Sorte freigeschaltet: ${name}`,
+  summaryCoinsDoubled: 'Münzen verdoppelt!',
+  summaryNext: 'Neuen Samen wählen',
+  entryReady: 'Ernten',
+  entryDrying: 'Zum Trockenraum',
+  entryDone: 'Einsammeln',
+  entrySummary: 'Ernte ansehen',
+  entryEmpty: 'Samen pflanzen',
 };
 
 export const seedSelect = {
