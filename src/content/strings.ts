@@ -580,3 +580,8 @@ export const dailyGoals = {
   chestReward: (coins: number) => `Da drin: ${coins} Münzen. Morgen hab ich wieder was für dich.`,
   claimed: 'Geschafft! Morgen gibt es ein neues Ziel.',
 };
+
+/** Web-Version zum Testen im Browser (Auftrag PWEB). */
+export const webVersion = {
+  notificationsUnavailable: 'In der Browser-Version meldet sich Budi nicht. Benachrichtigungen gibt es nur in der App.',
+};

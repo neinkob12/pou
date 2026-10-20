@@ -22,7 +22,8 @@
     },
     "web": {
       "favicon": "./assets/icon/favicon.png",
-      "bundler": "metro"
+      "bundler": "metro",
+      "output": "single"
     },
     "plugins": [
       "expo-router",
@@ -42,6 +43,9 @@
       "image": "./assets/icon/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#FFF4E0"
+    },
+    "experiments": {
+      "baseUrl": "/pou-"
     }
   }
 }

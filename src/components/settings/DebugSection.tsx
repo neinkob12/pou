@@ -2,11 +2,12 @@ import { Text } from 'react-native';
 
 import { debug } from '../../content/strings';
 import { NavLink } from '../ui/NavLink';
+import { devToolsEnabled } from '../../lib/devTools';
 import { SettingsSection } from './SettingsSection';
 
 /** Einstieg ins Debug-Menü. Im Release-Build nicht vorhanden. */
 export function DebugSection() {
-  if (!__DEV__) return null;
+  if (!devToolsEnabled()) return null;
   return (
     <SettingsSection title={debug.sectionTitle}>
       <Text className="font-body text-sm text-inkMuted">{debug.sectionHint}</Text>
