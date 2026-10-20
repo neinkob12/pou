@@ -184,6 +184,17 @@ export const tapGame = {
   circleLabel: 'Kreis',
 };
 
+// Budi Jump (Auftrag P14)
+export const jumpGame = {
+  hintTilt: 'Neig das Handy, damit Budi zur Seite hüpft.',
+  hintTap: 'Halt links oder rechts gedrückt, damit Budi zur Seite hüpft.',
+  tiltUnavailable: 'Kein Bewegungssensor gefunden. Budi hört aufs Tippen.',
+  controlsTitle: 'Steuerung bei Budi Jump',
+  controlTilt: 'Neigen',
+  controlTap: 'Tippen',
+  controlsHint: 'Neigen: Handy kippen. Tippen: linke oder rechte Bildschirmhälfte halten.',
+};
+
 export const smashGame = {
   title: 'Schädlings-Smash',
   mite: 'Spinnmilbe',
@@ -197,6 +208,45 @@ export const smashGame = {
 
 export const shop = {
   title: 'Shop',
+  upgradesTab: 'Upgrades',
+  cosmeticsTab: 'Kosmetik',
+  cosmeticsEmpty: 'Hüte, Brillen und Topf-Skins für Budi kommen bald.',
+  coinsLabel: (coins: number) => `${coins} Münzen`,
+  buy: (price: number) => `Kaufen: ${price}`,
+  upgradeTo: (level: number, price: number) => `Stufe ${level}: ${price}`,
+  owned: 'Gekauft',
+  level: (level: number, max: number) => `Stufe ${level} von ${max}`,
+  notEnoughCoins: 'Zu wenig Münzen',
+  upgrades: {
+    pot: {
+      name: 'Größerer Topf',
+      text: 'Mehr Platz für die Wurzeln: Wasser sinkt langsamer, mehr Ertrag.',
+    },
+    led: {
+      name: 'LED-Lampe',
+      text: 'Spart Strom: der Lichtbalken sinkt langsamer.',
+    },
+    fanDehumidifier: {
+      name: 'Ventilator und Entfeuchter',
+      text: 'Trockene Luft beim Trocknen: kein Schimmel.',
+    },
+    bioSoil: {
+      name: 'Bio-Erde und Spezialdünger',
+      text: 'Lockere Erde hält Nährstoffe länger.',
+    },
+    beneficials: {
+      name: 'Nützlings-Kit',
+      text: 'Raubmilben fressen Schädlinge: weniger Plagegeister.',
+    },
+  },
+  /** Kurzlabel im Raum, solange Grafiken fehlen. */
+  roomLabels: {
+    pot: (level: number) => `Topf ${level}`,
+    led: 'LED',
+    fanDehumidifier: 'Lüfter',
+    bioSoil: 'Bio-Erde',
+    beneficials: 'Nützlinge',
+  },
 };
 
 export const album = {

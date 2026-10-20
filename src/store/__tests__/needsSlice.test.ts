@@ -1,4 +1,9 @@
-import { COMA_AFTER_REAL_HOURS, COMA_REVIVE_NEED_LEVEL, NEED_START } from '../../game/config';
+import {
+  COMA_AFTER_REAL_HOURS,
+  COMA_REVIVE_NEED_LEVEL,
+  DARK_DISTURB_MOOD_PENALTY,
+  NEED_START,
+} from '../../game/config';
 import { gameEvents } from '../../game/events';
 import { useGameStore } from '../gameStore';
 
@@ -34,6 +39,23 @@ describe('needs-Slice', () => {
     const at = T0 + COMA_AFTER_REAL_HOURS * HOUR;
     expect(useGameStore.getState().care({ type: 'pet', phase: 'vegetative' }, at)).toBe(false);
     expect(listener).not.toHaveBeenCalled();
+  });
+
+  it('disturbMood senkt die Laune ohne careAction und ohne Pflegezeit', () => {
+    const listener = jest.fn();
+    gameEvents.on('careAction', listener);
+    expect(useGameStore.getState().disturbMood('flowering', T0)).toBe(true);
+    const { needs } = useGameStore.getState();
+    expect(needs.values.mood).toBe(NEED_START.mood - DARK_DISTURB_MOOD_PENALTY);
+    expect(needs.lastCareAtMs).toBe(T0);
+    expect(listener).not.toHaveBeenCalled();
+  });
+
+  it('disturbMood wirkt im Koma nicht', () => {
+    const at = T0 + COMA_AFTER_REAL_HOURS * HOUR;
+    const before = useGameStore.getState().needs;
+    expect(useGameStore.getState().disturbMood('flowering', at)).toBe(false);
+    expect(useGameStore.getState().needs).toBe(before);
   });
 
   it('holt Budi aus dem Koma', () => {

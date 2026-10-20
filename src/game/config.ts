@@ -238,6 +238,9 @@ export const BLOOM_FERTILIZER_PHASES: readonly PhaseId[] = ['flowering', 'ready'
 /** Füllstand aller Balken nach dem Wiederbeleben aus dem Koma (Kosten regelt P05). */
 export const COMA_REVIVE_NEED_LEVEL = 50;
 
+/** Laune-Abzug, wenn die Lampe in der Dunkelphase der Blüte angetippt wird (P10b). Vorläufig, Chef bestätigt, P32 prüft. */
+export const DARK_DISTURB_MOOD_PENALTY = 10;
+
 // ---------------------------------------------------------------------------
 // Ertrag und Wirtschaft
 // ---------------------------------------------------------------------------
@@ -258,6 +261,48 @@ export const PRICES_EUR = {
   cosmeticPackSmall: 0.99,
   cosmeticPackLarge: 2.99,
   seasonPass: 2.99,
+} as const;
+
+// ---------------------------------------------------------------------------
+// Minigames: Budi Jump (Auftrag P14)
+// ---------------------------------------------------------------------------
+
+/**
+ * Budi Jump: Endlos-Springer nach oben. Welt-Einheiten: die Bildschirmbreite ist immer 100,
+ * damit das Spiel auf jedem Handy gleich schwer ist. y zählt nach oben.
+ */
+export const BUDI_JUMP = {
+  worldWidth: 100,
+  /** Fallbeschleunigung in Einheiten pro Sekunde². */
+  gravity: 260,
+  /** Absprung-Geschwindigkeit bei Landung auf einem Blatt. Sprunghöhe = v² / (2 · gravity) ≈ 59. */
+  jumpVelocity: 175,
+  /** Höchste Seitwärts-Geschwindigkeit (Einheiten pro Sekunde). */
+  maxSideSpeed: 95,
+  /** Wie schnell Budi die Ziel-Geschwindigkeit erreicht (Anteil pro Sekunde, höher = direkter). */
+  sideResponse: 12,
+  /** Fester Physik-Schritt in ms (120 Hz), unabhängig von der Bildrate. */
+  stepMs: 1000 / 120,
+  budiRadius: 6,
+  platformWidth: 20,
+  platformHeight: 3,
+  /** Abstand der Blätter: am Start und ab difficultyHeight. Max bleibt unter der Sprunghöhe. */
+  gapStart: { min: 14, max: 24 },
+  gapHard: { min: 28, max: 46 },
+  /** Ab dieser Höhe gelten die schweren Abstände voll. */
+  difficultyHeight: 3000,
+  /** Budi bleibt höchstens so weit (Anteil der Sichthöhe) über dem unteren Rand, dann zieht die Kamera mit. */
+  cameraFollow: 0.45,
+  /** So weit über dem sichtbaren oberen Rand werden schon Blätter erzeugt. */
+  spawnAhead: 40,
+  /** Höhe in Einheiten pro Punkt. */
+  heightPerPoint: 10,
+  /** Neigung in g, ab der Budi volle Geschwindigkeit hat. */
+  tiltFullAt: 0.35,
+  /** Neigungen darunter zählen nicht (Zittern der Hand). */
+  tiltDeadZone: 0.04,
+  /** Takt des Beschleunigungssensors in ms. */
+  sensorIntervalMs: 16,
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -381,7 +426,43 @@ export const LIGHT_ON_AT_HOUR = 6;
 // Shop-Upgrades: Topf, LED, Ventilator, Erde, Nützlings-Kit (Auftrag P15)
 // ---------------------------------------------------------------------------
 
-// Werte hier einfügen, z. B. UPGRADES mit Preis und Effekt-Multiplikatoren.
+export type UpgradeId = 'pot' | 'led' | 'fanDehumidifier' | 'bioSoil' | 'beneficials';
+
+/** Wirkung einer Upgrade-Stufe. Fehlt ein Wert, ändert die Stufe daran nichts. */
+export interface UpgradeEffect {
+  /** Abfall-Multiplikator je Balken (0.8 = 20 % langsamer), geht als modifiers an computeNeeds. */
+  needDecay?: Partial<Record<keyof typeof NEED_DECAY_PER_REAL_HOUR, number>>;
+  /** Abfall-Multiplikator für den Lichtbalken (P11). */
+  lightDecay?: number;
+  /** Multiplikator auf den Ertrag (P24 reicht ihn an die Ernte). */
+  yieldMultiplier?: number;
+  /** Multiplikator auf die Schädlingschance (HealthCheckOptions.pestChanceMultiplier). */
+  pestChance?: number;
+  /** Trocknen mit Entfeuchter: kein Schimmel (HealthCheckOptions.hasDehumidifier). */
+  dehumidifier?: boolean;
+}
+
+export interface UpgradeLevel {
+  /** Preis in Münzen. */
+  price: number;
+  /** Gesamtwirkung dieser Stufe (nicht zusätzlich zur Stufe davor). */
+  effect: UpgradeEffect;
+}
+
+/** Reihenfolge im Shop. Mehrstufig: Topf (3 Stufen, Asset U1). */
+export const UPGRADE_IDS: readonly UpgradeId[] = ['pot', 'led', 'fanDehumidifier', 'bioSoil', 'beneficials'];
+
+export const UPGRADES: Record<UpgradeId, readonly UpgradeLevel[]> = {
+  pot: [
+    { price: 60, effect: { needDecay: { water: 0.85 }, yieldMultiplier: 1.1 } },
+    { price: 150, effect: { needDecay: { water: 0.75 }, yieldMultiplier: 1.2 } },
+    { price: 300, effect: { needDecay: { water: 0.65 }, yieldMultiplier: 1.3 } },
+  ],
+  led: [{ price: 120, effect: { lightDecay: 0.7 } }],
+  fanDehumidifier: [{ price: 100, effect: { dehumidifier: true } }],
+  bioSoil: [{ price: 80, effect: { needDecay: { nutrients: 0.75 } } }],
+  beneficials: [{ price: 90, effect: { pestChance: 0.5 } }],
+};
 
 // ---------------------------------------------------------------------------
 // Level und Freischaltungen (Auftrag P16)

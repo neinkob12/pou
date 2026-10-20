@@ -1,6 +1,7 @@
 import { COMA_AFTER_REAL_HOURS, COMA_REVIVE_COINS, MOLD_TREATMENT_COINS, PEST_MAX_ON_BUDI } from '../../../../game/config';
 import type { Pest } from '../../../../game/health';
 import { computeNeeds, deriveCondition, NO_MODIFIERS } from '../../../../game/needs';
+import { createUpgradeLevels, upgradeEffects } from '../../../../game/shop';
 import { createPlant, getPlantStatus } from '../../../../game/timeEngine';
 import { useGameStore } from '../../../../store/gameStore';
 import {
@@ -41,6 +42,26 @@ describe('Gesundheit im Raum', () => {
     const { neglect } = healthCheckOptions(plant, useGameStore.getState().needs, 1);
     if (typeof neglect !== 'function') throw new Error('neglect sollte eine Funktion sein');
     expect(neglect(T0 + 30 * HOUR)).toBeGreaterThan(neglect(T0 + HOUR));
+  });
+
+  it('reicht Nützlings-Kit und Entfeuchter aus dem Shop weiter', () => {
+    const effects = upgradeEffects({ ...createUpgradeLevels(), beneficials: 1, fanDehumidifier: 1 });
+    const options = healthCheckOptions(plant, useGameStore.getState().needs, 1, effects);
+    expect(options.pestChanceMultiplier).toBe(effects.pestChanceMultiplier);
+    expect(options.pestChanceMultiplier).toBeLessThan(1);
+    expect(options.hasDehumidifier).toBe(true);
+    const none = healthCheckOptions(plant, useGameStore.getState().needs, 1);
+    expect(none.pestChanceMultiplier).toBeUndefined();
+    expect(none.hasDehumidifier).toBeUndefined();
+  });
+
+  it('syncHealth nutzt gekaufte Upgrades', () => {
+    const effects = { ...createUpgradeLevels(), beneficials: 1 };
+    useGameStore.setState({ upgrades: effects });
+    const spy = jest.spyOn(useGameStore.getState(), 'checkHealth');
+    syncHealth(useGameStore.getState(), T0 + 2 * HOUR);
+    expect(spy.mock.calls[0][2].pestChanceMultiplier).toBe(upgradeEffects(effects).pestChanceMultiplier);
+    spy.mockRestore();
   });
 
   it('syncHealth würfelt nach Abwesenheit Schädlinge, ohne Pflanze nichts', () => {

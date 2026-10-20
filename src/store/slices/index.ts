@@ -6,11 +6,13 @@ import { createDebugSlice } from './debug';
 import { createFactsSlice } from './facts';
 import { createHarvestSlice } from './harvest';
 import { createHealthSlice } from './health';
+import { createJumpSlice } from './jump';
 import { createMinigamesSlice } from './minigames';
 import { createNeedsSlice } from './needs';
 import { createOnboardingSlice } from './onboarding';
 import { createPlantSlice } from './plant';
 import { createProgressionSlice } from './progression';
+import { createShopSlice } from './shop';
 
 export const slices = {
   plant: createPlantSlice,
@@ -20,7 +22,9 @@ export const slices = {
   debug: createDebugSlice,
   onboarding: createOnboardingSlice,
   minigames: createMinigamesSlice,
+  jump: createJumpSlice,
   harvest: createHarvestSlice,
+  shop: createShopSlice,
   facts: createFactsSlice,
 };
 
