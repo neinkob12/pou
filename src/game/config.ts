@@ -1,5 +1,9 @@
 // PotPou: zentrale Balancing-Werte.
 // Alle Zahlen, die das Spielgefühl bestimmen, stehen hier und nur hier.
+//
+// Büro-Regel (docs/AUFTRAEGE.md): Jeder Auftrag ergänzt Werte NUR in seinem markierten Abschnitt,
+// nie am Dateiende. Die Abschnitte unten sind vorab reserviert, damit parallele Branches
+// ohne Merge-Konflikt zusammenlaufen.
 // Einheiten: "Pflanzentage" = Tage im Leben der Pflanze, "echte Stunden" = Uhrzeit des Spielers.
 
 /** 1 echter Tag = TIME_SCALE Pflanzentage. Standard: ein Zyklus dauert rund 10 echte Tage. */
@@ -171,6 +175,42 @@ export const PRICES_EUR = {
   cosmeticPackLarge: 2.99,
   seasonPass: 2.99,
 } as const;
+
+// ---------------------------------------------------------------------------
+// Gesundheit: Schädlinge, Schimmel, Koma (Auftrag P05, UI P21)
+// ---------------------------------------------------------------------------
+
+// Werte hier einfügen, z. B. PEST_BASE_CHANCE_PER_PLANT_DAY, MOLD_HUMIDITY_THRESHOLD, COMA_REVIVE_COINS.
+
+// ---------------------------------------------------------------------------
+// Ernte-Qualität: Sterne, Trichom-Lupe, Trocknung (Auftrag P06, UI P24)
+// ---------------------------------------------------------------------------
+
+// Werte hier einfügen, z. B. QUALITY_PENALTY_PER_DISEASE, SEED_FRAGMENTS_PER_HARVEST.
+
+// ---------------------------------------------------------------------------
+// Shop-Upgrades: Topf, LED, Ventilator, Erde, Nützlings-Kit (Auftrag P15)
+// ---------------------------------------------------------------------------
+
+// Werte hier einfügen, z. B. UPGRADES mit Preis und Effekt-Multiplikatoren.
+
+// ---------------------------------------------------------------------------
+// Level und Freischaltungen (Auftrag P16)
+// ---------------------------------------------------------------------------
+
+// Werte hier einfügen, z. B. XP_PER_HARVEST, XP_PER_STAR, LEVEL_THRESHOLDS.
+
+// ---------------------------------------------------------------------------
+// Tagesziele und Benachrichtigungen (Aufträge P18, P19)
+// ---------------------------------------------------------------------------
+
+// Werte hier einfügen, z. B. NOTIFICATIONS_MAX_PER_DAY, QUIET_HOURS, DAILY_GOAL_POOL.
+
+// ---------------------------------------------------------------------------
+// Kosmetik und Saisonpass (Aufträge P25, P33)
+// ---------------------------------------------------------------------------
+
+// Werte hier einfügen, z. B. COSMETIC_ITEMS mit Münzpreis oder Produkt-ID.
 
 // ---------------------------------------------------------------------------
 // Minigames

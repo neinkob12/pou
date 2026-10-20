@@ -96,10 +96,12 @@ docs/
 - Debug-Menü im Spiel mit Zeitraffer (`DEBUG_SPEED_MULTIPLIER` in `config.ts`), damit ein ganzer Zyklus in Minuten testbar ist
 - Claude Code für Features und Änderungen über mehrere Dateien
 
-## Setup-Befehle (Session 2)
+## Setup-Befehle (Session 2 bzw. Auftrag P01)
+
+Das Expo-Projekt liegt im Repo-Root, nicht in einem Unterordner. Also in einem Temp-Ordner erzeugen und die Dateien ins Root verschieben, ohne `CLAUDE.md`, `docs/`, `src/game/`, `scripts/` und `.github/` zu überschreiben.
 
 ```bash
-npx create-expo-app potpou --template blank-typescript
+npx create-expo-app potpou --template blank-typescript   # im Temp-Ordner, dann Inhalt ins Repo-Root verschieben
 cd potpou
 
 npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar
@@ -109,7 +111,11 @@ npx expo install expo-haptics expo-notifications
 npm install zustand react-native-mmkv
 npm install nativewind
 npm install -D tailwindcss jest-expo jest @types/jest
+npx expo install expo-sensors expo-font @expo-google-fonts/fredoka @expo-google-fonts/nunito
+npm install -D eslint eslint-config-expo
 ```
+
+Pflicht-Skripte in `package.json`: `typecheck` (`tsc --noEmit`), `lint` (`eslint .`), `test` (`jest`). `bash scripts/check.sh` ruft sie in dieser Reihenfolge auf und ist der einzige Prüfbefehl für Kollegen und CI.
 
 RevenueCat, AdMob und expo-sensors kommen erst in ihren eigenen Sessions dazu.
 
