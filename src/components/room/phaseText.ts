@@ -1,8 +1,7 @@
 // Reine Textlogik für PhaseHeader (ohne React, damit testbar).
 
-import { PHASE_LABELS } from '../../game/config';
 import type { PlantStatus } from '../../game/timeEngine';
-import { room } from '../../content/strings';
+import { phaseLabels, room } from '../../content/strings';
 
 const MS_PER_HOUR = 60 * 60 * 1000;
 
@@ -24,7 +23,7 @@ export function formatRemaining(status: PlantStatus): string {
 export function phaseText(status: PlantStatus | null): PhaseText {
   if (!status) return { phaseLabel: room.noPlant, remaining: '', progress: 0 };
   return {
-    phaseLabel: PHASE_LABELS[status.phase],
+    phaseLabel: phaseLabels[status.phase],
     remaining: formatRemaining(status),
     progress: status.phaseProgress,
   };

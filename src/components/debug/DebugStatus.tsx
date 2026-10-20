@@ -1,7 +1,6 @@
 import { Text } from 'react-native';
 
-import { debug } from '../../content/strings';
-import { PHASE_LABELS } from '../../game/config';
+import { debug, phaseLabels } from '../../content/strings';
 import { formatClock } from '../../game/debug';
 import { computeNeeds, NEED_IDS, NO_MODIFIERS } from '../../game/needs';
 import { getPlantStatus } from '../../game/timeEngine';
@@ -35,7 +34,7 @@ export function DebugStatus() {
     <SettingsSection title={debug.statusTitle}>
       {status ? (
         <>
-          <Row label={debug.phaseLabel} value={PHASE_LABELS[status.phase]} />
+          <Row label={debug.phaseLabel} value={phaseLabels[status.phase]} />
           <Row label={debug.ageLabel} value={`${status.ageDays.toFixed(1)} ${debug.ageUnit}`} />
           <Row
             label={debug.remainingLabel}

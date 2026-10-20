@@ -6,11 +6,10 @@ import * as Notifications from 'expo-notifications';
 import { AndroidImportance, IosAuthorizationStatus } from 'expo-notifications';
 import { Platform } from 'react-native';
 
-import { PHASE_LABELS } from '../game/config';
 import type { NeedsState } from '../game/needs';
 import { planNotifications, type PlannedNotification } from '../game/notifications';
 import type { PlantRecord } from '../game/timeEngine';
-import { notifications as texts } from '../content/strings';
+import { notifications as texts, phaseLabels } from '../content/strings';
 import { safeSet, storage } from './storage';
 
 export const NOTIFICATION_KEYS = {
@@ -31,7 +30,7 @@ export function notificationsEnabled(): boolean {
 
 /** Titel und Text in Budis Stimme. Die Variante hängt an der Stunde, damit es nicht immer gleich klingt. */
 export function notificationContent(n: PlannedNotification): { title: string; body: string } {
-  if (n.kind === 'phaseChanged') return texts.phaseChanged(PHASE_LABELS[n.phase ?? 'seedling']);
+  if (n.kind === 'phaseChanged') return texts.phaseChanged(phaseLabels[n.phase ?? 'seedling']);
   const variants = texts[n.kind];
   return variants[Math.floor(n.atMs / MS_PER_HOUR) % variants.length];
 }

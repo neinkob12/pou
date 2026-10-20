@@ -1,6 +1,5 @@
-import { PHASE_LABELS } from '../../../game/config';
 import type { PlantStatus } from '../../../game/timeEngine';
-import { room } from '../../../content/strings';
+import { phaseLabels, room } from '../../../content/strings';
 import { formatRemaining, phaseText } from '../phaseText';
 
 const HOUR = 60 * 60 * 1000;
@@ -44,7 +43,7 @@ describe('phaseText', () => {
 
   it('mit Pflanze: Phasenname, Restzeit, Fortschritt', () => {
     expect(phaseText(status({}))).toEqual({
-      phaseLabel: PHASE_LABELS.seedling,
+      phaseLabel: phaseLabels.seedling,
       remaining: room.remainingHours(5),
       progress: 0.25,
     });
