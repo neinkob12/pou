@@ -16,13 +16,14 @@ import { playCareHaptic } from '../components/room/care/haptics';
 import { useNow } from '../components/room/useNow';
 import { useGameStore } from '../store/gameStore';
 import { selectDebugMultiplier } from '../store/slices/debug';
+import { clock } from '../lib/clock';
 
 /**
  * Pflege jetzt anwenden, mit der Phase zu diesem Zeitpunkt. Ohne Pflanze passiert nichts.
  * Rückgabe: Rückmeldung für Haptik und Animation, null ohne Pflanze.
  */
 export function applyCareNow(type: CareActionId, amount?: number): CareFeedback | null {
-  const nowMs = Date.now();
+  const nowMs = clock.now();
   const state = useGameStore.getState();
   if (!state.plant) return null;
   const { phase } = getPlantStatus(state.plant, nowMs, selectDebugMultiplier(state));
@@ -33,7 +34,7 @@ export function applyCareNow(type: CareActionId, amount?: number): CareFeedback 
 
 /** Laune-Bonus nach einem Minispiel (MINIGAME_REWARDS.moodPerRound), über applyCare. */
 export function applyMinigameMoodBonus(): void {
-  const nowMs = Date.now();
+  const nowMs = clock.now();
   const state = useGameStore.getState();
   const phase = state.plant ? getPlantStatus(state.plant, nowMs, selectDebugMultiplier(state)).phase : null;
   const action = moodBonusAction(phase);

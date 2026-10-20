@@ -5,6 +5,7 @@ import { flipLight, harvest, type PlantRecord } from '../../game/timeEngine';
 import { useGameStore } from '../../store/gameStore';
 import { selectDebugMultiplier } from '../../store/slices/debug';
 import { toProgressStats } from '../../store/slices/progression';
+import { clock as sharedClock } from '../../lib/clock';
 
 const START_STRAIN: StrainId = 'gustav';
 const EVENT_STRAIN: StrainId = 'koelsch';
@@ -25,7 +26,7 @@ export function statsUnlockingAll(stats: ProgressStats): ProgressStats {
 }
 
 /** Alle Aktionen des Debug-Menüs. Zeit läuft nur über debugMultiplier und Zeitstempel. */
-export function createDebugActions(store = useGameStore, clock: () => number = Date.now) {
+export function createDebugActions(store = useGameStore, clock: () => number = sharedClock.now) {
   const multiplier = () => selectDebugMultiplier(store.getState());
   const updatePlant = (fn: (plant: PlantRecord) => PlantRecord) => {
     const { plant, setPlant } = store.getState();
