@@ -145,10 +145,10 @@ export const debug = {
   resetTitle: 'Spielstand',
   reset: 'Spielstand zurücksetzen',
   resetConfirm: 'Nochmal tippen zum Bestätigen',
-  pendingTitle: 'Kommt später',
   setBars: 'Balken setzen',
+  strainsTitle: 'Sorten',
   unlockStrains: 'Alle Sorten freischalten',
-  pendingHint: 'Wartet auf den zuständigen Auftrag.',
+  unlockEventStrain: 'Kölsche Knospe freischalten',
 };
 
 export const harvestScreen = {
