@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "PotPou",
+    "slug": "potpou",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.potpou"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#FFF4E0",
+        "foregroundImage": "./assets/icon/android-icon-foreground.png",
+        "backgroundImage": "./assets/icon/android-icon-background.png",
+        "monochromeImage": "./assets/icon/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "app.potpou"
+    },
+    "web": {
+      "favicon": "./assets/icon/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-notifications"
+    ],
+    "scheme": "potpou",
+    "splash": {
+      "image": "./assets/icon/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFF4E0"
+    }
+  }
+}
