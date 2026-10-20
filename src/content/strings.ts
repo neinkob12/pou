@@ -195,6 +195,7 @@ export const minigameFeel = {
   tipTitle: 'Tipp',
   keyboardHint: 'Am Rechner: Pfeiltasten oder A/D, Esc für Pause',
   quizKeysHint: 'Am Rechner: Tasten 1 bis 3, Enter für weiter',
+  dropsSalt: 'Salz!',
   tips: {
     tap: [
       'Der Ring zeigt, wie lange die Knospe noch bleibt. Tipp sie, bevor er leer ist.',

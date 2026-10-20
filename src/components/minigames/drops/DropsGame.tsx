@@ -1,57 +1,121 @@
-// "Tropfen fangen": Topf unten per Wischen bewegen, Wasser und Dünger fangen, Salz meiden.
-// Feld und Topf sind Shared Values (UI-Thread, 60 fps). React bekommt nur Punkte, Leben und
-// Fänge. Am Rundenende füllen die Fänge Budis Balken über applyCare (dropsReward.ts).
+// "Tropfen fangen": Topf unten per Wischen (oder Pfeiltasten am Rechner) bewegen, Wasser und Dünger
+// fangen, Salz meiden. Feld und Topf sind Shared Values (UI-Thread, 60 fps). React bekommt nur Punkte,
+// Leben und Fänge. Am Rundenende füllen die Fänge Budis Balken über applyCare (dropsReward.ts).
+// Feedback (Auftrag 40): Spritzer, Topf federt, Popups, Wackeln bei Salz, Kombo für Fänge in Folge.
 
+import { Canvas, Group } from '@shopify/react-native-skia';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Text, View, type LayoutChangeEvent } from 'react-native';
+import { Platform, Text, View, type LayoutChangeEvent } from 'react-native';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import { useFrameCallback, useSharedValue } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
-import { dropsGame as t } from '../../../content/strings';
+import { dropsGame as t, minigameFeel } from '../../../content/strings';
 import { DROPS_GAME, MINIGAME_FRAMEWORK } from '../../../game/config';
 import { cue, useMinigameAudio } from '../../../lib/audio';
+import { colors, gameColors } from '../../../lib/theme';
+import { ComboBadge } from '../framework/fx/ComboBadge';
+import { FxLayer } from '../framework/fx/FxLayer';
+import { PopupLayer } from '../framework/fx/PopupLayer';
+import { useFx } from '../framework/fx/useFx';
+import { useShakeTransform } from '../framework/fx/useShake';
+import { useKeyAxis } from '../framework/input/useKeyboard';
 import type { MinigameSession } from '../framework/useMinigameSession';
 import { DropsCanvas } from './DropsCanvas';
+import { floorY, movePotByKeys, vanishedDrops } from './dropsFeel';
 import { DropsHud } from './DropsHud';
-import { barGain, clampPot, createField, grantExtraLife, stepField, type DropsReward } from './dropsLogic';
+import { barGain, clampPot, createField, grantExtraLife, potTop, stepField, type DropsReward } from './dropsLogic';
 import { applyDropsReward } from './dropsReward';
+
+/** Partikel: 0 Wasser, 1 Dünger, 2 Salz. */
+const PALETTE = [gameColors.water, colors.plantLight, colors.inkMuted] as const;
+const KIND_COLOR = { water: 0, fertilizer: 1, salt: 2 } as const;
 
 export function DropsGame({ session }: { session: MinigameSession }) {
   const { clock, addScore, endGame, setExtraLifeHandler, phase, result } = session;
   const size = useSharedValue({ width: 0, height: 0 });
   const field = useSharedValue(createField(0));
+  const lastCatchMs = useSharedValue(-1e9);
+  const streak = useSharedValue(0);
+  const keyAxis = useKeyAxis();
   const [lives, setLives] = useState<number>(DROPS_GAME.lives);
   const [caught, setCaught] = useState({ water: 0, fertilizer: 0 });
+  const [combo, setCombo] = useState(0);
   const [reward, setReward] = useState<DropsReward | null | undefined>(undefined);
   const rewardedRef = useRef(false);
+  const fx = useFx();
+  const shakeTransform = useShakeTransform(fx.state, fx.now);
   useMinigameAudio(phase, result?.coins ?? null);
 
   const onStep = useCallback(
-    (points: number, livesLeft: number, water: number, fertilizer: number, livesLost: number) => {
+    (
+      points: number,
+      livesLeft: number,
+      water: number,
+      fertilizer: number,
+      livesLost: number,
+      run: number,
+      x: number,
+    ) => {
       if (livesLost > 0) cue(livesLeft <= 0 ? 'fail' : 'ouch');
       else if (points > 0) cue('catch');
+      const y = potTop(size.get().height) - 16;
       if (points > 0) {
         addScore(points);
         setCaught({ water, fertilizer });
+        fx.popup(x, y, `+${points}`, colors.plantDark, run >= 5);
       }
+      if (livesLost > 0) fx.popup(x, y, minigameFeel.dropsSalt, colors.coral, true);
+      setCombo(run);
       setLives(livesLeft);
       if (livesLeft <= 0) endGame();
     },
-    [addScore, endGame],
+    [addScore, endGame, fx, size],
   );
 
   useFrameCallback((frame) => {
     'worklet';
     const { phase: p, elapsedMs } = clock.get();
     const { width, height } = size.get();
-    const before = field.get();
-    if (p !== 'playing' || width === 0 || before.lives <= 0) return;
+    const start = field.get();
+    if (p !== 'playing' || width === 0 || start.lives <= 0) return;
     const dt = Math.min(frame.timeSincePreviousFrame ?? 0, MINIGAME_FRAMEWORK.maxFrameStepMs);
+    const axis = keyAxis.get();
+    const before = axis === 0 ? start : { ...start, potX: movePotByKeys(start.potX, axis, dt, width) };
     const { field: next, events } = stepField(before, dt, elapsedMs, width, height, Math.random(), Math.random());
     field.set(next);
-    if (events.points > 0 || events.livesLost > 0) {
-      scheduleOnRN(onStep, events.points, next.lives, next.caughtWater, next.caughtFertilizer, events.livesLost);
+    let catchX = next.potX;
+    let streakBroken = false;
+    for (const v of vanishedDrops(before, next, height)) {
+      if (v.caught) {
+        catchX = v.x;
+        fx.burstAt(v.x, potTop(height), { count: v.kind === 'salt' ? 8 : 10, color: KIND_COLOR[v.kind], upward: true });
+      } else if (v.kind !== 'salt') {
+        // Daneben: kleiner Platscher am Boden, Serie vorbei.
+        fx.burstAt(v.x, floorY(height), { count: 5, color: KIND_COLOR[v.kind], upward: true, speed: 0.45, size: 0.7 });
+        streakBroken = streak.get() > 0;
+        streak.set(0);
+      }
+    }
+    if (events.points > 0) {
+      lastCatchMs.set(fx.now.get());
+      streak.set(streak.get() + events.points);
+    }
+    if (events.livesLost > 0) {
+      streak.set(0);
+      fx.shakeFail();
+    }
+    if (events.points > 0 || events.livesLost > 0 || streakBroken) {
+      scheduleOnRN(
+        onStep,
+        events.points,
+        next.lives,
+        next.caughtWater,
+        next.caughtFertilizer,
+        events.livesLost,
+        streak.get(),
+        catchX,
+      );
     }
   });
 
@@ -93,10 +157,25 @@ export function DropsGame({ session }: { session: MinigameSession }) {
   return (
     <View className="flex-1">
       <DropsHud lives={lives} gain={gain} reward={reward} />
-      {phase === 'countdown' && <Text className="px-4 text-center font-body text-base text-ink">{t.hint}</Text>}
       <GestureDetector gesture={pan}>
-        <View className="flex-1" onLayout={onLayout}>
-          <DropsCanvas field={field} size={size} />
+        <View className="flex-1 overflow-hidden" onLayout={onLayout}>
+          <Canvas style={{ flex: 1 }} pointerEvents="none">
+            <Group transform={shakeTransform}>
+              <DropsCanvas field={field} size={size} now={fx.now} lastCatchMs={lastCatchMs}>
+                <FxLayer state={fx.state} now={fx.now} palette={PALETTE} />
+              </DropsCanvas>
+            </Group>
+          </Canvas>
+          <PopupLayer popups={fx.popups} onDone={fx.removePopup} />
+          <ComboBadge combo={combo} />
+          {phase === 'countdown' && (
+            <View className="absolute inset-x-0 bottom-24 items-center gap-1 px-6" pointerEvents="none">
+              <Text className="text-center font-body-bold text-base text-ink">{t.hint}</Text>
+              {Platform.OS === 'web' && (
+                <Text className="text-center font-body text-sm text-inkMuted">{minigameFeel.keyboardHint}</Text>
+              )}
+            </View>
+          )}
         </View>
       </GestureDetector>
     </View>

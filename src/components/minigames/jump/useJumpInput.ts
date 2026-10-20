@@ -1,32 +1,41 @@
-// Eingabe für Budi Jump: Neigung (Beschleunigungssensor) oder Tippen links/rechts.
-// Ergebnis ist die Ziel-Geschwindigkeit als Shared Value, die der Frame-Callback liest.
+// Eingabe für Budi Jump: Neigung (Beschleunigungssensor), Tippen links/rechts oder am Rechner
+// Pfeiltasten und A/D (Auftrag 40). Ergebnis ist die Ziel-Geschwindigkeit, die der Frame-Callback
+// über `readVx` liest; eine gedrückte Taste gewinnt vor Finger und Neigung.
 
 import { Accelerometer } from 'expo-sensors';
 import { useEffect, useState } from 'react';
-import { Platform, type GestureResponderEvent, type LayoutChangeEvent } from 'react-native';
+import { Platform, type LayoutChangeEvent } from 'react-native';
 import { useSharedValue, type SharedValue } from 'react-native-reanimated';
 
 import { BUDI_JUMP } from '../../../game/config';
+import { usePointerInput } from '../framework/input/usePointerInput';
+import { useKeyAxis } from '../framework/input/useKeyboard';
 import { speedForTilt, tapDirection, tiltFromAccelerometer, type JumpControl } from './jumpControls';
 
 export interface JumpInput {
   targetVx: SharedValue<number>;
+  /** Ziel-Geschwindigkeit jetzt (Worklet): Tastatur vor Finger und Neigung. */
+  readVx: () => number;
   /** Tatsächlich genutzte Steuerung (Neigen fällt ohne Sensor auf Tippen zurück). */
   control: JumpControl;
   tiltUnavailable: boolean;
   onLayout: (e: LayoutChangeEvent) => void;
-  onTouch: (e: GestureResponderEvent) => void;
+  /** Für den GestureDetector um das Spielfeld: Finger und Maus. */
+  gesture: ReturnType<typeof usePointerInput>;
 }
 
 export function useJumpInput(wanted: JumpControl): JumpInput {
   const targetVx = useSharedValue(0);
   const width = useSharedValue(0);
+  const tapControl = useSharedValue(true);
+  const keyAxis = useKeyAxis();
   // Im Browser (PWEB) kein Neigen: am Rechner fehlt der Sensor, Safari fragt erst nach Erlaubnis.
   const [tiltUnavailable, setTiltUnavailable] = useState(Platform.OS === 'web');
   const control: JumpControl = wanted === 'tilt' && !tiltUnavailable ? 'tilt' : 'tap';
 
   useEffect(() => {
     targetVx.set(0);
+    tapControl.set(control === 'tap');
     if (control !== 'tilt') return;
     let active = true;
     let sub: { remove: () => void } | null = null;
@@ -47,16 +56,24 @@ export function useJumpInput(wanted: JumpControl): JumpInput {
       active = false;
       sub?.remove();
     };
-  }, [control, targetVx]);
+  }, [control, tapControl, targetVx]);
 
   const onLayout = (e: LayoutChangeEvent) => width.set(e.nativeEvent.layout.width);
 
-  // Start, Bewegung und Ende melden die noch liegenden Finger; daraus die Richtung.
-  const onTouch = (e: GestureResponderEvent) => {
-    if (control !== 'tap') return;
-    const xs = e.nativeEvent.touches.map((t) => t.pageX);
-    targetVx.set(tapDirection(xs, width.get()) * BUDI_JUMP.maxSideSpeed);
+  // Aufsetzen, Bewegen und Loslassen melden die noch liegenden Finger; daraus die Richtung.
+  const gesture = usePointerInput({
+    onHeld: (xs) => {
+      'worklet';
+      if (!tapControl.get()) return;
+      targetVx.set(tapDirection(xs, width.get()) * BUDI_JUMP.maxSideSpeed);
+    },
+  });
+
+  const readVx = () => {
+    'worklet';
+    const key = keyAxis.get();
+    return key !== 0 ? key * BUDI_JUMP.maxSideSpeed : targetVx.get();
   };
 
-  return { targetVx, control, tiltUnavailable, onLayout, onTouch };
+  return { targetVx, readVx, control, tiltUnavailable, onLayout, gesture };
 }

@@ -703,10 +703,10 @@ export const MINIGAME_FEEL = {
   keyboardPotSpeed: 620,
   /** Punkte für 1, 2 und 3 Sterne je Spiel. */
   stars: {
-    tap: [10, 20, 28],
-    smash: [12, 25, 40],
-    drops: [15, 30, 50],
-    jump: [40, 100, 200],
+    tap: [15, 35, 50],
+    smash: [20, 50, 70],
+    drops: [20, 45, 80],
+    jump: [80, 250, 600],
     quiz: [10, 20, 60],
   } as Record<string, readonly [number, number, number]>,
 } as const;

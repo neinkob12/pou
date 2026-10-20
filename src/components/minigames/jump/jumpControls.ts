@@ -27,6 +27,7 @@ export function speedForTilt(tilt: number, cfg: JumpConfig = BUDI_JUMP): number 
  * aufgesetzte Finger (letzter Eintrag) gewinnt. Kein Finger: 0.
  */
 export function tapDirection(touchXs: readonly number[], width: number): -1 | 0 | 1 {
+  'worklet';
   if (touchXs.length === 0 || width <= 0) return 0;
   return touchXs[touchXs.length - 1] < width / 2 ? -1 : 1;
 }

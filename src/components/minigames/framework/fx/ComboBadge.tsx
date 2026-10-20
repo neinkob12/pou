@@ -32,7 +32,7 @@ export function ComboBadge({ combo, multiplier = 1 }: ComboBadgeProps) {
   return (
     // Animated.View nimmt keine NativeWind-Klassen, deshalb StyleSheet.
     <Animated.View pointerEvents="none" style={[styles.badge, style]}>
-      <Text className="font-heading text-2xl text-white">{t.combo(combo)}</Text>
+      <Text className="font-heading text-xl text-white">{t.combo(combo)}</Text>
       {multiplier > 1 && <Text className="font-body-bold text-sm text-white">{t.multiplier(multiplier)}</Text>}
     </Animated.View>
   );
