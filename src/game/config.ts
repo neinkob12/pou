@@ -300,6 +300,34 @@ export const SEED_FRAGMENTS_BY_STARS: Record<1 | 2 | 3 | 4 | 5, number> = {
   5: 3,
 };
 
+/**
+ * Trichom-Lupe (P24): Erkennungsspiel in der Phase "ready". Der Spieler tippt die milchigen
+ * Köpfchen an. Mit jedem Pflanzentag in "ready" werden mehr Köpfchen bernsteinfarben;
+ * nach READY_GRACE_DAYS sinkt der Lupen-Wert je Tag um latePenaltyPerDay.
+ */
+export const TRICHOME_LUPE = {
+  heads: 12,
+  clearHeads: 2,
+  /** Bernstein-Anteil am Anfang von "ready" und Zuwachs je Pflanzentag, gedeckelt bei maxAmberShare. */
+  amberShareStart: 0.1,
+  amberSharePerDay: 0.04,
+  maxAmberShare: 0.6,
+  /** Abzug vom Lupen-Wert (0 bis 1) je falsch getipptem Köpfchen. */
+  wrongTapPenalty: 0.2,
+  latePenaltyPerDay: 0.1,
+  /** Lupen-Wert, wenn ohne Lupe geerntet wurde (z. B. über das Debug-Menü). */
+  skippedScore: 0.5,
+} as const;
+
+/**
+ * Trocknen (P24): Die Trockenzeit ist in Fenster geteilt, je Fenster zählt einmal Wenden.
+ * Trocknungswert = baseScore + (1 − baseScore) × gewendete Fenster / Fenster.
+ */
+export const DRYING_TURNS = {
+  windows: 3,
+  baseScore: 0.4,
+} as const;
+
 // ---------------------------------------------------------------------------
 // Shop-Upgrades: Topf, LED, Ventilator, Erde, Nützlings-Kit (Auftrag P15)
 // ---------------------------------------------------------------------------

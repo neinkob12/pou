@@ -34,6 +34,11 @@ export const ui: Partial<Record<UiAssetId, ImageSourcePropType>> = {};
 export type CareAssetId = 'u3_watering_can' | 'u4_fertilizer_grow' | 'u4_fertilizer_bloom';
 export const care: Partial<Record<CareAssetId, ImageSourcePropType>> = {};
 
+// --- Ernte: Lupe, Schere, Trocknen, Erntekiste (P24) ---
+// Schlüssel = ID aus docs/ASSETS.md. Fehlt die Datei, zeigt der Ernte-Screen einen Platzhalter.
+export type HarvestAssetId = 'u7_lupe' | 'u8_scissors' | 'b7_drying' | 'b8_crate' | 'h3_drying_room';
+export const harvest: Partial<Record<HarvestAssetId, ImageSourcePropType>> = {};
+
 // --- Minispiele: Sprites und Hintergründe (P08, P12 bis P14, P22) ---
 export const minigames: AssetMap = {};
 

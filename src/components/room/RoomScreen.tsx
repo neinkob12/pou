@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { HarvestEntry } from '../harvest/HarvestEntry';
 import { ActionTray } from './ActionTray';
 import { BottomNav } from './BottomNav';
 import { BudiStage } from './BudiStage';
@@ -26,6 +27,7 @@ export function RoomScreen() {
             <CoinDisplay />
           </View>
           <PhaseHeader />
+          <HarvestEntry />
         </SafeAreaView>
         <Lamp />
         <BudiStage />
