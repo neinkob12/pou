@@ -3,6 +3,7 @@ import type { View } from 'react-native';
 import { useAnimatedRef, useSharedValue, type AnimatedRef, type SharedValue } from 'react-native-reanimated';
 
 import type { CareActionId } from '../../../game/events';
+import { playCareCue } from '../../../lib/audio';
 import type { CareFeedback } from './careLogic';
 import { useLightDisturbStress } from './useLightDisturbStress';
 
@@ -31,6 +32,7 @@ export function CareStageProvider({ children }: { children: ReactNode }) {
   const [reaction, setReaction] = useState<CareReaction | null>(null);
   const react = useCallback((type: CareActionId, feedback: CareFeedback) => {
     setReaction((prev) => ({ type, feedback, id: (prev?.id ?? 0) + 1 }));
+    playCareCue(type, feedback);
   }, []);
   // Gestörte Dunkelphase: Budi zeigt Stress wie nach falscher Pflege (Kopfschütteln, beleidigt).
   const onDisturbed = useCallback(() => react('pet', 'warning'), [react]);

@@ -564,6 +564,44 @@ export const NOTIFICATION_PRIORITY = {
   phaseChanged: 4,
 } as const;
 
+// Tagesziele (P19)
+
+/**
+ * Alle Tagesziele. `kind` sagt, welches Ereignis zählt: `minigameScore` summiert die Punkte eines
+ * Spiels (`gameId`), `minigameRounds` zählt Runden in beliebigen Spielen, `care` zählt Pflege-
+ * Aktionen aus `careActions`. Sichtbare Texte stehen in strings.ts unter `dailyGoals.goals`.
+ */
+export const DAILY_GOAL_TEMPLATES = {
+  tapHits: { kind: 'minigameScore', gameId: 'tap', target: 40 },
+  smashMites: { kind: 'minigameScore', gameId: 'smash', target: 50 },
+  dropsCatch: { kind: 'minigameScore', gameId: 'drops', target: 30 },
+  jumpHeight: { kind: 'minigameScore', gameId: 'jump', target: 25 },
+  playRounds: { kind: 'minigameRounds', target: 3 },
+  waterTwice: { kind: 'care', careActions: ['water'], target: 2 },
+  petBudi: { kind: 'care', careActions: ['pet'], target: 5 },
+  feedBudi: { kind: 'care', careActions: ['fertilize', 'fertilizeGrow', 'fertilizeBloom'], target: 2 },
+} as const;
+
+export type DailyGoalId = keyof typeof DAILY_GOAL_TEMPLATES;
+
+/**
+ * Ziele, die gerade ausgelost werden, in dieser Reihenfolge reihum (ein Ziel pro Kalendertag).
+ * Spiel- und Pflegeziele wechseln sich ab.
+ */
+export const DAILY_GOAL_POOL: readonly DailyGoalId[] = [
+  'smashMites',
+  'waterTwice',
+  'dropsCatch',
+  'petBudi',
+  'jumpHeight',
+  'feedBudi',
+  'playRounds',
+  'tapHits',
+];
+
+/** Inhalt der Belohnungskiste: Münzen, gleich für jedes Ziel. Feinschliff in P32. */
+export const DAILY_GOAL_CHEST_COINS = 60;
+
 // ---------------------------------------------------------------------------
 // Kosmetik und Saisonpass (Aufträge P25, P33)
 // ---------------------------------------------------------------------------
@@ -590,6 +628,29 @@ export const COSMETIC_ITEMS: Record<CosmeticId, CosmeticItem> = {
 };
 
 // Echtgeld und Saisonpass (P33) hier darunter ergänzen.
+
+// ---------------------------------------------------------------------------
+// Audio (Auftrag P30)
+// ---------------------------------------------------------------------------
+
+/** Raum-Musik, Pflege-Effekte und Budi-Stimme (src/lib/audio.ts, src/components/budi/voice.ts). */
+export const AUDIO = {
+  /** Raum-Musik (S10), 0 bis 1. Leiser als die Minigame-Musik, sie läuft im Hintergrund lange mit. */
+  roomMusicVolume: 0.25,
+  /** Mehrere Phasenwechsel auf einmal (App war lange zu): die Fanfare nur einmal in diesem Abstand. */
+  phaseCueGapMs: 3000,
+  voice: {
+    /** Abspielrate = Tonhöhe. Schlechte Laune tief, gute Laune hoch, dazwischen linear. */
+    pitchMin: 0.85,
+    pitchMax: 1.25,
+    /** Zufällige Abweichung je Laut (±), damit Budi nicht wie ein Automat klingt. */
+    pitchJitter: 0.05,
+    /** Laune (0 bis 100) ab der Budi fröhlich plappert. */
+    happyFromMood: 70,
+    /** Laune unter der Budi grummelt. Dazwischen klingt er fragend. */
+    grumpyBelowMood: 30,
+  },
+} as const;
 
 // ---------------------------------------------------------------------------
 // Minigames

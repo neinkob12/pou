@@ -1,5 +1,7 @@
 import { Pressable, Text } from 'react-native';
 
+import { cue } from '../../../lib/audio';
+
 interface GameButtonProps {
   label: string;
   onPress: () => void;
@@ -12,6 +14,7 @@ export function GameButton({ label, onPress, variant = 'primary' }: GameButtonPr
   return (
     <Pressable
       accessibilityRole="button"
+      onPressIn={() => cue('tap')}
       onPress={onPress}
       className={`items-center rounded-full px-6 py-3 active:opacity-70 ${primary ? 'bg-coral' : 'bg-white'}`}
     >

@@ -547,3 +547,23 @@ export const notifications = {
   settingsDenied: 'Dein Handy blockiert Benachrichtigungen. Erlaube sie in den Systemeinstellungen.',
   settingsOpenSystem: 'Systemeinstellungen öffnen',
 };
+
+export const dailyGoals = {
+  title: 'Tagesziel',
+  goals: {
+    tapHits: (n: number) => `Triff ${n} Kreise`,
+    smashMites: (n: number) => `Hol ${n} Punkte beim Schädlings-Smash`,
+    dropsCatch: (n: number) => `Fang ${n} Tropfen`,
+    jumpHeight: (n: number) => `Hol ${n} Punkte beim Hüpfen`,
+    playRounds: (n: number) => `Spiel ${n} Runden Minigames`,
+    waterTwice: (n: number) => `Gieß Budi ${n} Mal`,
+    petBudi: (n: number) => `Streichel Budi ${n} Mal`,
+    feedBudi: (n: number) => `Dünge Budi ${n} Mal`,
+  },
+  progress: (done: number, target: number) => `${done}/${target}`,
+  chestPlaceholder: 'Kiste',
+  openChest: 'Kiste öffnen',
+  chestTitle: 'Kiste offen!',
+  chestReward: (coins: number) => `Da drin: ${coins} Münzen. Morgen hab ich wieder was für dich.`,
+  claimed: 'Geschafft! Morgen gibt es ein neues Ziel.',
+};

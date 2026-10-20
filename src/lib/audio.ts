@@ -1,4 +1,4 @@
-// Sounds, Musik und Haptik (Auftrag P23, P30 erweitert um Raum-Musik und Budi-Stimme).
+// Sounds, Musik und Haptik (Auftrag P23, P30 erweitert um Raum, Pflege und Budi-Stimme).
 // Spiele rufen nur `cue(...)` und `useMinigameAudio(...)`; welche Datei und welche Vibration dazu
 // gehört, steht in CUES. Musik, Effekte und Vibration sind getrennt schaltbar (Einstellungen,
 // SoundSection) und werden als Geräte-Einstellung in MMKV gespeichert, nicht im Spielstand.
@@ -8,6 +8,8 @@ import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-aud
 import * as Haptics from 'expo-haptics';
 import { useEffect } from 'react';
 
+import { AUDIO } from '../game/config';
+import type { CareActionId } from '../game/events';
 import { sounds, type SoundId } from './assets';
 import { storage } from './storage';
 
@@ -40,9 +42,46 @@ export const CUES = {
   fail: { sound: 's12_ouch', haptic: 'error' },
   /** Rundenende mit Münzen. */
   coins: { sound: 's4_coins', haptic: 'success' },
+  // Raum (P30). Pflege-Cues ohne Vibration: die kommt schon aus room/care/haptics.ts (P10).
+  /** Gegossen. */
+  water: { sound: 's1_water', haptic: null },
+  /** Gedüngt (Wachstum oder Blüte). */
+  feed: { sound: 's2_feed', haptic: null },
+  /** Pflege hat nicht gewirkt oder Budi gestresst (zu viel Wasser, falscher Dünger, nachts geweckt). */
+  careFail: { sound: 's12_ouch', haptic: null },
+  /** Werkzeug aus dem Fach genommen. */
+  pickup: { sound: 's3_tap', haptic: null },
+  /** Knopf in einem Minigame-Overlay. */
+  tap: { sound: 's3_tap', haptic: 'selection' },
+  /** Neue Wachstumsphase. */
+  phase: { sound: 's7_phase_change', haptic: 'success' },
+  /** Geerntet. */
+  harvest: { sound: 's8_harvest', haptic: 'success' },
 } as const satisfies Record<string, { sound: SoundId | null; haptic: HapticKind | null }>;
 
 export type CueId = keyof typeof CUES;
+
+/**
+ * Welcher Cue zu einer Pflege gehört. Streicheln hat keinen: dann spricht Budi (budi/voice.ts).
+ * Rein, damit testbar.
+ */
+export function careCue(type: CareActionId, feedback: 'success' | 'warning' | 'error'): CueId | null {
+  if (feedback !== 'success') return 'careFail';
+  if (type === 'water') return 'water';
+  if (type === 'pet') return null;
+  return 'feed';
+}
+
+/** Sound zur Pflege (Aufruf in room/care/CareStage.tsx). */
+export function playCareCue(type: CareActionId, feedback: 'success' | 'warning' | 'error') {
+  const id = careCue(type, feedback);
+  if (id) cue(id);
+}
+
+/** Fanfare jetzt? Nicht, wenn die letzte kürzer als AUDIO.phaseCueGapMs her ist (mehrere Wechsel auf einmal). */
+export function phaseCueDue(lastMs: number | null, nowMs: number): boolean {
+  return lastMs === null || nowMs - lastMs >= AUDIO.phaseCueGapMs;
+}
 
 /** Ohne Eintrag ist alles an. */
 export function soundSetting(key: SoundSetting): boolean {
@@ -118,8 +157,22 @@ export function cue(id: CueId) {
   player.play();
 }
 
+/**
+ * Ein Laut von Budi (S9) mit eigener Tonhöhe. Zählt als Effekt (Schalter "Effekte").
+ * `rate` 1 = Original; ohne Tonhöhen-Korrektur klingt schneller auch höher.
+ */
+export function playVoice(id: SoundId, rate: number) {
+  if (!soundSetting('effects')) return;
+  const player = playerFor(id);
+  if (!player) return;
+  player.shouldCorrectPitch = false;
+  player.setPlaybackRate(rate);
+  player.seekTo(0).catch(() => undefined);
+  player.play();
+}
+
 /** Startet eine Musik in Schleife (ersetzt die laufende). Spielt erst, wenn Musik an ist. */
-export function startMusic(id: SoundId) {
+export function startMusic(id: SoundId, volume: number = VOLUME.music) {
   if (music?.id !== id) {
     stopMusic();
     const source = sounds[id];
@@ -128,7 +181,7 @@ export function startMusic(id: SoundId) {
     try {
       const player = createAudioPlayer(source);
       player.loop = true;
-      player.volume = VOLUME.music;
+      player.volume = volume;
       music = { id, player };
     } catch {
       return;
