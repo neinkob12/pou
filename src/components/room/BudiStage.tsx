@@ -6,6 +6,7 @@ import Animated from 'react-native-reanimated';
 import { care } from '../../content/strings';
 import { useNeeds } from '../../hooks/useNeeds';
 import { Budi } from '../budi/Budi';
+import { budiSpeak } from '../budi/voice';
 import { ComaOverlay } from '../budi/ComaOverlay';
 import { Pests } from '../budi/Pests';
 import { useCareStage } from './care/CareStage';
@@ -21,6 +22,7 @@ export function BudiStage() {
   const onPet = useCallback(() => {
     const feedback = doCare('pet');
     if (feedback) react('pet', feedback);
+    budiSpeak();
   }, [doCare, react]);
   const pet = usePetGesture(canCare, onPet);
 

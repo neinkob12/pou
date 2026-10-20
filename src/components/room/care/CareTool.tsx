@@ -5,6 +5,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 
 import { care as careAssets, type CareAssetId } from '../../../lib/assets';
 import { care } from '../../../content/strings';
+import { cue } from '../../../lib/audio';
 import type { ColorName } from '../../../lib/theme';
 import { AssetImage } from '../../ui/AssetImage';
 import { useCareStage } from './CareStage';
@@ -49,6 +50,7 @@ export function CareTool({ tool, disabled, onDrop }: CareToolProps) {
       target.value = m ? { x: m.pageX, y: m.pageY, width: m.width, height: m.height } : null;
       lifted.value = withSpring(1);
       scheduleOnRN(playPickupHaptic);
+      scheduleOnRN(cue, 'pickup');
     },
     onUpdate: (e) => {
       'worklet';
