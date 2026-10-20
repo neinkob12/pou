@@ -1,8 +1,10 @@
-import { MS_PER_REAL_DAY, TIME_SCALE, TURBO_TIME_SCALE } from '../../../game/config';
+import { MS_PER_REAL_DAY, STRAINS, TIME_SCALE, TURBO_TIME_SCALE } from '../../../game/config';
+import { STRAIN_ORDER, unlockedStrainIds } from '../../../game/progression';
 import { currentScale, getPlantStatus, plantAgeDays } from '../../../game/timeEngine';
 import { useGameStore } from '../../../store/gameStore';
 import { selectDebugMultiplier } from '../../../store/slices/debug';
-import { createDebugActions } from '../debugActions';
+import { toProgressStats } from '../../../store/slices/progression';
+import { createDebugActions, statsUnlockingAll } from '../debugActions';
 
 const T0 = Date.UTC(2026, 9, 1, 12, 0, 0);
 const initial = useGameStore.getState();
@@ -66,5 +68,26 @@ describe('Debug-Aktionen', () => {
     actions.setNeeds(0);
     expect(useGameStore.getState().needs.values).toEqual({ water: 0, nutrients: 0, mood: 0 });
     expect(useGameStore.getState().needs.updatedAtMs).toBe(now);
+  });
+
+  it('schaltet alle Sorten frei', () => {
+    expect(unlockedStrainIds(toProgressStats(useGameStore.getState()))).toEqual(['gustav']);
+    actions.unlockAllStrains();
+    expect(unlockedStrainIds(toProgressStats(useGameStore.getState()))).toEqual(STRAIN_ORDER);
+  });
+
+  it('senkt beim Freischalten keine Zähler', () => {
+    const high = { xp: 99999, harvests: 50, seedFragments: 80, eventUnlocks: [] };
+    const next = statsUnlockingAll(high);
+    expect(next).toEqual(high);
+  });
+
+  it('schaltet die Kölsche Knospe einzeln frei', () => {
+    expect(STRAINS.koelsch.unlock.type).toBe('event');
+    actions.unlockEventStrain();
+    actions.unlockEventStrain();
+    const s = useGameStore.getState();
+    expect(s.eventUnlocks).toEqual(['koelsch']);
+    expect(unlockedStrainIds(toProgressStats(s))).toEqual(['gustav', 'koelsch']);
   });
 });

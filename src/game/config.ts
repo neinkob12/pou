@@ -53,6 +53,42 @@ export const BASE_PHASES = {
 export const READY_GRACE_DAYS = 7;
 
 // ---------------------------------------------------------------------------
+// Minigames: Schädlings-Smash (Auftrag P12)
+// ---------------------------------------------------------------------------
+
+/** Whack-a-Mole auf dem Blatt. Zeiten in Spiel-Millisekunden, Tempo steigt linear bis Rundenende. */
+export const PEST_SMASH = {
+  durationSeconds: 45,
+  /** Löcher auf dem Blatt: Spalten mal Reihen. */
+  gridCols: 3,
+  gridRows: 4,
+  /** Abstand zwischen zwei Tieren am Anfang und am Ende der Runde. */
+  spawnIntervalStartMs: 900,
+  spawnIntervalEndMs: 380,
+  /** So lange bleibt ein Tier sichtbar, am Anfang und am Ende der Runde. */
+  lifetimeStartMs: 1500,
+  lifetimeEndMs: 700,
+  /** Anteil Marienkäfer unter allen Tieren. Rest teilen sich Spinnmilbe und Trauermücke. */
+  ladybugChance: 0.2,
+  /** Anteil Spinnmilben unter den Schädlingen. */
+  miteShareOfPests: 0.5,
+  pointsPerPest: 1,
+  /** Marienkäfer getroffen: so viele Punkte weg (nie unter 0) und Kombo vorbei. */
+  ladybugPenalty: 3,
+  /** Treffer innerhalb dieser Zeit nach dem letzten zählen zur Kombo. */
+  comboWindowMs: 900,
+  /** Alle so viele Treffer in Folge steigt der Multiplikator um 1. */
+  comboStep: 5,
+  maxComboMultiplier: 3,
+  /** Getroffenes Tier bleibt so lange als "getroffen" stehen. */
+  hitShowMs: 250,
+  /** Tipp zählt im Umkreis von so viel Prozent der Lochbreite um die Lochmitte. */
+  hitRadiusFactor: 0.45,
+  /** Ab so vielen Punkten gibt es den Schädlingsschutz (PEST_PROTECTION_REAL_HOURS) dazu. */
+  protectionMinScore: 10,
+} as const;
+
+// ---------------------------------------------------------------------------
 // Sorten
 // ---------------------------------------------------------------------------
 
@@ -300,6 +336,47 @@ export const SEED_FRAGMENTS_BY_STARS: Record<1 | 2 | 3 | 4 | 5, number> = {
   5: 3,
 };
 
+/**
+ * Trichom-Lupe (P24): Erkennungsspiel in der Phase "ready". Der Spieler tippt die milchigen
+ * Köpfchen an. Mit jedem Pflanzentag in "ready" werden mehr Köpfchen bernsteinfarben;
+ * nach READY_GRACE_DAYS sinkt der Lupen-Wert je Tag um latePenaltyPerDay.
+ */
+export const TRICHOME_LUPE = {
+  heads: 12,
+  clearHeads: 2,
+  /** Bernstein-Anteil am Anfang von "ready" und Zuwachs je Pflanzentag, gedeckelt bei maxAmberShare. */
+  amberShareStart: 0.1,
+  amberSharePerDay: 0.04,
+  maxAmberShare: 0.6,
+  /** Abzug vom Lupen-Wert (0 bis 1) je falsch getipptem Köpfchen. */
+  wrongTapPenalty: 0.2,
+  latePenaltyPerDay: 0.1,
+  /** Lupen-Wert, wenn ohne Lupe geerntet wurde (z. B. über das Debug-Menü). */
+  skippedScore: 0.5,
+} as const;
+
+/**
+ * Trocknen (P24): Die Trockenzeit ist in Fenster geteilt, je Fenster zählt einmal Wenden.
+ * Trocknungswert = baseScore + (1 − baseScore) × gewendete Fenster / Fenster.
+ */
+export const DRYING_TURNS = {
+  windows: 3,
+  baseScore: 0.4,
+} as const;
+
+// ---------------------------------------------------------------------------
+// Licht und Phasen: Lichtplan, Tag/Nacht im Raum (Auftrag P11)
+// ---------------------------------------------------------------------------
+
+/** Lichtstunden je Pflanzentag (24 Stunden). Wachstum 18/6, Blüte nach dem Umschalten 12/12. */
+export const LIGHT_HOURS_ON = {
+  vegetative: 18,
+  flowering: 12,
+} as const;
+
+/** Tageszeit, zu der das Licht in jedem Pflanzentag angeht (Stunde 0 bis 23 im Pflanzentag). */
+export const LIGHT_ON_AT_HOUR = 6;
+
 // ---------------------------------------------------------------------------
 // Shop-Upgrades: Topf, LED, Ventilator, Erde, Nützlings-Kit (Auftrag P15)
 // ---------------------------------------------------------------------------
@@ -346,13 +423,52 @@ export const UPGRADES: Record<UpgradeId, readonly UpgradeLevel[]> = {
 // Level und Freischaltungen (Auftrag P16)
 // ---------------------------------------------------------------------------
 
-// Werte hier einfügen, z. B. XP_PER_HARVEST, XP_PER_STAR, LEVEL_THRESHOLDS.
+/** Erfahrung je abgeschlossener Ernte, egal wie gut. */
+export const XP_PER_HARVEST = 50;
+/** Zusätzliche Erfahrung je Qualitätsstern der Ernte (5 Sterne = +100). */
+export const XP_PER_STAR = 20;
+
+/**
+ * Erfahrung, ab der ein Level erreicht ist. Index 0 = Level 1. Eine 3-Sterne-Ernte bringt 110 XP,
+ * Level 5 (Auto-Anton) also nach rund 6 Ernten. Über dem letzten Eintrag gibt es kein höheres Level.
+ */
+export const LEVEL_XP_THRESHOLDS: readonly number[] = [0, 100, 250, 450, 700, 1000, 1400, 1900, 2500, 3200];
 
 // ---------------------------------------------------------------------------
 // Tagesziele und Benachrichtigungen (Aufträge P18, P19)
 // ---------------------------------------------------------------------------
 
-// Werte hier einfügen, z. B. NOTIFICATIONS_MAX_PER_DAY, QUIET_HOURS, DAILY_GOAL_POOL.
+// Benachrichtigungen (P18)
+
+/** Höchstens so viele Benachrichtigungen pro Kalendertag (Ortszeit). */
+export const NOTIFICATIONS_MAX_PER_DAY = 3;
+
+/** Ruhezeit in vollen Stunden Ortszeit: ab `startHour` bis `endHour` am nächsten Morgen keine Benachrichtigung. */
+export const NOTIFICATION_QUIET_HOURS = { startHour: 22, endHour: 9 } as const;
+
+/** So viele echte Stunden im Voraus wird geplant. Danach erst wieder beim nächsten Öffnen. */
+export const NOTIFICATION_HORIZON_REAL_HOURS = 72;
+
+/** Frühestens so viele Minuten nach dem Schließen der App kommt eine Benachrichtigung. */
+export const NOTIFICATION_MIN_DELAY_MINUTES = 30;
+
+/** Warnung vor dem Koma: so viele echte Stunden, bevor COMA_AFTER_REAL_HOURS erreicht ist. */
+export const NOTIFICATION_COMA_WARNING_HOURS_BEFORE = 4;
+
+/** Muss eine Warnung wegen der Ruhezeit vorgezogen werden: so viele Minuten vor Beginn der Ruhezeit. */
+export const NOTIFICATION_BEFORE_QUIET_MINUTES = 30;
+
+/** Mindestabstand zwischen zwei Benachrichtigungen. Liegen zwei näher beieinander, fällt die unwichtigere weg. */
+export const NOTIFICATION_MIN_GAP_MINUTES = 60;
+
+/** Rangfolge, wenn mehr als NOTIFICATIONS_MAX_PER_DAY an einem Tag anstehen (kleiner = wichtiger). */
+export const NOTIFICATION_PRIORITY = {
+  comaWarning: 0,
+  harvestReady: 1,
+  thirsty: 2,
+  hungry: 3,
+  phaseChanged: 4,
+} as const;
 
 // ---------------------------------------------------------------------------
 // Kosmetik und Saisonpass (Aufträge P25, P33)
@@ -368,4 +484,25 @@ export const MINIGAME_REWARDS = {
   coinsPerPoint: 0.5,
   maxCoinsPerRound: 50,
   moodPerRound: 15,
+} as const;
+
+/** Gerüst aller Minigames (Auftrag P08). */
+export const MINIGAME_FRAMEWORK = {
+  countdownSeconds: 3,
+  /** Längster Frame-Schritt, der zählt. Schützt vor Zeitsprüngen nach Ruckeln oder Hintergrund. */
+  maxFrameStepMs: 100,
+} as const;
+
+/** Beispielspiel "Tipp den Kreis" (Auftrag P08). */
+export const TAP_CIRCLE = {
+  durationSeconds: 30,
+  pointsPerHit: 1,
+  startRadius: 48,
+  minRadius: 22,
+  /** Radius schrumpft pro Treffer um so viele Pixel, bis minRadius. */
+  shrinkPerHit: 1,
+  /** So lange bleibt ein Kreis stehen, bevor er woanders auftaucht. */
+  lifetimeMs: 1400,
+  /** Treffer zählen auch etwas außerhalb des Kreises (Finger sind dicker als Pixel). */
+  hitSlop: 10,
 } as const;

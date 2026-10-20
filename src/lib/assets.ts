@@ -4,11 +4,66 @@
 
 import type { ImageSourcePropType } from 'react-native';
 
+import type { StrainId } from '../game/config';
+
 type AssetMap = Record<string, ImageSourcePropType>;
 type SoundMap = Record<string, number>;
 
 // --- Budi: Topf, Pflanze je Phase, Gesichter, Accessoires (P20) ---
-export const budi: AssetMap = {};
+// Alle Ebenen 1024 × 1024, Topfboden unten mittig (docs/ASSETS.md). Die Dateien in assets/budi/
+// sind bis P20b Platzhalter (farbige Form + Text) unter den endgültigen Namen: echte Grafik
+// einfach drüberkopieren. Sorten-Varianten (B9) optional als `<pflanze>_<sorte>`, z. B.
+// `b06_flowering_full_lotte: require(...)`. Fehlt die Variante, färbt Budi die Grundebene ein.
+export type BudiPlantId =
+  | 'b01_germination'
+  | 'b02_seedling'
+  | 'b03_vegetative_small'
+  | 'b04_vegetative_large'
+  | 'b05_flowering_early'
+  | 'b06_flowering_full'
+  | 'b07_drying'
+  | 'b08_harvest_ready';
+export type BudiFaceId =
+  | 'b10_face_neutral'
+  | 'b10_face_happy'
+  | 'b10_face_very_happy'
+  | 'b10_face_thirsty'
+  | 'b10_face_hungry'
+  | 'b10_face_tired'
+  | 'b10_face_snoring'
+  | 'b10_face_stressed'
+  | 'b10_face_sick'
+  | 'b10_face_offended'
+  | 'b10_face_coma'
+  | 'b10_face_surprised'
+  | 'b12_blink';
+export type BudiPotId = 'u01_pot_standard';
+export type BudiVariantId = `${BudiPlantId}_${StrainId}`;
+export const budi: Record<BudiPlantId | BudiFaceId | BudiPotId, ImageSourcePropType> &
+  Partial<Record<BudiVariantId, ImageSourcePropType>> = {
+  b01_germination: require('../../assets/budi/b01_germination.png'),
+  b02_seedling: require('../../assets/budi/b02_seedling.png'),
+  b03_vegetative_small: require('../../assets/budi/b03_vegetative_small.png'),
+  b04_vegetative_large: require('../../assets/budi/b04_vegetative_large.png'),
+  b05_flowering_early: require('../../assets/budi/b05_flowering_early.png'),
+  b06_flowering_full: require('../../assets/budi/b06_flowering_full.png'),
+  b07_drying: require('../../assets/budi/b07_drying.png'),
+  b08_harvest_ready: require('../../assets/budi/b08_harvest_ready.png'),
+  b10_face_neutral: require('../../assets/budi/b10_face_neutral.png'),
+  b10_face_happy: require('../../assets/budi/b10_face_happy.png'),
+  b10_face_very_happy: require('../../assets/budi/b10_face_very_happy.png'),
+  b10_face_thirsty: require('../../assets/budi/b10_face_thirsty.png'),
+  b10_face_hungry: require('../../assets/budi/b10_face_hungry.png'),
+  b10_face_tired: require('../../assets/budi/b10_face_tired.png'),
+  b10_face_snoring: require('../../assets/budi/b10_face_snoring.png'),
+  b10_face_stressed: require('../../assets/budi/b10_face_stressed.png'),
+  b10_face_sick: require('../../assets/budi/b10_face_sick.png'),
+  b10_face_offended: require('../../assets/budi/b10_face_offended.png'),
+  b10_face_coma: require('../../assets/budi/b10_face_coma.png'),
+  b10_face_surprised: require('../../assets/budi/b10_face_surprised.png'),
+  b12_blink: require('../../assets/budi/b12_blink.png'),
+  u01_pot_standard: require('../../assets/budi/u01_pot_standard.png'),
+};
 
 // --- Raum: Hintergründe, Lampe, Möbel (P03, P11) ---
 // Schlüssel = ID aus docs/ASSETS.md. Fehlt die Datei, zeigt der Slot einen Platzhalter.
@@ -28,6 +83,22 @@ export type UiAssetId =
   | 'u12_album'
   | 'u12_settings';
 export const ui: Partial<Record<UiAssetId, ImageSourcePropType>> = {};
+
+// --- Pflege: Gießkanne, Dünger (P10) ---
+// Schlüssel = ID aus docs/ASSETS.md. Fehlt die Datei, zeigt das Werkzeug einen Platzhalter.
+export type CareAssetId = 'u3_watering_can' | 'u4_fertilizer_grow' | 'u4_fertilizer_bloom';
+export const care: Partial<Record<CareAssetId, ImageSourcePropType>> = {};
+
+// --- Gesundheit: Schädlinge und Schimmel auf Budi (P21) ---
+// Schlüssel = ID aus docs/ASSETS.md (U17). Fehlt die Datei, zeigt Budi einen Platzhalter.
+// Datei einhängen: z. B. `u17_spider_mite: require('../../assets/images/u17_spider_mite.png'),`
+export type HealthAssetId = 'u17_spider_mite' | 'u17_fungus_gnat' | 'u17_mold';
+export const health: Partial<Record<HealthAssetId, ImageSourcePropType>> = {};
+
+// --- Ernte: Lupe, Schere, Trocknen, Erntekiste (P24) ---
+// Schlüssel = ID aus docs/ASSETS.md. Fehlt die Datei, zeigt der Ernte-Screen einen Platzhalter.
+export type HarvestAssetId = 'u7_lupe' | 'u8_scissors' | 'b7_drying' | 'b8_crate' | 'h3_drying_room';
+export const harvest: Partial<Record<HarvestAssetId, ImageSourcePropType>> = {};
 
 // --- Shop-Upgrades: Bilder im Shop und im Raum (P15) ---
 // Topf-Stufen U1, LED U2, Ventilator U5, Entfeuchter U6, Spezialdünger U4. Das Nützlings-Kit hat
