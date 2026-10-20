@@ -180,7 +180,40 @@ export const PRICES_EUR = {
 // Gesundheit: Schädlinge, Schimmel, Koma (Auftrag P05, UI P21)
 // ---------------------------------------------------------------------------
 
-// Werte hier einfügen, z. B. PEST_BASE_CHANCE_PER_PLANT_DAY, MOLD_HUMIDITY_THRESHOLD, COMA_REVIVE_COINS.
+/** Gesundheit wird in festen Fenstern echter Zeit ausgewürfelt, je Fenster ein Wurf pro Krankheit. */
+export const HEALTH_CHECK_INTERVAL_REAL_HOURS = 1;
+
+export type PestKind = 'spiderMite' | 'fungusGnat';
+export const PEST_KINDS: readonly PestKind[] = ['spiderMite', 'fungusGnat'];
+
+/** Chance auf einen neuen Schädling je Fenster bei bester Pflege (ca. einer alle 2 echten Tage). */
+export const PEST_BASE_CHANCE_PER_CHECK = 0.02;
+/** Bei voller Vernachlässigung (neglect = 1) ist die Chance (1 + dieser Wert) mal so hoch. */
+export const PEST_NEGLECT_MULTIPLIER = 4;
+/** Mehr Schädlinge sitzen nie gleichzeitig auf Budi. */
+export const PEST_MAX_ON_BUDI = 5;
+/** Schutz nach einer Runde Schädlings-Smash (P12): ein Spieltag = ein echter Tag. */
+export const PEST_PROTECTION_REAL_HOURS = 24;
+
+/** Luftfeuchte beim Trocknen in Prozent, ohne und mit Entfeuchter-Upgrade (P15). */
+export const DRYING_HUMIDITY_PERCENT = 65;
+export const DRYING_HUMIDITY_WITH_DEHUMIDIFIER_PERCENT = 55;
+/** Ab dieser Feuchte kann Schimmel entstehen. */
+export const MOLD_HUMIDITY_THRESHOLD = 62;
+/** Schimmelchance je Fenster und Prozentpunkt über der Schwelle (65 % ergibt 3 % je Stunde). */
+export const MOLD_CHANCE_PER_PERCENT_OVER = 0.01;
+/** Gegenmittel gegen Schimmel kostet so viele Münzen. */
+export const MOLD_TREATMENT_COINS = 20;
+
+/** Qualitätsmalus in Sternen (P06 zieht ihn vor dem Runden ab). */
+export const QUALITY_PENALTY_STARS = {
+  perPest: 0.25,
+  mold: 1.5,
+  max: 3,
+} as const;
+
+/** Wiederbeleben aus dem Koma (Schwelle: COMA_AFTER_REAL_HOURS im Abschnitt Bedürfnisse). */
+export const COMA_REVIVE_COINS = 30;
 
 // ---------------------------------------------------------------------------
 // Ernte-Qualität: Sterne, Trichom-Lupe, Trocknung (Auftrag P06, UI P24)
