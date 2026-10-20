@@ -249,6 +249,25 @@ export const shop = {
   },
 };
 
+/** Kosmetik-Tab im Shop (P25). */
+export const cosmetics = {
+  intro: 'Nur für die Optik: Tippe ein Teil an, um es an Budi anzuprobieren.',
+  previewLabel: 'Vorschau: Budi mit Accessoire',
+  tryOn: 'Anprobieren',
+  tryingOn: 'Probiert an',
+  buy: (price: number) => `Kaufen: ${price}`,
+  equip: 'Anziehen',
+  unequip: 'Ablegen',
+  equipped: 'Trägt Budi',
+  notEnoughCoins: 'Zu wenig Münzen',
+  items: {
+    u16_sunglasses: 'Sonnenbrille',
+    u16_hat_cap: 'Kappe',
+    u16_hat_straw: 'Strohhut',
+    u16_hat_crown: 'Krone',
+  },
+};
+
 export const album = {
   title: 'Album',
   strainsTab: 'Sorten',

@@ -519,7 +519,28 @@ export const NOTIFICATION_PRIORITY = {
 // Kosmetik und Saisonpass (Aufträge P25, P33)
 // ---------------------------------------------------------------------------
 
-// Werte hier einfügen, z. B. COSMETIC_ITEMS mit Münzpreis oder Produkt-ID.
+// Kosmetik (P25)
+// Nur Optik: Kosmetik ändert keinen Spielwert. IDs nach docs/ASSETS.md (U16).
+
+/** Accessoires für den Accessoire-Slot von Budi (eine Ebene über Pflanze und Gesicht). */
+export type CosmeticId = 'u16_sunglasses' | 'u16_hat_straw' | 'u16_hat_cap' | 'u16_hat_crown';
+
+export interface CosmeticItem {
+  /** Preis in Münzen. */
+  priceCoins: number;
+}
+
+/** Reihenfolge im Kosmetik-Tab. */
+export const COSMETIC_IDS: readonly CosmeticId[] = ['u16_sunglasses', 'u16_hat_cap', 'u16_hat_straw', 'u16_hat_crown'];
+
+export const COSMETIC_ITEMS: Record<CosmeticId, CosmeticItem> = {
+  u16_sunglasses: { priceCoins: 80 },
+  u16_hat_cap: { priceCoins: 120 },
+  u16_hat_straw: { priceCoins: 150 },
+  u16_hat_crown: { priceCoins: 400 },
+};
+
+// Echtgeld und Saisonpass (P33) hier darunter ergänzen.
 
 // ---------------------------------------------------------------------------
 // Minigames
