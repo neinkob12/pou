@@ -54,8 +54,9 @@ export function DebugControls() {
           <DebugButton key={l} label={String(l)} onPress={() => actions.setNeeds(l)} />
         ))}
       </Group>
-      <Group title={debug.pendingTitle} hint={debug.pendingHint}>
-        <DebugButton label={debug.unlockStrains} disabled />
+      <Group title={debug.strainsTitle}>
+        <DebugButton label={debug.unlockStrains} onPress={actions.unlockAllStrains} />
+        <DebugButton label={debug.unlockEventStrain} onPress={actions.unlockEventStrain} />
       </Group>
       <Group title={debug.resetTitle}>
         <DebugButton
