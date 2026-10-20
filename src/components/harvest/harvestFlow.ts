@@ -3,6 +3,7 @@
 
 import {
   DRYING_TURNS,
+  MIN_YIELD_UNITS,
   READY_GRACE_DAYS,
   REWARDED_AD,
   STRAINS,
@@ -142,14 +143,19 @@ export function fallbackSession(careScore: number, moodScore: number): HarvestSe
   return { trichomeScore: TRICHOME_LUPE.skippedScore, careScore, moodScore, dryingTurns: [] };
 }
 
-/** Ergebnis beim Einsammeln. newStrains und coinsDoubled füllt der Aufrufer. */
+/**
+ * Ergebnis beim Einsammeln. newStrains und coinsDoubled füllt der Aufrufer.
+ * @param yieldMultiplier Ertrags-Faktor aus den Shop-Upgrades (P15, größerer Topf), Standard 1
+ */
 export function computeHarvestResult(
   plant: PlantRecord,
   session: HarvestSession,
   diseasePenaltyStars: number,
+  yieldMultiplier = 1,
 ): Omit<HarvestResult, 'newStrains' | 'coinsDoubled'> {
   const strain = STRAINS[plant.strainId];
-  const yieldUnits = computeYield(plant, session.careScore, session.moodScore, strain);
+  const baseYield = computeYield(plant, session.careScore, session.moodScore, strain);
+  const yieldUnits = Math.max(MIN_YIELD_UNITS, Math.round(baseYield * yieldMultiplier));
   const stars = computeQualityStars(diseasePenaltyStars, dryingScore(session.dryingTurns), session.trichomeScore);
   const { coins, seedFragments } = harvestRewards(yieldUnits, stars, strain);
   return { strainId: plant.strainId, yieldUnits, stars, coins, seedFragments };

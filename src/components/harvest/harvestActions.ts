@@ -4,12 +4,13 @@
 import { TRICHOME_LUPE } from '../../game/config';
 import { gameEvents } from '../../game/events';
 import { neglectFromNeeds, qualityPenaltyStars } from '../../game/health';
-import { computeNeeds, NO_MODIFIERS } from '../../game/needs';
+import { computeNeeds } from '../../game/needs';
 import { newlyUnlocked } from '../../game/progression';
 import { getPlantStatus, harvest } from '../../game/timeEngine';
 import { useGameStore } from '../../store/gameStore';
 import { selectDebugMultiplier } from '../../store/slices/debug';
 import { toProgressStats } from '../../store/slices/progression';
+import { selectUpgradeEffects } from '../../store/slices/shop';
 import {
   careScoreFromNeglect,
   computeHarvestResult,
@@ -24,7 +25,8 @@ import {
 
 /** Pflege und Laune zu `nowMs`, für Ertrag und Fallback. */
 function careAndMood(nowMs: number, phase: Parameters<typeof computeNeeds>[3]) {
-  const needs = computeNeeds(useGameStore.getState().needs, nowMs, NO_MODIFIERS, phase);
+  const state = useGameStore.getState();
+  const needs = computeNeeds(state.needs, nowMs, selectUpgradeEffects(state).needModifiers, phase);
   return { careScore: careScoreFromNeglect(neglectFromNeeds(needs)), moodScore: needs.mood };
 }
 
@@ -75,7 +77,12 @@ export function collectHarvest(nowMs: number = Date.now()): HarvestResult | null
     const { careScore, moodScore } = careAndMood(nowMs, status.phase);
     session = fallbackSession(careScore, moodScore);
   }
-  const base = computeHarvestResult(state.plant, session, qualityPenaltyStars(state.health));
+  const base = computeHarvestResult(
+    state.plant,
+    session,
+    qualityPenaltyStars(state.health),
+    selectUpgradeEffects(state).yieldMultiplier,
+  );
   const before = toProgressStats(state);
   state.addCoins(base.coins);
   state.recordHarvest();
