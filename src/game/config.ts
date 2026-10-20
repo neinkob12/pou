@@ -304,7 +304,43 @@ export const SEED_FRAGMENTS_BY_STARS: Record<1 | 2 | 3 | 4 | 5, number> = {
 // Shop-Upgrades: Topf, LED, Ventilator, Erde, Nützlings-Kit (Auftrag P15)
 // ---------------------------------------------------------------------------
 
-// Werte hier einfügen, z. B. UPGRADES mit Preis und Effekt-Multiplikatoren.
+export type UpgradeId = 'pot' | 'led' | 'fanDehumidifier' | 'bioSoil' | 'beneficials';
+
+/** Wirkung einer Upgrade-Stufe. Fehlt ein Wert, ändert die Stufe daran nichts. */
+export interface UpgradeEffect {
+  /** Abfall-Multiplikator je Balken (0.8 = 20 % langsamer), geht als modifiers an computeNeeds. */
+  needDecay?: Partial<Record<keyof typeof NEED_DECAY_PER_REAL_HOUR, number>>;
+  /** Abfall-Multiplikator für den Lichtbalken (P11). */
+  lightDecay?: number;
+  /** Multiplikator auf den Ertrag (P24 reicht ihn an die Ernte). */
+  yieldMultiplier?: number;
+  /** Multiplikator auf die Schädlingschance (HealthCheckOptions.pestChanceMultiplier). */
+  pestChance?: number;
+  /** Trocknen mit Entfeuchter: kein Schimmel (HealthCheckOptions.hasDehumidifier). */
+  dehumidifier?: boolean;
+}
+
+export interface UpgradeLevel {
+  /** Preis in Münzen. */
+  price: number;
+  /** Gesamtwirkung dieser Stufe (nicht zusätzlich zur Stufe davor). */
+  effect: UpgradeEffect;
+}
+
+/** Reihenfolge im Shop. Mehrstufig: Topf (3 Stufen, Asset U1). */
+export const UPGRADE_IDS: readonly UpgradeId[] = ['pot', 'led', 'fanDehumidifier', 'bioSoil', 'beneficials'];
+
+export const UPGRADES: Record<UpgradeId, readonly UpgradeLevel[]> = {
+  pot: [
+    { price: 60, effect: { needDecay: { water: 0.85 }, yieldMultiplier: 1.1 } },
+    { price: 150, effect: { needDecay: { water: 0.75 }, yieldMultiplier: 1.2 } },
+    { price: 300, effect: { needDecay: { water: 0.65 }, yieldMultiplier: 1.3 } },
+  ],
+  led: [{ price: 120, effect: { lightDecay: 0.7 } }],
+  fanDehumidifier: [{ price: 100, effect: { dehumidifier: true } }],
+  bioSoil: [{ price: 80, effect: { needDecay: { nutrients: 0.75 } } }],
+  beneficials: [{ price: 90, effect: { pestChance: 0.5 } }],
+};
 
 // ---------------------------------------------------------------------------
 // Level und Freischaltungen (Auftrag P16)

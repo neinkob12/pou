@@ -5,11 +5,13 @@
 import { createHealthSlice } from './health';
 import { createNeedsSlice } from './needs';
 import { createPlantSlice } from './plant';
+import { createShopSlice } from './shop';
 
 export const slices = {
   plant: createPlantSlice,
   health: createHealthSlice,
   needs: createNeedsSlice,
+  shop: createShopSlice,
 };
 
 type UnionToIntersection<U> = (U extends unknown ? (arg: U) => void : never) extends (
