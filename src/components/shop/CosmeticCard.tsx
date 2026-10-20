@@ -4,6 +4,7 @@ import { cosmetics as text } from '../../content/strings';
 import { COSMETIC_ITEMS, type CosmeticId } from '../../game/config';
 import { canBuyCosmetic, equippedCosmetic, ownsCosmetic } from '../../game/cosmetics';
 import { cosmetics as cosmeticAssets } from '../../lib/assets';
+import { cue } from '../../lib/audio';
 import { clock } from '../../lib/clock';
 import { useGameStore } from '../../store/gameStore';
 import { AssetImage } from '../ui/AssetImage';
@@ -60,7 +61,11 @@ export function CosmeticCard({ id, tryingOn, onTryOn, onDone }: CosmeticCardProp
             <Button
               label={text.buy(COSMETIC_ITEMS[id].priceCoins)}
               disabled={!affordable}
-              onPress={() => buyCosmetic(id, spendCoins, clock.now()) && onDone()}
+              onPress={() => {
+                if (!buyCosmetic(id, spendCoins, clock.now())) return;
+                cue('coins');
+                onDone();
+              }}
             />
           )}
         </View>

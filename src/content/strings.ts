@@ -246,6 +246,10 @@ export const shop = {
   owned: 'Gekauft',
   level: (level: number, max: number) => `Stufe ${level} von ${max}`,
   notEnoughCoins: 'Zu wenig Münzen',
+  // Shop-Karten (WEB-3).
+  missingCoins: (missing: number) => `Dir fehlen noch ${missing} Münzen`,
+  bought: 'Gekauft!',
+  maxed: 'Voll ausgebaut',
   upgrades: {
     pot: {
       name: 'Größerer Topf',
@@ -415,6 +419,9 @@ export const harvestScreen = {
   dryingDone: 'Fertig getrocknet!',
   collect: 'Einsammeln',
   summaryTitle: 'Ernte fertig!',
+  // Aufdecken der Kiste (WEB-3).
+  revealTitle: 'Deine Ernte ist da!',
+  revealHint: 'Tipp auf die Kiste',
   summaryCrate: 'Erntekiste (B8)',
   summaryStars: (stars: number) => `${stars} von 5 Sternen`,
   starFull: '★',
@@ -450,6 +457,9 @@ export const strainsAlbum = {
   harvests: (count: number) => `${count} Ernten`,
   locked: 'Gesperrt',
   unlocked: 'Freigeschaltet',
+  // Sammelkarte (WEB-3): Schloss-Zeichen und Rätsel-Porträt gesperrter Sorten.
+  lockSymbol: '?',
+  lockedPortrait: 'Noch unbekannt',
   floweringWeeks: (weeks: number) => `${weeks} Wochen Blüte`,
   autoflower: 'Autoflower',
   portrait: (name: string) => `${name} (U15)`,
@@ -495,23 +505,24 @@ export const onboarding = {
     next: 'Weiter',
     skip: 'Überspringen',
     done: "Los geht's",
+    // Budi spricht selbst (WEB-3).
     steps: {
       plant: {
-        title: 'Dein erster Samen',
-        text: 'Pflanz einen Samen in den Topf. Daraus wächst Budi, in Echtzeit.',
-        action: 'Samen pflanzen',
+        title: 'Hallo, ich bin Budi!',
+        text: 'Noch bin ich ein kleiner Samen. Steckst du mich in die Erde?',
+        action: 'Einpflanzen',
       },
       water: {
-        title: 'Gießen',
-        text: 'Zieh die Gießkanne unten zu Budi und lass es regnen. Probier es gleich aus.',
+        title: 'Puh, ist das trocken hier.',
+        text: 'Zieh die Gießkanne unten zu mir und lass es regnen.',
       },
       bars: {
-        title: 'Die Balken',
-        text: 'Oben siehst du Wasser, Nährstoffe, Licht und Laune. Sinkt ein Balken, braucht Budi dich. Budi wächst auch weiter, wenn die App zu ist.',
+        title: 'So geht es mir',
+        text: 'Oben siehst du Wasser, Nährstoffe, Licht und Laune. Wird ein Balken leer, brauche ich dich. Ich wachse weiter, auch wenn du weg bist.',
       },
       minigames: {
-        title: 'Minigames',
-        text: 'Unter "Spiele" sammelst du Münzen und machst Budi gute Laune.',
+        title: 'Lust auf ein Spiel?',
+        text: 'Unter "Spiele" sammelst du Münzen und machst mir gute Laune.',
         action: 'Zeig mal',
       },
     },

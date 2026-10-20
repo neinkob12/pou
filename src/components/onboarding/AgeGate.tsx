@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Text, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { onboarding } from '../../content/strings';
 import { useGameStore } from '../../store/gameStore';
+import { BudiAvatar } from '../feedback/BudiAvatar';
 import { Button } from '../ui/Button';
 
 /**
@@ -17,6 +19,9 @@ export function AgeGate() {
   return (
     <SafeAreaView className="flex-1 bg-cream">
       <View className="flex-1 justify-center gap-6 p-6">
+        <Animated.View entering={FadeInDown.springify().damping(12)} style={{ alignItems: 'center' }}>
+          <BudiAvatar size={96} />
+        </Animated.View>
         {declined ? (
           <>
             <Text className="font-heading text-3xl text-ink">{onboarding.declined.title}</Text>
