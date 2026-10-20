@@ -2,6 +2,7 @@
 // Büro-Regel: Eigener Slice als Datei src/store/slices/<bereich>.ts, hier eine Zeile im
 // Objekt `slices` (plus Import). Der Schlüssel ist der Bereichsname.
 
+import { createFactsSlice } from './facts';
 import { createHealthSlice } from './health';
 import { createNeedsSlice } from './needs';
 import { createPlantSlice } from './plant';
@@ -10,6 +11,7 @@ export const slices = {
   plant: createPlantSlice,
   health: createHealthSlice,
   needs: createNeedsSlice,
+  facts: createFactsSlice,
 };
 
 type UnionToIntersection<U> = (U extends unknown ? (arg: U) => void : never) extends (
