@@ -48,6 +48,7 @@ describe('Debug-Aktionen', () => {
     expect(r.coins).toBe(0);
     expect(r.turbo).toBe(false);
     expect(r.debugMultiplier).toBe(1);
+    expect(r.hydration).toBe(s.hydration);
   });
 
   it('kommt per Vorspulen, Lichtwechsel und Ernte bis zum Ende', () => {

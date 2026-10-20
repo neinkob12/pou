@@ -24,6 +24,7 @@ export function createDebugActions(store = useGameStore, clock: () => number = D
       const now = clock();
       store.getState().plantSeed(START_STRAIN, now);
       store.getState().resetNeeds(now);
+      store.getState().resetHealth(now);
     },
     flipLight: () => updatePlant((p) => flipLight(p, clock(), multiplier())),
     harvest: () => updatePlant((p) => harvest(p, clock(), multiplier())),
@@ -34,8 +35,11 @@ export function createDebugActions(store = useGameStore, clock: () => number = D
       store.setState({ turbo: on, plant: plant ? setTurboScale(plant, clock(), on) : null });
     },
     reset: () => {
-      store.setState(store.getInitialState(), true);
-      store.getState().resetNeeds(clock());
+      // Startwerte aller Slices; der Lade-Status gehört nicht zum Spielstand und bleibt.
+      const now = clock();
+      store.setState({ ...store.getInitialState(), hydration: store.getState().hydration }, true);
+      store.getState().resetNeeds(now);
+      store.getState().resetHealth(now);
     },
   };
 }
