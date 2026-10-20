@@ -184,6 +184,17 @@ export const tapGame = {
   circleLabel: 'Kreis',
 };
 
+export const smashGame = {
+  title: 'Schädlings-Smash',
+  mite: 'Spinnmilbe',
+  gnat: 'Trauermücke',
+  ladybug: 'Marienkäfer: verschonen!',
+  combo: 'Kombo',
+  protectionHint: (minScore: number) => `Ab ${minScore} Punkten: Schädlingsschutz für Budi`,
+  protectionEarned: 'Budi ist jetzt einen Tag vor Schädlingen geschützt!',
+  leafLabel: 'Blatt',
+};
+
 export const shop = {
   title: 'Shop',
 };
