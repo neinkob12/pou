@@ -83,7 +83,12 @@ export interface BudiReaction {
  * Gesicht: Reaktion auf Pflege (kurz) vor Schweben eines Werkzeugs vor dem Zustand aus needs.ts.
  * Koma und krank lassen sich nicht wegstreicheln: dann bleibt das Zustandsgesicht.
  */
-export function faceFor(condition: Condition, reaction: BudiReaction | null, hovering: boolean): BudiFaceId {
+export function faceFor(
+  condition: Condition,
+  reaction: BudiReaction | null,
+  hovering: boolean,
+  asleep = false,
+): BudiFaceId {
   if (condition === 'coma' || condition === 'sick') return CONDITION_FACES[condition];
   // 'error' = Pflege hat nicht gewirkt (z. B. keine Pflanze): kein Reaktionsgesicht.
   if (reaction && reaction.feedback !== 'error') {
@@ -91,6 +96,8 @@ export function faceFor(condition: Condition, reaction: BudiReaction | null, hov
     return reaction.type === 'pet' ? 'b10_face_very_happy' : 'b10_face_happy';
   }
   if (hovering) return 'b10_face_surprised';
+  // Nachts schläft Budi, wenn ihm nichts fehlt. Durst oder Hunger wecken ihn (Zustandsgesicht).
+  if (asleep && condition === 'ok') return 'b10_face_snoring';
   return CONDITION_FACES[condition];
 }
 
@@ -141,6 +148,13 @@ export interface BudiLookInput {
   condition: Condition | null;
   reaction: BudiReaction | null;
   hovering: boolean;
+  /** Dunkelphase im Lichtplan: Budi schläft (nur Darstellung). */
+  isNight?: boolean;
+}
+
+/** Erntereif: Blütenhärchen werden bernsteinfarben. */
+export function isRipe(phase: PhaseId | null): boolean {
+  return phase === 'ready';
 }
 
 export function computeBudiLook(
@@ -153,6 +167,6 @@ export function computeBudiLook(
   }
   const plant = plantLayerWithStrain(plantLayerFor(phase, input.phaseProgress), phase, strainId, hasAsset);
   if (HARVESTED_PHASES.includes(phase)) return { plant, pot: null, face: null, blink: false };
-  const face = faceFor(condition ?? 'ok', input.reaction, input.hovering);
+  const face = faceFor(condition ?? 'ok', input.reaction, input.hovering, input.isNight ?? false);
   return { plant, pot: 'u01_pot_standard', face, blink: canBlink(face) };
 }

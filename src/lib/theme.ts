@@ -50,3 +50,37 @@ export const radii = {
 } as const;
 
 export const theme = { colors, fonts, fontSizes, spacing, radii } as const;
+
+// --- WEB-1: Zeichenfarben für Budi und Zimmer (Skia) ---
+// Abstufungen der Palette für Schatten, Lichtkanten und Details. Nur Grafik, kein Spielwert.
+export const artColors = {
+  outline: colors.plantDark,
+  leaf: colors.plantLight,
+  leafShade: '#5DAE55',
+  leafLight: '#A6E39A',
+  leafVein: '#4E9A49',
+  stem: '#5DAE55',
+  soil: '#6B4430',
+  soilLight: '#8A5A3E',
+  pot: colors.terracotta,
+  potShade: '#A95C3A',
+  potLight: '#E39A72',
+  potRim: '#D9825A',
+  cheek: '#FF9DA8',
+  eye: '#2B2B2B',
+  eyeShine: colors.white,
+  mouth: '#7A2F3A',
+  tongue: '#FF7A8A',
+  sweat: '#8FD3FF',
+  sick: '#B9D98A',
+  bud: '#9ED88E',
+  budShade: '#6FBF63',
+  pistil: '#FFFFFF',
+  pistilRipe: '#F2A65A',
+  frost: '#FFFFFF',
+  seed: '#B98A5E',
+  wood: '#C48A55',
+  woodShade: '#9C6638',
+  string: '#8A6A4A',
+  zzz: colors.lavender,
+} as const;
