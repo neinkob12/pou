@@ -221,3 +221,24 @@ export const MINIGAME_REWARDS = {
   maxCoinsPerRound: 50,
   moodPerRound: 15,
 } as const;
+
+/** Gerüst aller Minigames (Auftrag P08). */
+export const MINIGAME_FRAMEWORK = {
+  countdownSeconds: 3,
+  /** Längster Frame-Schritt, der zählt. Schützt vor Zeitsprüngen nach Ruckeln oder Hintergrund. */
+  maxFrameStepMs: 100,
+} as const;
+
+/** Beispielspiel "Tipp den Kreis" (Auftrag P08). */
+export const TAP_CIRCLE = {
+  durationSeconds: 30,
+  pointsPerHit: 1,
+  startRadius: 48,
+  minRadius: 22,
+  /** Radius schrumpft pro Treffer um so viele Pixel, bis minRadius. */
+  shrinkPerHit: 1,
+  /** So lange bleibt ein Kreis stehen, bevor er woanders auftaucht. */
+  lifetimeMs: 1400,
+  /** Treffer zählen auch etwas außerhalb des Kreises (Finger sind dicker als Pixel). */
+  hitSlop: 10,
+} as const;
