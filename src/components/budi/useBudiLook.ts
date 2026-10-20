@@ -8,7 +8,7 @@ import { budi, type BudiVariantId } from '../../lib/assets';
 import { useGameStore } from '../../store/gameStore';
 import { selectDebugMultiplier } from '../../store/slices/debug';
 import type { CareReaction } from '../room/care/CareStage';
-import { useNow } from '../room/useNow';
+import { useNow } from '../../hooks/useNow';
 import { computeBudiLook, type BudiLook, type BudiReaction } from './budiLook';
 
 /** So lange zeigt Budi nach einer Pflege das Reaktionsgesicht. */

@@ -1,7 +1,7 @@
 import { getPlantStatus, type PlantStatus } from '../../game/timeEngine';
 import { useGameStore } from '../../store/gameStore';
 import { selectDebugMultiplier } from '../../store/slices/debug';
-import { useNow } from '../room/useNow';
+import { FAST_REFRESH_MS, useNow } from '../../hooks/useNow';
 import { harvestStep, type HarvestResult, type HarvestSession, type HarvestStep } from './harvestFlow';
 
 export interface HarvestView {
@@ -19,7 +19,7 @@ export function useHarvestView(): HarvestView {
   const session = useGameStore((s) => s.harvestSession);
   const result = useGameStore((s) => s.harvestResult);
   const debugMultiplier = useGameStore(selectDebugMultiplier);
-  const now = useNow();
+  const now = useNow(FAST_REFRESH_MS);
   const status = plant ? getPlantStatus(plant, now, debugMultiplier) : null;
   return {
     step: harvestStep(status, result !== null),

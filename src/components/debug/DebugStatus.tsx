@@ -1,14 +1,13 @@
 import { Text } from 'react-native';
 
-import { debug } from '../../content/strings';
-import { PHASE_LABELS } from '../../game/config';
+import { debug, phaseLabels } from '../../content/strings';
 import { formatClock } from '../../game/debug';
 import { computeNeeds, NEED_IDS, NO_MODIFIERS } from '../../game/needs';
 import { getPlantStatus } from '../../game/timeEngine';
 import { useGameStore } from '../../store/gameStore';
 import { selectDebugMultiplier } from '../../store/slices/debug';
 import { SettingsSection } from '../settings/SettingsSection';
-import { useNow } from './useNow';
+import { FAST_REFRESH_MS, useNow } from '../../hooks/useNow';
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
@@ -21,7 +20,7 @@ function Row({ label, value }: { label: string; value: string }) {
 
 /** Phase, Alter, Restzeit, Münzen, Turbo und Balken der aktuellen Pflanze. */
 export function DebugStatus() {
-  const now = useNow();
+  const now = useNow(FAST_REFRESH_MS);
   const plant = useGameStore((s) => s.plant);
   const coins = useGameStore((s) => s.coins);
   const turbo = useGameStore((s) => s.turbo);
@@ -35,7 +34,7 @@ export function DebugStatus() {
     <SettingsSection title={debug.statusTitle}>
       {status ? (
         <>
-          <Row label={debug.phaseLabel} value={PHASE_LABELS[status.phase]} />
+          <Row label={debug.phaseLabel} value={phaseLabels[status.phase]} />
           <Row label={debug.ageLabel} value={`${status.ageDays.toFixed(1)} ${debug.ageUnit}`} />
           <Row
             label={debug.remainingLabel}

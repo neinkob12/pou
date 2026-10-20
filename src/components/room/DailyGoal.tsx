@@ -3,11 +3,12 @@ import { Pressable, Text, View } from 'react-native';
 
 import { dailyGoals } from '../../content/strings';
 import { canClaimChest, goalTemplate } from '../../game/dailyGoals';
+import { clock } from '../../lib/clock';
 import { useGameStore } from '../../store/gameStore';
 import { Bar } from '../ui/Bar';
 import { Modal } from '../ui/Modal';
 import { Placeholder } from '../ui/Placeholder';
-import { useNow } from './useNow';
+import { useNow } from '../../hooks/useNow';
 
 /** Tagesziel im Raum (P19): ein Ziel pro Tag mit Fortschritt und Belohnungskiste. */
 export function DailyGoal() {
@@ -26,7 +27,7 @@ export function DailyGoal() {
 
   const openChest = () => {
     const s = useGameStore.getState();
-    const coins = s.claimDailyGoalChest(Date.now(), s.addCoins);
+    const coins = s.claimDailyGoalChest(clock.now(), s.addCoins);
     if (coins > 0) setChestCoins(coins);
   };
 

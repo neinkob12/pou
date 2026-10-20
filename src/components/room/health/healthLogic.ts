@@ -10,6 +10,7 @@ import { getPlantStatus, type PlantRecord } from '../../../game/timeEngine';
 import type { GameState } from '../../../store/slices';
 import { selectDebugMultiplier } from '../../../store/slices/debug';
 import { selectUpgradeEffects } from '../../../store/slices/shop';
+import { computeCareView } from '../care/careLogic';
 
 /**
  * Hook-Punkt für P29: Sobald Rewarded Ads da sind, liefert P29 hier `true` (Anzeige geladen,
@@ -63,8 +64,18 @@ export function syncHealth(state: GameState, nowMs: number): void {
   );
 }
 
-/** Wiederbeleben gegen Münzen: erst bezahlen (P05), dann die Balken auffüllen (P04). */
+/** Liegt Budi gerade im Koma? Gleiche Wahrheit wie der Raum (deriveCondition über computeCareView). */
+export function isInComa(state: GameState, nowMs: number): boolean {
+  const modifiers = selectUpgradeEffects(state).needModifiers;
+  return computeCareView(state.plant, state.needs, nowMs, selectDebugMultiplier(state), modifiers).condition === 'coma';
+}
+
+/**
+ * Wiederbeleben gegen Münzen: erst bezahlen (P05), dann die Balken auffüllen (P04).
+ * Nur im Koma, damit ein schneller Doppel-Tap nicht zweimal bezahlt (P31).
+ */
 export function reviveWithCoins(state: GameState, nowMs: number): boolean {
+  if (!isInComa(state, nowMs)) return false;
   if (!state.reviveBudi(nowMs, state.spendCoins)) return false;
   state.reviveFromComa(nowMs);
   return true;

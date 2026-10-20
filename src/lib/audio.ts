@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import { AUDIO } from '../game/config';
 import type { CareActionId } from '../game/events';
 import { sounds, type SoundId } from './assets';
-import { storage } from './storage';
+import { safeSet, storage } from './storage';
 
 export const SOUND_KEYS = {
   music: 'sound.music',
@@ -203,7 +203,7 @@ export function stopMusic() {
 
 /** Schalter aus den Einstellungen. Musik reagiert sofort. */
 export function setSoundSetting(key: SoundSetting, enabled: boolean) {
-  storage.set(SOUND_KEYS[key], enabled);
+  safeSet(SOUND_KEYS[key], enabled);
   if (key !== 'music' || !music) return;
   if (enabled) music.player.play();
   else music.player.pause();

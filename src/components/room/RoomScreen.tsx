@@ -3,6 +3,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FactUnlockPopup } from '../facts/FactUnlockPopup';
 import { HarvestEntry } from '../harvest/HarvestEntry';
+import { canShowRoom } from '../onboarding/onboardingFlow';
+import { useGameStore } from '../../store/gameStore';
 import { ActionTray } from './ActionTray';
 import { useRoomAudio } from './audio/useRoomAudio';
 import { BottomNav } from './BottomNav';
@@ -24,6 +26,10 @@ import { RoomUpgrades } from './RoomUpgrades';
 export function RoomScreen() {
   useMinigameMoodBonus();
   useRoomAudio();
+  const hydrated = useGameStore((s) => s.hydration !== 'pending');
+  const ageConfirmed = useGameStore((s) => s.ageConfirmed);
+  // Vor der Altersfrage nur der leere Hintergrund, damit das Zimmer nicht aufblitzt (P31).
+  if (!canShowRoom(hydrated, ageConfirmed)) return <View className="flex-1 bg-cream" />;
   return (
     <CareStageProvider>
       <View className="flex-1">

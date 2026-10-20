@@ -1,5 +1,11 @@
 import { notifications as texts } from '../../content/strings';
-import { deliveredOnly, notificationContent, notificationsEnabled, NOTIFICATION_KEYS } from '../notifications';
+import {
+  deliveredOnly,
+  notificationActionFor,
+  notificationContent,
+  notificationsEnabled,
+  NOTIFICATION_KEYS,
+} from '../notifications';
 import { storage } from '../storage';
 
 const HOUR = 60 * 60 * 1000;
@@ -23,5 +29,12 @@ describe('lib/notifications', () => {
   it('behält nur zugestellte Einträge der letzten zwei Tage', () => {
     const now = 100 * HOUR;
     expect(deliveredOnly([now - 50 * HOUR, now - 2 * HOUR, now, now + HOUR], now)).toEqual([now - 2 * HOUR, now]);
+  });
+
+  it('plant schon bei "inactive" neu, damit Wegwischen im App-Umschalter nicht ohne Plan endet (P31)', () => {
+    expect(notificationActionFor('inactive')).toBe('reschedule');
+    expect(notificationActionFor('background')).toBe('reschedule');
+    expect(notificationActionFor('active')).toBe('cancel');
+    expect(notificationActionFor('unknown')).toBeNull();
   });
 });

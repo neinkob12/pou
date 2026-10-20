@@ -1,4 +1,5 @@
-import { PHASE_LABELS, type PhaseId } from '../../game/config';
+import { type PhaseId } from '../../game/config';
+import { phaseLabels } from '../strings';
 import { FACT_CARDS, factById, factsForPhase } from '../facts';
 
 describe('facts', () => {
@@ -8,7 +9,7 @@ describe('facts', () => {
 
   it('jede Karte hat Phase, Titel, Text, Quelle und einen https-Link', () => {
     for (const card of FACT_CARDS) {
-      expect(Object.keys(PHASE_LABELS)).toContain(card.phase);
+      expect(Object.keys(phaseLabels)).toContain(card.phase);
       expect(card.title.trim()).not.toBe('');
       expect(card.text.trim()).not.toBe('');
       expect(card.source.trim()).not.toBe('');
