@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -24,12 +24,21 @@ function Round({ title, children, onPlayAgain, ...options }: MinigameShellProps 
   const { phase, result } = session;
   const exit = () => (router.canGoBack() ? router.back() : router.replace('/minigames'));
 
-  // Am Rechner: Esc oder P pausiert und setzt fort, Enter startet nach dem Ende neu.
+  // Am Rechner: Esc oder P pausiert und setzt fort, Enter startet nach dem Ende neu. Enter erst
+  // nach kurzer Zeit, damit das Enter, das die Runde beendet (Quiz), nicht gleich neu startet.
+  const resultShownAt = useRef<number | null>(null);
+  useEffect(() => {
+    resultShownAt.current = result ? Date.now() : null;
+  }, [result]);
   useKeyDown((key) => {
     if (key === 'Escape' || key === 'p' || key === 'P') {
       if (phase === 'paused') session.resume();
       else if (phase === 'playing' || phase === 'countdown') session.pause();
-    } else if (key === 'Enter' && result) {
+    } else if (
+      key === 'Enter' &&
+      resultShownAt.current !== null &&
+      Date.now() - resultShownAt.current > MINIGAME_FEEL.restartKeyDelayMs
+    ) {
       onPlayAgain();
     }
   });

@@ -38,7 +38,7 @@ function popScale(t: number): number {
   return t < 0.7 ? (1.15 * t) / 0.7 : 1.15 - (0.15 * (t - 0.7)) / 0.3;
 }
 
-function Mite({ legWiggle }: { legWiggle: SharedValue<number> }) {
+export function Mite({ legWiggle }: { legWiggle: SharedValue<number> }) {
   const legs = useDerivedValue(() => [{ rotate: legWiggle.get() * 0.12 }]);
   return (
     <>

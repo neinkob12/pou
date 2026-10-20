@@ -50,7 +50,7 @@ function Background({ size }: { size: SharedValue<{ width: number; height: numbe
 }
 
 /** Knospe in Einheitsgröße (Radius 1), die Gruppe skaliert auf den Kreisradius. */
-function Bud() {
+export function Bud() {
   return (
     <>
       {PETALS.map((deg) => (

@@ -677,6 +677,8 @@ export const MINIGAME_FRAMEWORK = {
 export const MINIGAME_FEEL = {
   /** Spielfeld höchstens so breit (dp), damit Spiele am Rechner nicht in die Breite laufen. */
   playfieldMaxWidth: 520,
+  /** Enter startet am Rechner erst so lange nach dem Ergebnis neu. */
+  restartKeyDelayMs: 700,
   /** "Los!" nach dem Countdown so lange zeigen. */
   goFlashMs: 650,
   /** Kurzes Anhalten der Spielzeit bei einem Treffer. */
