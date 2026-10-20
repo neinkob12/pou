@@ -19,7 +19,7 @@ GitHub Pages einschalten: Repo **Settings > Pages > Build and deployment > Sourc
   - Consent/Werbung: `src/components/onboarding/consentHook.web.ts` (sofort erledigt). P29 füllt nur die native Datei.
   - Sensoren: Budi Jump startet im Web mit Tippen statt Neigen (`useJumpInput.ts`, eine Zeile).
   - Haptik: `expo-haptics` ist im Web ein No-op, Aufrufe fangen Fehler schon ab. Keine Änderung nötig.
-- Debug-Menü und Zeitraffer sind im Web immer da (`src/lib/devTools.ts`: `__DEV__ || web`), damit du Phasen und Ernte testen kannst. Nativ gilt weiter nur `__DEV__`.
+- Debug-Menü und Zeitraffer sind im Web immer da (`src/lib/devTools.ts`: `devToolsEnabled()` = `__DEV__` oder Web), damit du Phasen und Ernte testen kannst. Nativ gilt weiter nur `__DEV__`.
 - `.github/workflows/pages.yml`: Bei Push auf `main` bauen und auf Pages veröffentlichen. Kopiert `index.html` als `404.html` und je Route (`shop.html`, `minigames/smash.html` ...), damit Direktlinks und Neuladen auf Unterseiten gehen. `ci.yml` unverändert.
 
 ### Bugfix nativ (betrifft auch Android/iOS)

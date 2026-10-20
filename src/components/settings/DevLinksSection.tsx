@@ -1,11 +1,11 @@
 import { debug, harvestScreen, onboarding, seedSelect, settings } from '../../content/strings';
 import { NavLink } from '../ui/NavLink';
-import { DEV_TOOLS } from '../../lib/devTools';
+import { devToolsEnabled } from '../../lib/devTools';
 import { SettingsSection } from './SettingsSection';
 
 /** Nur im Entwicklungs-Build: Links zu Screens ohne eigenen Tab. */
 export function DevLinksSection() {
-  if (!DEV_TOOLS) return null;
+  if (!devToolsEnabled()) return null;
   return (
     <SettingsSection title={settings.devTitle}>
       <NavLink href="/debug" label={debug.title} />
