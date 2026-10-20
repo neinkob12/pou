@@ -310,7 +310,16 @@ export const SEED_FRAGMENTS_BY_STARS: Record<1 | 2 | 3 | 4 | 5, number> = {
 // Level und Freischaltungen (Auftrag P16)
 // ---------------------------------------------------------------------------
 
-// Werte hier einfügen, z. B. XP_PER_HARVEST, XP_PER_STAR, LEVEL_THRESHOLDS.
+/** Erfahrung je abgeschlossener Ernte, egal wie gut. */
+export const XP_PER_HARVEST = 50;
+/** Zusätzliche Erfahrung je Qualitätsstern der Ernte (5 Sterne = +100). */
+export const XP_PER_STAR = 20;
+
+/**
+ * Erfahrung, ab der ein Level erreicht ist. Index 0 = Level 1. Eine 3-Sterne-Ernte bringt 110 XP,
+ * Level 5 (Auto-Anton) also nach rund 6 Ernten. Über dem letzten Eintrag gibt es kein höheres Level.
+ */
+export const LEVEL_XP_THRESHOLDS: readonly number[] = [0, 100, 250, 450, 700, 1000, 1400, 1900, 2500, 3200];
 
 // ---------------------------------------------------------------------------
 // Tagesziele und Benachrichtigungen (Aufträge P18, P19)
