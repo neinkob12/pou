@@ -1,12 +1,14 @@
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { onboarding } from '../../content/strings';
 import { gameEvents } from '../../game/events';
 import { usePlantNewSeed } from '../../hooks/usePlantNewSeed';
 import { useGameStore } from '../../store/gameStore';
+import { budiSpeak } from '../budi/voice';
+import { SpeechBubble } from '../feedback/SpeechBubble';
 import { Button } from '../ui/Button';
 import {
   careCompletesStep,
@@ -16,8 +18,8 @@ import {
   type TutorialStep,
 } from './onboardingFlow';
 
-/** Abstand der Karte unter der Statusleiste, damit Balken und Phase sichtbar bleiben. */
-const CARD_TOP_OFFSET = 150;
+/** Abstand der Blase unter der Statusleiste, damit Balken und Phase sichtbar bleiben. */
+const CARD_TOP_OFFSET = 124;
 
 interface TutorialOverlayProps {
   step: TutorialStep;
@@ -25,8 +27,8 @@ interface TutorialOverlayProps {
 }
 
 /**
- * Geführtes Tutorial über dem Zimmer: eine Karte je Schritt, das Zimmer bleibt bedienbar.
- * Überspringen geht in jedem Schritt.
+ * Geführtes Tutorial über dem Zimmer: Budi erklärt in einer Sprechblase je Schritt (WEB-3), das
+ * Zimmer bleibt bedienbar. Überspringen geht in jedem Schritt.
  */
 export function TutorialOverlay({ step, onStepChange }: TutorialOverlayProps) {
   const insets = useSafeAreaInsets();
@@ -38,6 +40,9 @@ export function TutorialOverlay({ step, onStepChange }: TutorialOverlayProps) {
   const next = nextTutorialStep(step);
 
   const advance = () => (next ? onStepChange(next) : finishTutorial());
+
+  // Budi sagt bei jedem Schritt etwas (im Browser erst nach der ersten Berührung hörbar).
+  useEffect(() => budiSpeak(), [step]);
 
   // Gepflanzt (auch auf anderem Weg): weiter zum Gießen.
   useEffect(() => {
@@ -60,26 +65,32 @@ export function TutorialOverlay({ step, onStepChange }: TutorialOverlayProps) {
 
   return (
     <View pointerEvents="box-none" className="absolute inset-0">
-      <View className="mx-4 gap-3 rounded-2xl bg-white p-4" style={{ marginTop: insets.top + CARD_TOP_OFFSET }}>
-        <Text className="font-body text-sm text-inkMuted">
-          {texts.stepCounter(TUTORIAL_STEPS.indexOf(step) + 1, TUTORIAL_STEPS.length)}
-        </Text>
-        <Text className="font-heading text-xl text-ink">{texts.steps[step].title}</Text>
-        <Text className="font-body text-base text-ink">{texts.steps[step].text}</Text>
-        <View className="gap-2">
-          {step === 'plant' && (
-            <Button label={texts.steps.plant.action} onPress={() => plantNewSeed(tutorialStrainId())} />
-          )}
-          {step === 'minigames' && <Button label={texts.steps.minigames.action} onPress={showMinigames} />}
-          {step !== 'plant' && (
-            <Button
-              label={next ? texts.next : texts.done}
-              variant={step === 'minigames' ? 'secondary' : 'primary'}
-              onPress={advance}
-            />
-          )}
-          {next && <Button label={texts.skip} variant="secondary" onPress={finishTutorial} />}
-        </View>
+      <View className="mx-4" style={{ marginTop: insets.top + CARD_TOP_OFFSET }}>
+        <SpeechBubble
+          bubbleKey={step}
+          kicker={texts.stepCounter(TUTORIAL_STEPS.indexOf(step) + 1, TUTORIAL_STEPS.length)}
+          title={texts.steps[step].title}
+          text={texts.steps[step].text}
+        >
+          <View className="gap-2 pt-1">
+            {step === 'plant' && (
+              <Button label={texts.steps.plant.action} onPress={() => plantNewSeed(tutorialStrainId())} />
+            )}
+            {step === 'minigames' && <Button label={texts.steps.minigames.action} onPress={showMinigames} />}
+            {step !== 'plant' && (
+              <Button
+                label={next ? texts.next : texts.done}
+                variant={step === 'minigames' ? 'secondary' : 'primary'}
+                onPress={advance}
+              />
+            )}
+            {next && (
+              <Pressable accessibilityRole="button" onPress={finishTutorial} className="items-center py-1">
+                <Text className="font-body text-sm text-inkMuted underline">{texts.skip}</Text>
+              </Pressable>
+            )}
+          </View>
+        </SpeechBubble>
       </View>
     </View>
   );
