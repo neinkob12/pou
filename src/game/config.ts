@@ -186,7 +186,38 @@ export const PRICES_EUR = {
 // Ernte-Qualität: Sterne, Trichom-Lupe, Trocknung (Auftrag P06, UI P24)
 // ---------------------------------------------------------------------------
 
-// Werte hier einfügen, z. B. QUALITY_PENALTY_PER_DISEASE, SEED_FRAGMENTS_PER_HARVEST.
+/** Pflegequalität 0 bis 1 skaliert den Ertrag von diesem Faktor (Pflege 0) bis 1 (Pflege perfekt). */
+export const YIELD_CARE_MIN_FACTOR = 0.5;
+
+/** Jede Ernte bringt mindestens so viele Ertragseinheiten. */
+export const MIN_YIELD_UNITS = 1;
+
+/** Sterne = Basis + Trichom-Lupe (0 bis 1) × Max + Trocknung (0 bis 1) × Max − Krankheitsmalus, gerundet. */
+export const QUALITY_STARS = {
+  min: 1,
+  max: 5,
+  base: 1,
+  trichomeMax: 2,
+  dryingMax: 2,
+} as const;
+
+/** Ernte-Wert = Ertrag × Qualität: Münz-Multiplikator je Sternzahl. */
+export const STAR_COIN_MULTIPLIER: Record<1 | 2 | 3 | 4 | 5, number> = {
+  1: 0.5,
+  2: 0.75,
+  3: 1,
+  4: 1.25,
+  5: 1.5,
+};
+
+/** Samen-Fragmente je Ernte nach Sternzahl (Sativa Sascha braucht 10). */
+export const SEED_FRAGMENTS_BY_STARS: Record<1 | 2 | 3 | 4 | 5, number> = {
+  1: 0,
+  2: 1,
+  3: 1,
+  4: 2,
+  5: 3,
+};
 
 // ---------------------------------------------------------------------------
 // Shop-Upgrades: Topf, LED, Ventilator, Erde, Nützlings-Kit (Auftrag P15)
