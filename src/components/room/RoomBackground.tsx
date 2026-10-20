@@ -1,19 +1,25 @@
 import { ImageBackground, StyleSheet, View } from 'react-native';
 
+import { lightPhase, room } from '../../content/strings';
 import { room as roomAssets } from '../../lib/assets';
-import { room } from '../../content/strings';
 import { Placeholder } from '../ui/Placeholder';
+import { usePlantStatus } from './phase/usePlantStatus';
 
-// Slot. Später P11: Tag/Nacht-Wechsel (H1, H2).
-/** Raum-Hintergrund über die ganze Fläche, hinter allen anderen Slots. */
+/** Raum-Hintergrund über die ganze Fläche: Tag (H1) oder Nacht (H2) nach Lichtplan der Pflanze. */
 export function RoomBackground() {
-  const source = roomAssets.h1_day;
+  const { light } = usePlantStatus();
+  const isDay = light?.isDay ?? true;
+  const source = isDay ? roomAssets.h1_day : roomAssets.h2_night;
   if (source) {
     return <ImageBackground source={source} style={StyleSheet.absoluteFill} resizeMode="cover" />;
   }
   return (
-    <View pointerEvents="none" style={StyleSheet.absoluteFill} className="bg-cream p-2">
-      <Placeholder label={room.background} color="cream" height="100%" />
+    <View pointerEvents="none" style={StyleSheet.absoluteFill} className={`p-2 ${isDay ? 'bg-cream' : 'bg-night'}`}>
+      <Placeholder
+        label={isDay ? room.background : `${room.background}, ${lightPhase.night} (H2)`}
+        color={isDay ? 'cream' : 'night'}
+        height="100%"
+      />
     </View>
   );
 }
