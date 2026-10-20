@@ -94,7 +94,7 @@ Stand: 34 Aufträge gemergt (30 aus dem Plan, die Nacharbeiten P09b, P10b, P27b 
 
 ## Braucht dich (gesammelt vom Leiter)
 
-1. **GitHub Pages einschalten:** Settings > Pages > Source: GitHub Actions. Danach läuft das Spiel nach dem nächsten Push auf main unter https://neinkob12.github.io/pou-/ (Debug-Menü sichtbar, Spielstand nur im Browser). Ohne diesen Schalter schlägt nur der Pages-Lauf fehl, die CI bleibt grün.
+1. **GitHub Pages einschalten:** Settings > Pages > Source: GitHub Actions. Danach läuft das Spiel nach dem nächsten Push auf main unter https://neinkob12.github.io/pou/ (Debug-Menü sichtbar, Spielstand nur im Browser). Ohne diesen Schalter schlägt nur der Pages-Lauf fehl, die CI bleibt grün.
 1. **Balancing aus P32 entscheiden** (Tabelle "Vorschläge" in `docs/progress/p32.md`, Ja/Nein je Zeile). Kern: Wer einmal am Tag spielt, liegt heute ca. 14 Mal in 30 Tagen im Koma und hat nie eine seltene Sorte. Vorschlag: Koma nach 36 statt 24 h, Wasser 3 und Laune 3 statt 5 und 4 pro Stunde, Lila Lotte ab 1 Ernte, Tageskiste 25 statt 60, Münzen je Ertragseinheit 10 statt 5, Jump-Münzkurs 0,05. Ergebnis: 0 Koma, Lila Lotte an Tag 13. Danach legt der Leiter P32b an.
 1. Development Build auf dem Handy installieren: Anleitung in `docs/progress/p01.md`. Danach die `projectId` aus `eas init` an den Leiter geben. Seit P23 ist `expo-audio` dabei: ein schon installierter Build muss neu gebaut werden.
 2. Balancing: Licht-Balken, wie viele Punkte pro echter Stunde? Ohne Wert sinkt er nie, LED-Upgrade wirkt nicht. P32 empfiehlt: keinen Abfallwert, solange der Balken nichts bewirkt.
