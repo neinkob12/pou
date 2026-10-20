@@ -154,6 +154,54 @@ export const COMA_AFTER_REAL_HOURS = 24;
 export const MOOD_BONUS_THRESHOLD = 70;
 export const MOOD_YIELD_BONUS = 0.05;
 
+/** Obergrenze jedes Balkens. */
+export const NEED_MAX = 100;
+
+/** Füllstand nach dem Pflanzen eines Samens. */
+export const NEED_START = { water: 80, nutrients: 80, mood: 80 } as const;
+
+/**
+ * Phasen-Faktor auf den Abfall (Auftrag P04). Fehlt ein Eintrag, gilt 1.
+ * Sämling braucht wenig Wasser; im Trocknen und danach gibt es keine Bedürfnisse mehr.
+ */
+export const NEED_PHASE_DECAY_FACTOR: Partial<
+  Record<PhaseId, Partial<Record<keyof typeof NEED_DECAY_PER_REAL_HOUR, number>>>
+> = {
+  germination: { water: 0.5 },
+  seedling: { water: 0.5 },
+  drying: { water: 0, nutrients: 0, mood: 0 },
+  done: { water: 0, nutrients: 0, mood: 0 },
+};
+
+/** Wie viel eine Pflege-Aktion auffüllt (Punkte auf dem Balken). */
+export const CARE_AMOUNTS = {
+  water: 35,
+  fertilize: 25, // Universaldünger, passt immer
+  fertilizeGrow: 40, // Stickstoff-betont, richtig im Wachstum
+  fertilizeBloom: 40, // Phosphor/Kalium-betont, richtig in der Blüte
+  pet: 20,
+} as const;
+
+/** Ab diesem Wasserstand nach dem Gießen gilt es als Überwässerung. Fehlt die Phase: NEED_THRESHOLDS.overwatered. */
+export const OVERWATER_LIMIT_BY_PHASE: Partial<Record<PhaseId, number>> = {
+  germination: 70, // Keimling und Sämling sind empfindlich gegen zu viel Wasser
+  seedling: 70,
+};
+
+/** So lange (echte Stunden) bleibt Budi nach Überwässerung gestresst. */
+export const OVERWATER_STRESS_REAL_HOURS = 6;
+
+/** Falscher Dünger wirkt nur zu diesem Anteil und stresst Budi so lange (echte Stunden). */
+export const WRONG_FERTILIZER_FACTOR = 0.25;
+export const WRONG_FERTILIZER_STRESS_REAL_HOURS = 4;
+
+/** Stickstoff-Dünger passt in diesen Phasen, Phosphor/Kalium-Dünger in den anderen lebenden Phasen. */
+export const GROW_FERTILIZER_PHASES: readonly PhaseId[] = ['germination', 'seedling', 'vegetative'];
+export const BLOOM_FERTILIZER_PHASES: readonly PhaseId[] = ['flowering', 'ready'];
+
+/** Füllstand aller Balken nach dem Wiederbeleben aus dem Koma (Kosten regelt P05). */
+export const COMA_REVIVE_NEED_LEVEL = 50;
+
 // ---------------------------------------------------------------------------
 // Ertrag und Wirtschaft
 // ---------------------------------------------------------------------------

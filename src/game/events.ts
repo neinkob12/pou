@@ -6,7 +6,7 @@
 import type { PhaseId, StrainId } from './config';
 
 /** Pflege-Aktionen. P04 ergänzt hier weitere, falls nötig. */
-export type CareActionId = 'water' | 'fertilize' | 'pet';
+export type CareActionId = 'water' | 'fertilize' | 'pet' | 'fertilizeGrow' | 'fertilizeBloom';
 
 export interface GameEvents {
   phaseChanged: { from: PhaseId; to: PhaseId; atMs: number };

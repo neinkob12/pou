@@ -3,11 +3,13 @@
 // Objekt `slices` (plus Import). Der Schlüssel ist der Bereichsname.
 
 import { createHealthSlice } from './health';
+import { createNeedsSlice } from './needs';
 import { createPlantSlice } from './plant';
 
 export const slices = {
   plant: createPlantSlice,
   health: createHealthSlice,
+  needs: createNeedsSlice,
 };
 
 type UnionToIntersection<U> = (U extends unknown ? (arg: U) => void : never) extends (
