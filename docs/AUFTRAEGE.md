@@ -7,23 +7,24 @@ Kurzfassung des Systems:
 - Ein Auftrag = ein Branch = ein PR = eine Session. Abhängigkeiten entscheiden, wann ein Auftrag starten darf.
 - `bash scripts/check.sh` ist der einzige Prüfbefehl (Typen, Lint, Tests, Inhalts-Check). Grün in der CI heißt: der Büro-Mod merged automatisch.
 - Geteilte Dateien haben feste Regeln (Abschnitte, Slices, Einhängezeilen), damit parallele Branches sauber zusammenlaufen.
-- Der CvD schreibt keinen Feature-Code. Er führt das Brett, bewacht `main` und pflegt `docs/PROGRESS.md`.
+- Der Leiter (Abteilungsleiter PotPou) schreibt keinen Feature-Code. Er führt das Brett, bewacht `main` und pflegt `docs/PROGRESS.md`. Über ihm steht der CvD des Büros (Luis), der ihn ernennt und Eskalationen bekommt.
 
 ## Rollen
 
 | Rolle | Wer | Aufgabe |
 | --- | --- | --- |
 | Chef | Vincent | Entscheidungen, Assets, Konten, Tests auf dem Handy, Rückfragen beantworten |
-| CvD (Chef vom Dienst) | eine Session | Aufträge anlegen, Kollegen holen, `main` bewachen, PROGRESS.md konsolidieren, Blocker bündeln, dem Chef berichten |
+| CvD (Chef vom Dienst) | Luis, übergreifend über alle Repos | Ernennt den Leiter mit dem Prompt aus `docs/LEITER_PROMPT.md`, bekommt Eskalationen (`mcp__buero__cvd`), greift nur ein, wenn der Leiter hängt |
+| Leiter (Abteilungsleiter PotPou) | eine Session, von Luis ernannt | Aufträge anlegen, Kollegen holen, `main` bewachen, PROGRESS.md konsolidieren, Blocker bündeln, dem Leiter und dem Chef berichten |
 | Kollegen | bis zu 8 Sessions | je ein Auftrag von diesem Brett |
 
 ## Ablauf eines Auftrags
 
-1. Der CvD legt den Auftrag auf dem Brett an (Vorlage ganz unten) und holt einen Kollegen.
+1. Der Leiter legt den Auftrag auf dem Brett an (Vorlage ganz unten) und holt einen Kollegen.
 2. Der Kollege arbeitet auf `claude/auftrag-{nr}-{name}`, prüft lokal mit `bash scripts/check.sh`, schreibt `docs/progress/pNN.md`, merged `origin/main` in seinen Branch, pusht, öffnet den PR und meldet `review`.
 3. CI läuft. Grün: Auto-Merge, Session wird archiviert. Rot: der Kollege behebt die Ursache, bis grün.
-4. Der CvD prüft nach dem Merge: CI auf `main` grün? Abnahme laut Progress-Notiz plausibel? Fremde Dateien angefasst? Er überträgt Handy-Tests, offene Punkte und Blocker nach `docs/PROGRESS.md`.
-5. Sobald alle Abhängigkeiten eines weiteren Auftrags gemerged sind und ein Platz frei ist, startet der CvD ihn. **Wellen sind Orientierung, die Spalte "Braucht" ist verbindlich.**
+4. Der Leiter prüft nach dem Merge: CI auf `main` grün? Abnahme laut Progress-Notiz plausibel? Fremde Dateien angefasst? Er überträgt Handy-Tests, offene Punkte und Blocker nach `docs/PROGRESS.md`.
+5. Sobald alle Abhängigkeiten eines weiteren Auftrags gemerged sind und ein Platz frei ist, startet der Leiter ihn. **Wellen sind Orientierung, die Spalte "Braucht" ist verbindlich.**
 
 ## Arbeitsregeln für Kollegen
 
@@ -32,11 +33,11 @@ Kurzfassung des Systems:
 3. **Vor `review`:** `git fetch origin main && git merge origin/main`, Konflikte lösen, `bash scripts/check.sh` grün, dann pushen und `review` melden. Nie `review` mit roter lokaler Prüfung.
 4. **Logik in `src/game/` ist reines TypeScript** ohne React-Import. Jede neue Logikfunktion bekommt einen Test. Balancing-Werte nur in `src/game/config.ts`, im eigenen Abschnitt.
 5. **Fehlende Assets:** Platzhalter über `src/lib/assets.ts` und `Placeholder`-Komponente, Eintrag in der Progress-Notiz unter "Fehlende Assets". Nie auf Assets warten.
-6. **Progress-Notiz** `docs/progress/pNN.md` nach `docs/progress/VORLAGE.md`. `docs/PROGRESS.md` fasst nur der CvD an.
+6. **Progress-Notiz** `docs/progress/pNN.md` nach `docs/progress/VORLAGE.md`. `docs/PROGRESS.md` fasst nur der Leiter an.
 7. **Nie:** Tests löschen, überspringen oder abschwächen; CI-Workflow oder `scripts/` ändern; Force-Push; neue Abhängigkeiten ohne Nennung im Auftrag; Spielregeln oder Balancing ändern, wenn der Auftrag es nicht sagt; Konsum, Rauchen, Wirkung, Dosierung oder echten Verkauf darstellen (der Inhalts-Check in der CI blockt das, aber er ist nur ein Netz).
-8. **Blockiert** (fehlende Abhängigkeit, fehlende Entscheidung, fehlendes Material): `auftrag blockieren` mit Grund und dem CvD melden. Nicht raten, nicht warten, nicht selbst erweitern.
+8. **Blockiert** (fehlende Abhängigkeit, fehlende Entscheidung, fehlendes Material): `auftrag blockieren` mit Grund und dem Leiter per Nachricht melden (Leiter nicht erreichbar: `mcp__buero__cvd`). Nicht raten, nicht warten, nicht selbst erweitern.
 9. **Kontext knapp:** `abgeben` mit Stand, offenen Punkten und nächstem Schritt, statt halbfertig zu pushen.
-10. **CI rot nach dem Push:** Ursache lesen und beheben. Dreimal rot in Folge: CvD melden.
+10. **CI rot nach dem Push:** Ursache lesen und beheben. Dreimal rot in Folge: Leiter melden.
 
 ## Geteilte Dateien und wie man sie anfasst
 
@@ -47,7 +48,7 @@ Kurzfassung des Systems:
 | `src/lib/assets.ts` | Eigenen Abschnitt ergänzen, Dateien nach `docs/ASSETS.md` benennen. |
 | `src/content/strings.ts` | Eigenes Objekt je Screen oder Bereich ergänzen. Alle sichtbaren Texte dort, nicht in Komponenten. |
 | `src/game/events.ts` | Ereignisse (Typen) nur ergänzen, nie umbenennen. Wer ein Ereignis braucht, das fehlt, fügt es als eigenen Typ hinzu. |
-| `app/_layout.tsx`, `app/(tabs)/_layout.tsx` | Gehören P01. Alle Routen sind ab P01 als Platzhalter angelegt. Fehlt eine Route, fragt man den CvD, statt die Layouts zu ändern (Ausnahme: P26 darf die Onboarding-Weiche einbauen). |
+| `app/_layout.tsx`, `app/(tabs)/_layout.tsx` | Gehören P01. Alle Routen sind ab P01 als Platzhalter angelegt. Fehlt eine Route, fragt man den Leiter, statt die Layouts zu ändern (Ausnahme: P26 darf die Onboarding-Weiche einbauen). |
 | `app/index.tsx`, `src/components/room/RoomScreen.tsx` | Ein Besitzer je Welle: P03 (Welle 1), P10 (Welle 2), danach P31. Alle anderen bauen eigene Komponenten unter `src/components/room/<bereich>/` und hängen sie mit **einer** Zeile in `RoomScreen.tsx` ein, nach Merge von `main`. |
 | `src/components/room/*.tsx` (Slots) | Jeder Slot hat genau einen Besitzer (siehe P03). |
 | `app/settings.tsx` | Rendert eine Liste von Abschnitten. Eigener Abschnitt als Datei `src/components/settings/<Bereich>Section.tsx`, eine Zeile in der Liste. |
@@ -55,7 +56,7 @@ Kurzfassung des Systems:
 | `app/shop.tsx` | Gehört P15. Kosmetik als eigene Datei `CosmeticsTab.tsx` (P25, P33). |
 | `package.json`, `package-lock.json` | Neue Pakete nur, wenn der Auftrag sie nennt; Eintrag in `TECH_STACK.md` mit Begründung; vor `review` `main` mergen und `npm install` erneut laufen lassen. |
 | `src/game/timeEngine.ts` | Bis P27 nur lesen. |
-| `docs/PROGRESS.md` | Nur der CvD. |
+| `docs/PROGRESS.md` | Nur der Leiter. |
 | `docs/SESSIONS.md`, `docs/KONZEPT.md`, `CLAUDE.md`, `.github/`, `scripts/` | Niemand ohne ausdrücklichen Auftrag vom Chef. |
 
 ## Wellen-Übersicht
@@ -329,7 +330,7 @@ P25 + P28 → P33          P31 + P33 → P34          P34 → P35
 
 - **Basis:** Session 28. **Braucht:** P04, P05, P06, P16, P19.
 - **Besitzt:** `scripts/simulate.ts` (Ausnahme von der `scripts/`-Regel, nur diese Datei), `docs/progress/p32.md` mit Ergebnistabelle.
-- **Zusatz:** **Keine Änderung an `config.ts`.** Vorschläge in die Notiz. Der Chef entscheidet; danach legt der CvD P32b "Balancing anwenden" an.
+- **Zusatz:** **Keine Änderung an `config.ts`.** Vorschläge in die Notiz. Der Chef entscheidet; danach legt der Leiter P32b "Balancing anwenden" an.
 - **Abnahme:** Tabelle für drei Spielertypen über 30 Tage, Vorschläge mit Begründung.
 
 ### P33 Kosmetik gegen Echtgeld und Saisonpass-Modell
@@ -366,11 +367,11 @@ P25 + P28 → P33          P31 + P33 → P34          P34 → P35
 | Welle 4 | Apple- und Google-Konten, RevenueCat, AdMob mit Freigabe des Themas, S1, S2, S7 bis S10 | P28 bis P30 |
 | Welle 5 | A1 bis A9, Bundle-ID, Datenschutz- und Impressum-URLs, Store-Texte | P34, P35 |
 
-Alles mit "optional" blockiert nichts: Kollegen bauen mit Platzhaltern. Alles mit "Pflicht" startet der CvD erst, wenn das Material da ist.
+Alles mit "optional" blockiert nichts: Kollegen bauen mit Platzhaltern. Alles mit "Pflicht" startet der Leiter erst, wenn das Material da ist.
 
 ## Vorlage: Auftragstext auf dem Brett
 
-Der CvD setzt jeden Auftrag aus vier Teilen zusammen. Titel: `[P07] Inhalte: Fakten-Karten, Budi-Sprüche`.
+Der Leiter setzt jeden Auftrag aus vier Teilen zusammen. Titel: `[P07] Inhalte: Fakten-Karten, Budi-Sprüche`.
 
 ```
 ## Ziel

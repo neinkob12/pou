@@ -13,8 +13,8 @@ PotPou ist ein Pou-artiges Handyspiel (iOS + Android): Der Spieler pflegt eine C
 - Ein Auftrag, ein Branch (`claude/auftrag-{nr}-{name}`), ein PR. Nichts außerhalb des Auftrags.
 - Ändere nur Dateien, die dein Auftrag besitzt. Geteilte Dateien (`config.ts`, Store-Slices, `assets.ts`, `strings.ts`, `RoomScreen.tsx`, `settings.tsx`) nur nach der Tabelle in `docs/AUFTRAEGE.md`: eigener Abschnitt, eigene Slice-Datei, eine Einhängezeile.
 - Vor `review`: `git fetch origin main && git merge origin/main`, Konflikte lösen, `bash scripts/check.sh` grün. Grün in der CI heißt Auto-Merge, es gibt keinen zweiten Blick. Pushe also nur, was du selbst geprüft hast.
-- Schreib `docs/progress/pNN.md` nach `docs/progress/VORLAGE.md`. `docs/PROGRESS.md` pflegt nur der Chef vom Dienst.
-- Blockiert oder unklar: `auftrag blockieren` mit Grund und dem CvD melden. Nicht raten.
+- Schreib `docs/progress/pNN.md` nach `docs/progress/VORLAGE.md`. `docs/PROGRESS.md` pflegt nur der Leiter.
+- Blockiert oder unklar: `auftrag blockieren` mit Grund und dem Leiter melden. Nicht raten.
 - Nie: Tests löschen oder überspringen, `.github/` oder `scripts/` ändern, Force-Push, neue Pakete ohne Nennung im Auftrag.
 
 ## Feste Regeln des Spiels (nicht ändern ohne Rückfrage)
@@ -46,6 +46,6 @@ PotPou ist ein Pou-artiges Handyspiel (iOS + Android): Der Spieler pflegt eine C
 - Antworte auf Deutsch.
 - Sei direkt. Widersprich, wenn etwas keinen Sinn ergibt.
 - Benutze keine Gedankenstriche (em dashes).
-- Bei Unklarheit: eine konkrete Rückfrage an den CvD statt raten.
+- Bei Unklarheit: eine konkrete Rückfrage an den Leiter (Nachricht) statt raten. Der CvD des Büros (Luis) ist nur Eskalationsstufe.
 - Neue Libraries nur, wenn der Auftrag sie nennt, und mit Begründung in `TECH_STACK.md`. Größere Architekturwechsel vorher ankündigen.
 - Ich habe ADHS: Halte Zusammenfassungen kurz, mit klaren nächsten Schritten.

@@ -1,6 +1,6 @@
 # PotPou: Fortschritt
 
-Wird vom Chef vom Dienst (CvD) nach jedem Merge aus `docs/progress/pNN.md` zusammengeführt. Kollegen schreiben nur ihre eigene Notiz. Du kannst hier selbst Notizen ergänzen.
+Wird vom Leiter (Abteilungsleiter PotPou) nach jedem Merge aus `docs/progress/pNN.md` zusammengeführt. Kollegen schreiben nur ihre eigene Notiz. Du kannst hier selbst Notizen ergänzen.
 
 Aktuelle Welle: 0 (Fundament). Plan: `docs/AUFTRAEGE.md`.
 
@@ -21,7 +21,7 @@ Aktuelle Welle: 0 (Fundament). Plan: `docs/AUFTRAEGE.md`.
 
 - P01, danach Welle 1 (P02 bis P09)
 
-## Braucht dich (gesammelt vom CvD)
+## Braucht dich (gesammelt vom Leiter)
 
 - D1 bis D3 in `docs/DESIGN_GUIDE.md` eintragen (Name, Stil, Palette). Sonst nimmt P01 die Empfehlungen.
 - Nach P01: Development Build auf dem Handy installieren (Anleitung kommt in `docs/progress/p01.md`).
@@ -43,4 +43,4 @@ Aktuelle Welle: 0 (Fundament). Plan: `docs/AUFTRAEGE.md`.
 - Zyklus ca. 10 echte Tage (TIME_SCALE 10), Turbo 9,99 € halbiert auf ca. 5 Tage
 - Budi im MVP als PNG-Ebenen, Gesicht auf dem Topf (Empfehlung, siehe DESIGN_GUIDE.md D4)
 - Spielstand nur lokal, kein Login
-- Büro-Betrieb: Auto-Merge bei grüner CI, bis zu 8 Kollegen, ein CvD. Grün heißt: Typen, Lint, Tests, Inhalts-Check.
+- Büro-Betrieb: Auto-Merge bei grüner CI, bis zu 8 Kollegen, ein Leiter (von CvD Luis ernannt). Grün heißt: Typen, Lint, Tests, Inhalts-Check.

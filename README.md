@@ -9,9 +9,9 @@ Alles, was du brauchst, um PotPou mit Claude Code bis in den App Store zu bringe
 | `CLAUDE.md` | Feste Regeln für Claude Code, wird automatisch gelesen | Claude Code |
 | `TECH_STACK.md` | Technik, Ordnerstruktur, Setup-Befehle | Claude Code |
 | `docs/KONZEPT.md` | Das komplette Spielkonzept mit Quellen | beide |
-| `docs/SESSIONS.md` | 30 Sessions mit fertigen Prompts (fachliche Vorlage) | du, CvD |
-| `docs/AUFTRAEGE.md` | Paralleler Auftragsplan fürs Büro: 35 Aufträge, Abhängigkeiten, Dateibesitz | CvD, Kollegen |
-| `docs/CVD_PROMPT.md` | Der Prompt, mit dem du den Chef vom Dienst startest | du |
+| `docs/SESSIONS.md` | 30 Sessions mit fertigen Prompts (fachliche Vorlage) | du, Leiter |
+| `docs/AUFTRAEGE.md` | Paralleler Auftragsplan fürs Büro: 35 Aufträge, Abhängigkeiten, Dateibesitz | Leiter, Kollegen |
+| `docs/LEITER_PROMPT.md` | Der Prompt, mit dem der CvD (Luis) den Leiter für PotPou ernennt | du, Luis |
 | `scripts/check.sh` | Einziger Prüfbefehl (Typen, Lint, Tests, Inhalts-Check), läuft auch in der CI | alle |
 | `docs/ASSETS.md` | Jede Grafik, jeder Sound, jede Größe, wo du es herbekommst | du |
 | `docs/DESIGN_GUIDE.md` | Design-Entscheidungen Schritt für Schritt, Inspirationsquellen | du |
@@ -32,8 +32,8 @@ Alles, was du brauchst, um PotPou mit Claude Code bis in den App Store zu bringe
 ## Im Büro (bis zu 8 Sessions parallel)
 
 1. Trag D1 bis D3 in `docs/DESIGN_GUIDE.md` ein (oder lass die Empfehlungen gelten).
-2. Starte eine Session mit dem Prompt aus `docs/CVD_PROMPT.md`. Das ist der Chef vom Dienst.
-3. Der CvD legt Aufträge aus `docs/AUFTRAEGE.md` an, holt Kollegen, und der Büro-Mod merged jeden PR, sobald die CI grün ist.
+2. Gib Luis (CvD im Büro) den Auftrag, mit `docs/LEITER_PROMPT.md` eine Session zum Leiter für PotPou zu ernennen.
+3. Der Leiter legt Aufträge aus `docs/AUFTRAEGE.md` an, holt Kollegen, und der Büro-Mod merged jeden PR, sobald die CI grün ist.
 4. Du lieferst, was in `AUFTRAEGE.md` unter "Was der Chef liefern muss" steht, und testest auf dem Handy, was in `docs/PROGRESS.md` unter "Handy-Tests" steht.
 
 ## Wie die Arbeit sich aufteilt
