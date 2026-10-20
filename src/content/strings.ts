@@ -184,6 +184,20 @@ export const tapGame = {
   circleLabel: 'Kreis',
 };
 
+// Tropfen fangen (Auftrag P13)
+export const dropsGame = {
+  lives: 'Leben',
+  water: 'Wasser',
+  nutrients: 'Nährstoffe',
+  hint: 'Wisch den Topf hin und her. Fang Wasser und Dünger, meide Salz!',
+  rewardTitle: 'Budis Balken',
+  noReward: 'Ohne Pflanze, im Trocknen oder im Koma füllen sich keine Balken.',
+  waterLabel: 'Wassertropfen',
+  fertilizerLabel: 'Dünger',
+  saltLabel: 'Salz',
+  potLabel: 'Topf',
+};
+
 // Budi Jump (Auftrag P14)
 export const jumpGame = {
   hintTilt: 'Neig das Handy, damit Budi zur Seite hüpft.',
