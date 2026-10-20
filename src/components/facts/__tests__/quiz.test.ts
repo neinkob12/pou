@@ -1,5 +1,8 @@
 import { FACT_CARDS, factById } from '../../../content/facts';
 import { FACT_QUIZ } from '../../../game/config';
+import { useGameStore } from '../../../store/gameStore';
+import { finishRound } from '../../minigames/framework/finishRound';
+import { coinsForScore } from '../../minigames/framework/session';
 import { canStartQuiz, pickQuizQuestions, pointsForAnswer, quizScore } from '../quiz';
 
 /** Deterministischer Zufall (LCG), damit Tests reproduzierbar sind. */
@@ -68,5 +71,25 @@ describe('Fakten-Quiz', () => {
       }
       expect(sum).toBe(quizScore(correct, total));
     }
+  });
+});
+
+describe('Fakten-Quiz und Münzen (P08)', () => {
+  const initial = useGameStore.getState();
+  beforeEach(() => useGameStore.setState(initial, true));
+
+  it('zahlt bei voller Punktzahl doppelte Münzen', () => {
+    const total = FACT_QUIZ.questionsPerRound;
+    const withoutBonus = coinsForScore(total * FACT_QUIZ.pointsPerCorrect);
+    const result = finishRound('quiz', quizScore(total, total));
+    expect(withoutBonus).toBeGreaterThan(0);
+    expect(result.coins).toBe(2 * withoutBonus);
+    expect(useGameStore.getState().coins).toBe(2 * withoutBonus);
+  });
+
+  it('zahlt mit einem Fehler den normalen Satz', () => {
+    const total = FACT_QUIZ.questionsPerRound;
+    const result = finishRound('quiz', quizScore(total - 1, total));
+    expect(result.coins).toBe(coinsForScore((total - 1) * FACT_QUIZ.pointsPerCorrect));
   });
 });

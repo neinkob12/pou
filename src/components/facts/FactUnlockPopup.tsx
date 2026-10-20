@@ -1,21 +1,24 @@
 import { useEffect } from 'react';
-import { Text } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { factById } from '../../content/facts';
-import { facts as t } from '../../content/strings';
+import { facts as t, modal } from '../../content/strings';
 import { useGameStore } from '../../store/gameStore';
 import { Button } from '../ui/Button';
-import { Modal } from '../ui/Modal';
 import { FactCardView } from './FactCardView';
 import { useFactUnlocks } from './useFactUnlocks';
 
-/** Freischaltung und Popup in Budis Stimme. Wird einmal im Hauptraum eingehängt. */
+/**
+ * Freischaltung und Popup in Budis Stimme. Wird einmal im Hauptraum eingehängt.
+ * Bewusst kein RN-Modal: Beim Phasenwechsel zeigt P11 schon eins, und zwei Modals gleichzeitig
+ * sind auf iOS unzuverlässig. Als Overlay liegt die Karte unter dem Phasen-Popup und ist zu
+ * sehen, sobald es geschlossen ist.
+ */
 export function FactUnlockPopup() {
   useFactUnlocks();
   const pending = useGameStore((s) => s.pendingFactIds);
   const dismiss = useGameStore((s) => s.dismissFactPopup);
   const card = pending[0] ? factById(pending[0]) : undefined;
-
   const orphan = pending[0] !== undefined && card === undefined;
 
   useEffect(() => {
@@ -23,17 +26,26 @@ export function FactUnlockPopup() {
     if (orphan) dismiss();
   }, [orphan, dismiss]);
 
+  if (!card) return null;
   const more = pending.length - 1;
+
   return (
-    <Modal visible={card !== undefined} title={t.popupTitle} onClose={dismiss}>
-      <Text className="font-body text-base text-ink">{t.popupIntro}</Text>
-      {card ? <FactCardView card={card} unlocked /> : null}
-      {more > 0 ? (
-        <>
-          <Text className="font-body text-sm text-inkMuted">{t.popupMore(more)}</Text>
-          <Button label={t.popupNext} onPress={dismiss} />
-        </>
-      ) : null}
-    </Modal>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={modal.close}
+      onPress={dismiss}
+      className="absolute inset-0 items-center justify-center bg-ink/50 p-6"
+    >
+      <Pressable accessibilityViewIsModal className="w-full gap-4 rounded-3xl bg-cream p-6">
+        <Text className="font-heading text-2xl text-ink">{t.popupTitle}</Text>
+        <Text className="font-body text-base text-ink">{t.popupIntro}</Text>
+        <FactCardView card={card} unlocked />
+        {more > 0 ? <Text className="font-body text-sm text-inkMuted">{t.popupMore(more)}</Text> : null}
+        <View className="gap-2">
+          {more > 0 ? <Button label={t.popupNext} onPress={dismiss} /> : null}
+          <Button label={modal.close} variant="secondary" onPress={dismiss} />
+        </View>
+      </Pressable>
+    </Pressable>
   );
 }

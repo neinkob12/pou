@@ -4,7 +4,9 @@
 
 import { createDebugSlice } from './debug';
 import { createFactsSlice } from './facts';
+import { createHarvestSlice } from './harvest';
 import { createHealthSlice } from './health';
+import { createMinigamesSlice } from './minigames';
 import { createNeedsSlice } from './needs';
 import { createOnboardingSlice } from './onboarding';
 import { createPlantSlice } from './plant';
@@ -17,6 +19,8 @@ export const slices = {
   progression: createProgressionSlice,
   debug: createDebugSlice,
   onboarding: createOnboardingSlice,
+  minigames: createMinigamesSlice,
+  harvest: createHarvestSlice,
   facts: createFactsSlice,
 };
 

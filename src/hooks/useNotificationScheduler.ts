@@ -16,16 +16,17 @@ import {
 } from '../lib/notifications';
 import { useGameStore } from '../store/gameStore';
 import { selectDebugMultiplier } from '../store/slices/debug';
+import { clock } from '../lib/clock';
 
 function reschedule(): void {
   const state = useGameStore.getState();
-  rescheduleNotifications(state.plant, state.needs, Date.now(), selectDebugMultiplier(state)).catch(() => undefined);
+  rescheduleNotifications(state.plant, state.needs, clock.now(), selectDebugMultiplier(state)).catch(() => undefined);
 }
 
 export function useNotificationScheduler(): void {
   useEffect(() => {
     configureNotifications().catch(() => undefined);
-    if (AppState.currentState === 'active') cancelPendingNotifications(Date.now()).catch(() => undefined);
+    if (AppState.currentState === 'active') cancelPendingNotifications(clock.now()).catch(() => undefined);
 
     const offCare = gameEvents.on('careAction', () => {
       if (permissionAsked()) return;
@@ -33,7 +34,7 @@ export function useNotificationScheduler(): void {
     });
 
     const appState = AppState.addEventListener('change', (state) => {
-      if (state === 'active') cancelPendingNotifications(Date.now()).catch(() => undefined);
+      if (state === 'active') cancelPendingNotifications(clock.now()).catch(() => undefined);
       else if (state === 'background') reschedule();
     });
 

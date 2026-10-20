@@ -49,6 +49,37 @@ export const room = {
   coinsLabel: (coins: number) => `${coins} Münzen`,
 };
 
+// Licht-Schalter, Tag/Nacht und Phasenwechsel (Auftrag P11).
+export const lightPhase = {
+  schedule: {
+    '18/6': 'Licht 18/6',
+    '12/12': 'Licht 12/12',
+    off: 'Licht aus',
+  },
+  autoflower: 'Autoflower: blüht von selbst',
+  switchLabel: 'Auf 12/12 umschalten',
+  switchLockedFrom: (day: number, now: number) => `Umschalten ab Tag ${day} (jetzt Tag ${now})`,
+  flipTitle: 'Blüte starten?',
+  flipText:
+    'Mit 12 Stunden Licht und 12 Stunden Dunkelheit beginnt Budi zu blühen. Wartest du länger, wächst Budi größer und bringt mehr Ertrag, braucht aber mehr Zeit.',
+  flipConfirm: 'Jetzt umschalten',
+  lampOn: 'Lampe an',
+  lampOff: 'Lampe aus',
+  night: 'Nacht',
+  disturbed: 'Pssst! Budi braucht in der Blüte ungestörte Dunkelheit.',
+  phaseChangedTitle: 'Neue Phase!',
+  phaseChanged: {
+    germination: 'Budi keimt!',
+    seedling: 'Budi ist jetzt ein Sämling!',
+    vegetative: 'Budi wächst jetzt richtig los!',
+    flowering: 'Budi blüht jetzt!',
+    ready: 'Budi ist bereit zur Ernte!',
+    drying: 'Budi hängt jetzt zum Trocknen.',
+    done: 'Budi ist fertig getrocknet!',
+  },
+  puff: 'Puff (Effekt)',
+};
+
 // Pflege-Gesten und Balken im Raum (P10).
 export const care = {
   tools: {
@@ -82,6 +113,28 @@ export const care = {
   },
 };
 
+// Krankheiten im Raum: Schädlinge, Schimmel, Koma (P21).
+export const health = {
+  pests: {
+    spiderMite: 'Spinnmilbe',
+    fungusGnat: 'Trauermücke',
+  },
+  pestPlaceholder: {
+    spiderMite: 'U17',
+    fungusGnat: 'U17',
+  },
+  pestLabel: (name: string) => `${name} wegtippen`,
+  mold: 'Schimmel',
+  moldPlaceholder: 'U17',
+  moldLabel: (coins: number) => `Schimmel behandeln, ${coins} Münzen`,
+  moldTooPoor: 'Zu wenig Münzen gegen den Schimmel',
+  comaTitle: 'Budi liegt im Koma',
+  comaText: 'Zu lange ohne Pflege. Hol Budi zurück!',
+  revive: (coins: number) => `Wiederbeleben · ${coins} Münzen`,
+  reviveTooPoor: 'Zu wenig Münzen',
+  reviveAd: 'Mit Video wiederbeleben (bald)',
+};
+
 export const modal = {
   close: 'Schließen',
 };
@@ -93,6 +146,53 @@ export const minigames = {
   drops: 'Tropfen fangen',
   jump: 'Hüpfen',
   quiz: 'Pflanzen-Quiz',
+};
+
+// Minigame-Gerüst und Auswahl-Karten (Auftrag P08)
+export const minigameFramework = {
+  selectSubtitle: 'Spiel eine Runde, sammle Münzen und mach Budi gute Laune.',
+  highscore: 'Rekord',
+  noHighscore: 'Noch kein Rekord',
+  play: 'Spielen',
+  score: 'Punkte',
+  timeLeft: 'Zeit',
+  pause: 'Pause',
+  paused: 'Pause',
+  resume: 'Weiter',
+  quit: 'Aufhören',
+  gameOver: 'Runde vorbei',
+  newHighscore: 'Neuer Rekord!',
+  coinsEarned: 'Münzen',
+  moodBonus: 'Budi freut sich',
+  playAgain: 'Nochmal',
+  toSelection: 'Zur Auswahl',
+  extraLifeQuestion: 'Noch ein Leben?',
+  extraLifeAccept: 'Extra-Leben holen',
+  extraLifeDecline: 'Nein, Runde beenden',
+};
+
+export const minigameCards = {
+  tap: 'Tippe die Kreise, bevor sie verschwinden.',
+  smash: 'Klatsch die Schädlinge vom Blatt, aber verschone die Marienkäfer.',
+  drops: 'Fang Wasser- und Düngertropfen mit dem Topf.',
+  jump: 'Hüpf mit Budi von Blatt zu Blatt nach oben.',
+  quiz: 'Was weißt du über Pflanzen?',
+};
+
+export const tapGame = {
+  title: 'Tipp den Kreis',
+  circleLabel: 'Kreis',
+};
+
+export const smashGame = {
+  title: 'Schädlings-Smash',
+  mite: 'Spinnmilbe',
+  gnat: 'Trauermücke',
+  ladybug: 'Marienkäfer: verschonen!',
+  combo: 'Kombo',
+  protectionHint: (minScore: number) => `Ab ${minScore} Punkten: Schädlingsschutz für Budi`,
+  protectionEarned: 'Budi ist jetzt einen Tag vor Schädlingen geschützt!',
+  leafLabel: 'Blatt',
 };
 
 export const shop = {
@@ -116,6 +216,18 @@ export const facts = {
   popupIntro: 'Ich hab gerade was Neues über mich gelernt:',
   popupMore: (count: number) => `Noch ${count} weitere Karte${count === 1 ? '' : 'n'} warten.`,
   popupNext: 'Nächste Karte',
+};
+
+export const factQuiz = {
+  questionCounter: (n: number, total: number) => `Frage ${n} von ${total}`,
+  correct: 'Richtig! Budi ist stolz auf dich.',
+  wrong: (answer: string) => `Knapp daneben. Richtig wäre: ${answer}`,
+  next: 'Nächste Frage',
+  finish: 'Auswerten',
+  perfectHint: 'Alles richtig: doppelte Münzen!',
+  notEnoughTitle: 'Noch zu wenig Wissen',
+  notEnoughText: (needed: number) =>
+    `Budi braucht mindestens ${needed} Karten fürs Quiz. Pflege ihn weiter, bei jedem Phasenwechsel verrät er dir etwas Neues.`,
 };
 
 export const settings = {
@@ -164,8 +276,55 @@ export const debug = {
   unlockEventStrain: 'Kölsche Knospe freischalten',
 };
 
+/** Ernte-Ablauf (P24): Lupe, Schere, Trocknen, Abschluss. */
 export const harvestScreen = {
   title: 'Ernte',
+  noPlant: 'Der Topf ist leer.',
+  toSeedSelect: 'Samen wählen',
+  notReady: 'Budi ist noch nicht erntereif. Schau wieder vorbei, wenn er "Erntebereit" ist.',
+  toRoom: 'Zurück zu Budi',
+  lupeTitle: 'Trichom-Lupe',
+  lupeIntro: 'Unter der Lupe glitzern kleine Köpfchen. Tippe alle milchigen an, dann weißt du, ob Budi reif ist.',
+  lupeLegendClear: 'klar: noch zu früh',
+  lupeLegendMilky: 'milchig: genau richtig',
+  lupeLegendAmber: 'bernstein: schon spät',
+  lupeLabel: 'Lupe (U7)',
+  lupeHeadLabel: (n: number) => `Köpfchen ${n}`,
+  lupeDone: 'Fertig geschaut',
+  lupeSkip: 'Ohne Lupe weiter',
+  lupeResult: (percent: number) => `Lupen-Ergebnis: ${percent} %`,
+  lupeLate: 'Budi wartet schon lange. Viele Köpfchen sind bernsteinfarben.',
+  cutTitle: 'Schere ansetzen',
+  cutIntro: 'Wisch mit der Schere quer über den Stiel.',
+  cutScissors: 'Schere (U8)',
+  cutStem: 'Budis Stiel',
+  dryingTitle: 'Trocknen',
+  dryingIntro: 'Budis Zweige hängen kopfüber im Trockenraum. Wende sie ab und zu, dann trocknen sie gleichmäßig.',
+  dryingRoom: 'Trockenraum (H3)',
+  dryingBranches: 'Zweige an der Leine (B7)',
+  dryingTurn: 'Zweige wenden',
+  dryingTurned: 'In diesem Abschnitt schon gewendet',
+  dryingTurns: (done: number, total: number) => `Gewendet: ${done} von ${total}`,
+  dryingDone: 'Fertig getrocknet!',
+  collect: 'Einsammeln',
+  summaryTitle: 'Ernte fertig!',
+  summaryCrate: 'Erntekiste (B8)',
+  summaryStars: (stars: number) => `${stars} von 5 Sternen`,
+  starFull: '★',
+  starEmpty: '☆',
+  summaryYield: (units: number) => `${units} Ertragseinheiten`,
+  summaryMarket: 'Der Kräutermarkt zahlt',
+  summaryCoins: (coins: number) => `${coins} Münzen`,
+  summaryFragments: (n: number) => (n === 1 ? '1 Samen-Fragment' : `${n} Samen-Fragmente`),
+  summaryNoFragments: 'Keine Samen-Fragmente, beim nächsten Mal mehr Sterne holen.',
+  summaryNewStrain: (name: string) => `Neue Sorte freigeschaltet: ${name}`,
+  summaryCoinsDoubled: 'Münzen verdoppelt!',
+  summaryNext: 'Neuen Samen wählen',
+  entryReady: 'Ernten',
+  entryDrying: 'Zum Trockenraum',
+  entryDone: 'Einsammeln',
+  entrySummary: 'Ernte ansehen',
+  entryEmpty: 'Samen pflanzen',
 };
 
 export const seedSelect = {

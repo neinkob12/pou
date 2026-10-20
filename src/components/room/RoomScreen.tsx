@@ -2,15 +2,18 @@ import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FactUnlockPopup } from '../facts/FactUnlockPopup';
+import { HarvestEntry } from '../harvest/HarvestEntry';
 import { ActionTray } from './ActionTray';
 import { BottomNav } from './BottomNav';
 import { BudiStage } from './BudiStage';
 import { CareStageProvider } from './care/CareStage';
 import { useMinigameMoodBonus } from './care/useMinigameMoodBonus';
 import { CoinDisplay } from './CoinDisplay';
+import { HealthWatch } from './health/useHealthCheck';
 import { Lamp } from './Lamp';
 import { NeedBars } from './NeedBars';
 import { PhaseHeader } from './PhaseHeader';
+import { PhaseChangePopup } from './phase/PhaseChangePopup';
 import { RoomBackground } from './RoomBackground';
 
 // Hauptraum: nur Komposition der Slots. Besitzer je Welle siehe docs/AUFTRAEGE.md
@@ -27,13 +30,16 @@ export function RoomScreen() {
             <CoinDisplay />
           </View>
           <PhaseHeader />
+          <HarvestEntry />
         </SafeAreaView>
         <Lamp />
         <BudiStage />
+        <HealthWatch />
         <ActionTray />
         <View className="h-3" />
         <BottomNav />
         <FactUnlockPopup />
+        <PhaseChangePopup />
       </View>
     </CareStageProvider>
   );
