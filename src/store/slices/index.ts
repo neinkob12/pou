@@ -5,6 +5,7 @@
 import { createDebugSlice } from './debug';
 import { createHarvestSlice } from './harvest';
 import { createHealthSlice } from './health';
+import { createJumpSlice } from './jump';
 import { createMinigamesSlice } from './minigames';
 import { createNeedsSlice } from './needs';
 import { createOnboardingSlice } from './onboarding';
@@ -20,6 +21,7 @@ export const slices = {
   debug: createDebugSlice,
   onboarding: createOnboardingSlice,
   minigames: createMinigamesSlice,
+  jump: createJumpSlice,
   harvest: createHarvestSlice,
   shop: createShopSlice,
 };
