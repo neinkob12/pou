@@ -2,6 +2,7 @@ import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FactUnlockPopup } from '../facts/FactUnlockPopup';
+import { CelebrationLayer } from '../feedback/CelebrationLayer';
 import { HarvestEntry } from '../harvest/HarvestEntry';
 import { canShowRoom } from '../onboarding/onboardingFlow';
 import { useGameStore } from '../../store/gameStore';
@@ -52,6 +53,7 @@ export function RoomScreen() {
         <BottomNav />
         <FactUnlockPopup />
         <PhaseChangePopup />
+        <CelebrationLayer />
       </View>
     </CareStageProvider>
   );

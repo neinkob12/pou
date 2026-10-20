@@ -585,3 +585,10 @@ export const dailyGoals = {
 export const webVersion = {
   notificationsUnavailable: 'In der Browser-Version meldet sich Budi nicht. Benachrichtigungen gibt es nur in der App.',
 };
+
+// Feiern im Zimmer (WEB-3): Phasenwechsel und Tageskiste.
+export const celebrations = {
+  continue: 'Weiter',
+  coins: (coins: number) => `+${coins} Münzen`,
+  chestText: 'Morgen hab ich wieder was für dich.',
+};

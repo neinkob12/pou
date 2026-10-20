@@ -16,6 +16,8 @@ export interface GameEvents {
   purchaseCompleted: { productId: string; atMs: number };
   /** Lampe in der Dunkelphase der Blüte angetippt: Budi wird gestört (Stress, P11). */
   lightDisturbed: { atMs: number };
+  /** Tageskiste geöffnet (WEB-3): die Feier-Ebene zeigt die Belohnung. */
+  dailyChestOpened: { coins: number; atMs: number };
 }
 
 export type GameEventName = keyof GameEvents;
