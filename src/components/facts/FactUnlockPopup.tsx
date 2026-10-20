@@ -18,6 +18,8 @@ export function FactUnlockPopup() {
   useFactUnlocks();
   const pending = useGameStore((s) => s.pendingFactIds);
   const dismiss = useGameStore((s) => s.dismissFactPopup);
+  // Erst nach dem Tutorial (WEB-3): Sonst liegen Karte und Budis Sprechblase übereinander.
+  const tutorialDone = useGameStore((s) => s.tutorialDone);
   const card = pending[0] ? factById(pending[0]) : undefined;
   const orphan = pending[0] !== undefined && card === undefined;
 
@@ -26,7 +28,7 @@ export function FactUnlockPopup() {
     if (orphan) dismiss();
   }, [orphan, dismiss]);
 
-  if (!card) return null;
+  if (!card || !tutorialDone) return null;
   const more = pending.length - 1;
 
   return (

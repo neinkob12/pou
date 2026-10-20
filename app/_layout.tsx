@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { AppFrame } from '../src/components/frame/AppFrame';
 import { OnboardingGate } from '../src/components/onboarding/OnboardingGate';
 import { TabIcon } from '../src/components/ui/TabIcon';
 import { tabs } from '../src/content/strings';
@@ -35,30 +36,34 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar style="dark" />
-      <Tabs
-        backBehavior="history"
-        screenOptions={{
-          headerShown: false,
-          tabBarActiveTintColor: colors.coral,
-          tabBarInactiveTintColor: colors.inkMuted,
-          tabBarStyle: { backgroundColor: colors.white },
-          tabBarLabelStyle: { fontFamily: fonts.bodyBold },
-          tabBarIcon: TabIcon,
-        }}
-      >
-        <Tabs.Screen name="index" options={{ title: tabs.room }} />
-        <Tabs.Screen name="minigames" options={{ title: tabs.minigames }} />
-        <Tabs.Screen name="shop" options={{ title: tabs.shop }} />
-        <Tabs.Screen name="album" options={{ title: tabs.album }} />
-        <Tabs.Screen name="settings" options={{ title: tabs.settings }} />
-        <Tabs.Screen name="debug" options={hidden} />
-        <Tabs.Screen name="harvest" options={hidden} />
-        <Tabs.Screen name="seed-select" options={hidden} />
-        <Tabs.Screen name="onboarding" options={hidden} />
-      </Tabs>
-      {/* Onboarding-Weiche (P26): Altersfrage, Tutorial im Zimmer, Consent-Schritt. */}
-      <OnboardingGate />
-      {/* Ende Onboarding-Weiche (P26) */}
+      {/* Web am Rechner: zentrierter Handy-Rahmen (WEB-3). Nativ ohne Wirkung. */}
+      <AppFrame>
+        <Tabs
+          backBehavior="history"
+          screenOptions={{
+            headerShown: false,
+            tabBarActiveTintColor: colors.coral,
+            tabBarInactiveTintColor: colors.inkMuted,
+            tabBarStyle: { backgroundColor: colors.white },
+            tabBarLabelStyle: { fontFamily: fonts.bodyBold },
+            tabBarIcon: TabIcon,
+            animation: 'fade',
+          }}
+        >
+          <Tabs.Screen name="index" options={{ title: tabs.room }} />
+          <Tabs.Screen name="minigames" options={{ title: tabs.minigames }} />
+          <Tabs.Screen name="shop" options={{ title: tabs.shop }} />
+          <Tabs.Screen name="album" options={{ title: tabs.album }} />
+          <Tabs.Screen name="settings" options={{ title: tabs.settings }} />
+          <Tabs.Screen name="debug" options={hidden} />
+          <Tabs.Screen name="harvest" options={hidden} />
+          <Tabs.Screen name="seed-select" options={hidden} />
+          <Tabs.Screen name="onboarding" options={hidden} />
+        </Tabs>
+        {/* Onboarding-Weiche (P26): Altersfrage, Tutorial im Zimmer, Consent-Schritt. */}
+        <OnboardingGate />
+        {/* Ende Onboarding-Weiche (P26) */}
+      </AppFrame>
     </GestureHandlerRootView>
   );
 }
