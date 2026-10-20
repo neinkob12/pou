@@ -2,6 +2,7 @@
 // Jede Füllung geht über den Needs-Slice und damit über applyCare (src/game/needs.ts).
 
 import { NEED_MAX, NEED_THRESHOLDS, OVERWATER_LIMIT_BY_PHASE } from '../../../game/config';
+import { clock } from '../../../lib/clock';
 import { useGameStore } from '../../../store/gameStore';
 import { selectDebugMultiplier } from '../../../store/slices/debug';
 import { computeCareView } from '../../room/care/careLogic';
@@ -14,7 +15,7 @@ import { roundReward, type DropsReward } from './dropsLogic';
 export function applyDropsReward(
   caughtWater: number,
   caughtFertilizer: number,
-  nowMs: number = Date.now(),
+  nowMs: number = clock.now(),
 ): DropsReward | null {
   const state = useGameStore.getState();
   const view = computeCareView(state.plant, state.needs, nowMs, selectDebugMultiplier(state));

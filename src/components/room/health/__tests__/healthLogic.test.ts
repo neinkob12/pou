@@ -101,6 +101,16 @@ describe('Gesundheit im Raum', () => {
     expect(useGameStore.getState().health.revives).toBe(1);
   });
 
+  it('Doppel-Tap auf Wiederbeleben (P31) zahlt nur einmal, außerhalb des Komas gar nicht', () => {
+    expect(reviveWithCoins(useGameStore.getState(), T0 + HOUR)).toBe(false);
+    const now = T0 + (COMA_AFTER_REAL_HOURS + 1) * HOUR;
+    useGameStore.getState().addCoins(COMA_REVIVE_COINS * 2);
+    expect(reviveWithCoins(useGameStore.getState(), now)).toBe(true);
+    expect(reviveWithCoins(useGameStore.getState(), now)).toBe(false);
+    expect(useGameStore.getState().coins).toBe(COMA_REVIVE_COINS);
+    expect(useGameStore.getState().health.revives).toBe(1);
+  });
+
   it('Werbe-Wiederbelebung ist noch aus, der Hook-Punkt belebt ohne Münzen', () => {
     expect(isRewardedReviveReady()).toBe(false);
     const now = T0 + (COMA_AFTER_REAL_HOURS + 1) * HOUR;

@@ -3,6 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 
 import { dailyGoals } from '../../content/strings';
 import { canClaimChest, goalTemplate } from '../../game/dailyGoals';
+import { clock } from '../../lib/clock';
 import { useGameStore } from '../../store/gameStore';
 import { Bar } from '../ui/Bar';
 import { Modal } from '../ui/Modal';
@@ -26,7 +27,7 @@ export function DailyGoal() {
 
   const openChest = () => {
     const s = useGameStore.getState();
-    const coins = s.claimDailyGoalChest(Date.now(), s.addCoins);
+    const coins = s.claimDailyGoalChest(clock.now(), s.addCoins);
     if (coins > 0) setChestCoins(coins);
   };
 
