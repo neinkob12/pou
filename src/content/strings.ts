@@ -36,6 +36,8 @@ export const room = {
   actions: {
     water: 'Gießen',
     fertilize: 'Düngen',
+    fertilizeGrow: 'Wachstumsdünger',
+    fertilizeBloom: 'Blütendünger',
     pet: 'Streicheln',
   },
   nav: {
