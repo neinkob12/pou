@@ -13,6 +13,7 @@ import {
   type NeedsState,
 } from '../../game/needs';
 import type { SliceCreator } from './types';
+import { clock } from '../../lib/clock';
 
 export interface NeedsSlice {
   needs: NeedsState;
@@ -25,7 +26,7 @@ export interface NeedsSlice {
 }
 
 export const createNeedsSlice: SliceCreator<NeedsSlice> = (set, get) => ({
-  needs: createNeeds(Date.now()),
+  needs: createNeeds(clock.now()),
   care: (action, nowMs, modifiers = NO_MODIFIERS) => {
     const before = get().needs;
     const after = applyCare(before, action, nowMs, modifiers);
