@@ -3,6 +3,7 @@ import { Text, View } from 'react-native';
 import type { UpgradeId } from '../../game/config';
 import { canBuy, levelOf, maxLevel, nextLevel } from '../../game/shop';
 import { upgrades as upgradeAssets } from '../../lib/assets';
+import { clock } from '../../lib/clock';
 import { shop } from '../../content/strings';
 import { useGameStore } from '../../store/gameStore';
 import { AssetImage } from '../ui/AssetImage';
@@ -44,7 +45,7 @@ export function UpgradeCard({ id }: { id: UpgradeId }) {
             label={label}
             variant={next ? 'primary' : 'secondary'}
             disabled={!affordable}
-            onPress={() => buyUpgrade(id, spendCoins, Date.now())}
+            onPress={() => buyUpgrade(id, spendCoins, clock.now(), level)}
           />
         </View>
         {next && !affordable ? <Text className="font-body text-xs text-inkMuted">{shop.notEnoughCoins}</Text> : null}

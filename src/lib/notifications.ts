@@ -6,12 +6,11 @@ import * as Notifications from 'expo-notifications';
 import { AndroidImportance, IosAuthorizationStatus } from 'expo-notifications';
 import { Platform } from 'react-native';
 
-import { PHASE_LABELS } from '../game/config';
 import type { NeedsState } from '../game/needs';
 import { planNotifications, type PlannedNotification } from '../game/notifications';
 import type { PlantRecord } from '../game/timeEngine';
-import { notifications as texts } from '../content/strings';
-import { storage } from './storage';
+import { notifications as texts, phaseLabels } from '../content/strings';
+import { safeSet, storage } from './storage';
 
 export const NOTIFICATION_KEYS = {
   enabled: 'notifications.enabled',
@@ -31,7 +30,7 @@ export function notificationsEnabled(): boolean {
 
 /** Titel und Text in Budis Stimme. Die Variante hängt an der Stunde, damit es nicht immer gleich klingt. */
 export function notificationContent(n: PlannedNotification): { title: string; body: string } {
-  if (n.kind === 'phaseChanged') return texts.phaseChanged(PHASE_LABELS[n.phase ?? 'seedling']);
+  if (n.kind === 'phaseChanged') return texts.phaseChanged(phaseLabels[n.phase ?? 'seedling']);
   const variants = texts[n.kind];
   return variants[Math.floor(n.atMs / MS_PER_HOUR) % variants.length];
 }
@@ -51,7 +50,7 @@ function readSentLog(): number[] {
 }
 
 function writeSentLog(log: number[]): void {
-  storage.set(NOTIFICATION_KEYS.sentLog, JSON.stringify(log));
+  safeSet(NOTIFICATION_KEYS.sentLog, JSON.stringify(log));
 }
 
 /** Einmal beim Start: Verhalten im Vordergrund und Android-Kanal. */
@@ -84,10 +83,21 @@ export function permissionAsked(): boolean {
 
 /** Fragt das System nach der Erlaubnis. Nur einmal automatisch, danach über die Einstellungen. */
 export async function requestPermission(): Promise<boolean> {
-  storage.set(NOTIFICATION_KEYS.permissionAsked, true);
+  safeSet(NOTIFICATION_KEYS.permissionAsked, true);
   if (await hasPermission()) return true;
   const status = await Notifications.requestPermissionsAsync();
   return status.granted;
+}
+
+/**
+ * Was beim Wechsel des App-Zustands passiert. Neu geplant wird schon bei "inactive", nicht erst bei
+ * "background" (P31): Wischt der Spieler die App im App-Umschalter weg, meldet iOS oft nur noch
+ * "inactive", und ohne Plan käme nie eine Benachrichtigung. Kommt die App zurück, wird ohnehin verworfen.
+ */
+export function notificationActionFor(appState: string): 'cancel' | 'reschedule' | null {
+  if (appState === 'active') return 'cancel';
+  if (appState === 'inactive' || appState === 'background') return 'reschedule';
+  return null;
 }
 
 /** App kommt in den Vordergrund oder Benachrichtigungen sind aus: alles Geplante weg. */

@@ -1,4 +1,5 @@
-import { PHASE_LABELS, STRAINS, type PhaseId, type StrainId } from '../../game/config';
+import { STRAINS, type PhaseId, type StrainId } from '../../game/config';
+import { phaseLabels } from '../strings';
 import {
   PHASE_CHANGE_QUOTES,
   QUOTES,
@@ -9,7 +10,7 @@ import {
 } from '../quotes';
 
 const strainIds = Object.keys(STRAINS) as StrainId[];
-const phaseIds = Object.keys(PHASE_LABELS) as PhaseId[];
+const phaseIds = Object.keys(phaseLabels) as PhaseId[];
 const situations = Object.keys(QUOTES) as QuoteSituation[];
 
 describe('quotes', () => {

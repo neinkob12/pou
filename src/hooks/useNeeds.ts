@@ -14,7 +14,7 @@ import {
   type CareView,
 } from '../components/room/care/careLogic';
 import { playCareHaptic } from '../components/room/care/haptics';
-import { useNow } from '../components/room/useNow';
+import { useNow } from './useNow';
 import { useGameStore } from '../store/gameStore';
 import { selectDebugMultiplier } from '../store/slices/debug';
 import { selectUpgradeEffects } from '../store/slices/shop';

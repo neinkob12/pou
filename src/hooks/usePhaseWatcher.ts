@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import type { PhaseId } from '../game/config';
 import { gameEvents } from '../game/events';
-import { storage } from '../lib/storage';
+import { safeSet, storage } from '../lib/storage';
 import { parseSeenPhase, phaseTransitions } from '../components/room/phase/phaseWatch';
 import { clock } from '../lib/clock';
 
@@ -19,7 +19,7 @@ export function usePhaseWatcher(plantedAtMs: number | null, phase: PhaseId | nul
     if (plantedAtMs === null || phase === null) return;
     const seen = parseSeenPhase(storage.getString(PHASE_SEEN_KEY));
     const steps = phaseTransitions(seen, plantedAtMs, phase);
-    storage.set(PHASE_SEEN_KEY, JSON.stringify({ plantedAtMs, phase }));
+    safeSet(PHASE_SEEN_KEY, JSON.stringify({ plantedAtMs, phase }));
     const atMs = clock.now();
     for (const step of steps) gameEvents.emit('phaseChanged', { ...step, atMs });
   }, [plantedAtMs, phase]);

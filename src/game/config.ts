@@ -30,16 +30,6 @@ export type PhaseId =
   | 'drying' // hängt zum Trocknen
   | 'done'; // fertig, kann eingesammelt werden
 
-export const PHASE_LABELS: Record<PhaseId, string> = {
-  germination: 'Keimung',
-  seedling: 'Sämling',
-  vegetative: 'Wachstum',
-  flowering: 'Blüte',
-  ready: 'Erntebereit',
-  drying: 'Trocknen',
-  done: 'Fertig',
-};
-
 /** Feste Phasendauern in Pflanzentagen (Quellen siehe docs/KONZEPT.md). */
 export const BASE_PHASES = {
   germinationDays: 7, // real 3 bis 10 Tage

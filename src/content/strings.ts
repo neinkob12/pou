@@ -1,11 +1,24 @@
 // Alle sichtbaren Texte der App. Büro-Regel: ein Objekt je Screen oder Bereich, jeder Auftrag
 // ergänzt nur sein eigenes Objekt. Keine Texte direkt in Komponenten.
 
+import type { PhaseId } from '../game/config';
+
 export const common = {
   appName: 'PotPou',
   placeholder: 'Platzhalter',
   comingSoon: 'Kommt bald',
   back: 'Zurück',
+};
+
+/** Sichtbare Namen der Pflanzenphasen (P31, vorher PHASE_LABELS in config.ts). */
+export const phaseLabels: Record<PhaseId, string> = {
+  germination: 'Keimung',
+  seedling: 'Sämling',
+  vegetative: 'Wachstum',
+  flowering: 'Blüte',
+  ready: 'Erntebereit',
+  drying: 'Trocknen',
+  done: 'Fertig',
 };
 
 export const tabs = {

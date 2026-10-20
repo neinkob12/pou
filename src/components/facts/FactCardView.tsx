@@ -1,8 +1,7 @@
 import { Pressable, Text, View } from 'react-native';
 
 import type { FactCard } from '../../content/facts';
-import { facts as t } from '../../content/strings';
-import { PHASE_LABELS } from '../../game/config';
+import { facts as t, phaseLabels } from '../../content/strings';
 import { openSource } from './openSource';
 
 interface FactCardViewProps {
@@ -12,7 +11,7 @@ interface FactCardViewProps {
 
 /** Eine Fakten-Karte. Gesperrt: grau, ohne Text, mit Hinweis auf die Phase. Rahmen U14 fehlt noch. */
 export function FactCardView({ card, unlocked }: FactCardViewProps) {
-  const phase = PHASE_LABELS[card.phase];
+  const phase = phaseLabels[card.phase];
 
   if (!unlocked) {
     return (

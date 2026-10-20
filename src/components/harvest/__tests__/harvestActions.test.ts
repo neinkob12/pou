@@ -1,6 +1,7 @@
 import { MS_PER_REAL_DAY, STRAINS, TIME_SCALE } from '../../../game/config';
 import { gameEvents } from '../../../game/events';
 import { getPlantStatus } from '../../../game/timeEngine';
+import { clock } from '../../../lib/clock';
 import { useGameStore } from '../../../store/gameStore';
 import { claimDoubleCoins, collectHarvest, cutPlant, turnDryingNow } from '../harvestActions';
 
@@ -24,6 +25,21 @@ function plantReadyGustav() {
 
 describe('Ernte-Aktionen', () => {
   beforeEach(() => useGameStore.setState(initial, true));
+
+  it('ohne Zeitangabe gilt die Spieluhr, nicht die Geräteuhr (P31)', () => {
+    plantReadyGustav();
+    // Geräteuhr zurückgestellt: Date.now() liegt vor der Ernte, die Spieluhr nicht.
+    const deviceNow = jest.spyOn(Date, 'now').mockReturnValue(T0);
+    const gameNow = jest.spyOn(clock, 'now').mockReturnValue(at(READY_DAY + 1));
+    try {
+      expect(cutPlant(1)).toBe(true);
+      gameNow.mockReturnValue(at(READY_DAY + 9));
+      expect(collectHarvest()).not.toBeNull();
+    } finally {
+      deviceNow.mockRestore();
+      gameNow.mockRestore();
+    }
+  });
 
   it('ohne Pflanze oder vor "ready": nichts', () => {
     expect(cutPlant(1, T0)).toBe(false);

@@ -7,6 +7,7 @@ import { neglectFromNeeds, qualityPenaltyStars } from '../../game/health';
 import { computeNeeds } from '../../game/needs';
 import { newlyUnlocked } from '../../game/progression';
 import { getPlantStatus, harvest } from '../../game/timeEngine';
+import { clock } from '../../lib/clock';
 import { useGameStore } from '../../store/gameStore';
 import { selectDebugMultiplier } from '../../store/slices/debug';
 import { toProgressStats } from '../../store/slices/progression';
@@ -35,7 +36,7 @@ function careAndMood(nowMs: number, phase: Parameters<typeof computeNeeds>[3]) {
  * @param lupeScore Ergebnis der Trichom-Lupe 0 bis 1, null wenn ohne Lupe geschnitten
  * Rückgabe: ob geschnitten wurde (nur in der Phase "ready").
  */
-export function cutPlant(lupeScore: number | null, nowMs: number = Date.now()): boolean {
+export function cutPlant(lupeScore: number | null, nowMs: number = clock.now()): boolean {
   const state = useGameStore.getState();
   if (!state.plant) return false;
   const multiplier = selectDebugMultiplier(state);
@@ -52,7 +53,7 @@ export function cutPlant(lupeScore: number | null, nowMs: number = Date.now()): 
 }
 
 /** Einmal wenden im aktuellen Trocknungs-Fenster. Rückgabe: ob gewendet wurde. */
-export function turnDryingNow(nowMs: number = Date.now()): boolean {
+export function turnDryingNow(nowMs: number = clock.now()): boolean {
   const state = useGameStore.getState();
   if (!state.plant || !state.harvestSession) return false;
   const status = getPlantStatus(state.plant, nowMs, selectDebugMultiplier(state));
@@ -67,7 +68,7 @@ export function turnDryingNow(nowMs: number = Date.now()): boolean {
  * Einsammeln nach dem Trocknen: Münzen gutschreiben, Ernte zählen, `harvested` melden,
  * Topf leeren. Rückgabe: das Ergebnis für den Abschluss, null wenn noch nicht fertig.
  */
-export function collectHarvest(nowMs: number = Date.now()): HarvestResult | null {
+export function collectHarvest(nowMs: number = clock.now()): HarvestResult | null {
   const state = useGameStore.getState();
   if (!state.plant) return null;
   const status = getPlantStatus(state.plant, nowMs, selectDebugMultiplier(state));

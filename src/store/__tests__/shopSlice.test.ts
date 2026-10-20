@@ -26,6 +26,18 @@ describe('shop-Slice', () => {
     expect(listener).toHaveBeenCalledWith({ productId: 'upgrade:pot:1', atMs: T0 });
   });
 
+  it('Doppel-Tap (P31): zweiter Tipp mit der alten Stufe kauft nicht die übernächste Stufe', () => {
+    useGameStore.setState({ coins: 10000 });
+    const { buyUpgrade, spendCoins } = useGameStore.getState();
+    expect(buyUpgrade('pot', spendCoins, T0, 0)).toBe(true);
+    expect(buyUpgrade('pot', spendCoins, T0, 0)).toBe(false);
+    const state = useGameStore.getState();
+    expect(state.upgrades.pot).toBe(1);
+    expect(state.coins).toBe(10000 - UPGRADES.pot[0].price);
+    expect(buyUpgrade('pot', spendCoins, T0, 1)).toBe(true);
+    expect(useGameStore.getState().upgrades.pot).toBe(2);
+  });
+
   it('ohne genug Münzen passiert nichts', () => {
     const listener = jest.fn();
     gameEvents.on('purchaseCompleted', listener);
