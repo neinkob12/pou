@@ -1,5 +1,6 @@
 import { DRYING_TURNS, READY_GRACE_DAYS, REWARDED_AD, STRAINS, TRICHOME_LUPE } from '../../../game/config';
 import { computeQualityStars, computeYield, harvestRewards } from '../../../game/harvest';
+import { createUpgradeLevels, upgradeEffects } from '../../../game/shop';
 import { createPlant, getPlantStatus, type PlantRecord } from '../../../game/timeEngine';
 import {
   addDryingTurn,
@@ -111,6 +112,15 @@ describe('Abschluss', () => {
     const yieldUnits = computeYield(plant, 0.8, 70, STRAINS.gustav);
     const stars = computeQualityStars(0.5, 1, 1);
     expect(r).toEqual({ strainId: 'gustav', yieldUnits, stars, ...harvestRewards(yieldUnits, stars, STRAINS.gustav) });
+  });
+
+  it('Shop-Upgrade (größerer Topf) erhöht den Ertrag', () => {
+    const plant = flippedPlant();
+    const { yieldMultiplier } = upgradeEffects({ ...createUpgradeLevels(), pot: 3 });
+    const plain = computeHarvestResult(plant, session, 0);
+    const withPot = computeHarvestResult(plant, session, 0, yieldMultiplier);
+    expect(withPot.yieldUnits).toBe(Math.round(plain.yieldUnits * yieldMultiplier));
+    expect(withPot.yieldUnits).toBeGreaterThan(plain.yieldUnits);
   });
 
   it('Krankheitsmalus senkt die Sterne', () => {

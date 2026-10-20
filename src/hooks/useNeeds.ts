@@ -16,6 +16,7 @@ import { playCareHaptic } from '../components/room/care/haptics';
 import { useNow } from '../components/room/useNow';
 import { useGameStore } from '../store/gameStore';
 import { selectDebugMultiplier } from '../store/slices/debug';
+import { selectUpgradeEffects } from '../store/slices/shop';
 import { clock } from '../lib/clock';
 
 /**
@@ -28,7 +29,7 @@ export function applyCareNow(type: CareActionId, amount?: number): CareFeedback 
   if (!state.plant) return null;
   const { phase } = getPlantStatus(state.plant, nowMs, selectDebugMultiplier(state));
   const before = state.needs;
-  const applied = state.care({ type, phase, amount }, nowMs);
+  const applied = state.care({ type, phase, amount }, nowMs, selectUpgradeEffects(state).needModifiers);
   return careFeedback(before, useGameStore.getState().needs, applied);
 }
 
@@ -38,7 +39,7 @@ export function applyMinigameMoodBonus(): void {
   const state = useGameStore.getState();
   const phase = state.plant ? getPlantStatus(state.plant, nowMs, selectDebugMultiplier(state)).phase : null;
   const action = moodBonusAction(phase);
-  if (action) state.care(action, nowMs);
+  if (action) state.care(action, nowMs, selectUpgradeEffects(state).needModifiers);
 }
 
 export interface UseNeeds extends CareView {
@@ -50,11 +51,12 @@ export function useNeeds(): UseNeeds {
   const plant = useGameStore((s) => s.plant);
   const needs = useGameStore((s) => s.needs);
   const debugMultiplier = useGameStore(selectDebugMultiplier);
+  const upgrades = useGameStore((s) => s.upgrades);
   const now = useNow();
   // Nach einer Pflege ist updatedAtMs neuer als `now`; computeNeeds rechnet dann ohne Abfall.
   const view = useMemo(
-    () => computeCareView(plant, needs, now, debugMultiplier),
-    [plant, needs, now, debugMultiplier],
+    () => computeCareView(plant, needs, now, debugMultiplier, selectUpgradeEffects({ upgrades }).needModifiers),
+    [plant, needs, now, debugMultiplier, upgrades],
   );
 
   const care = useCallback((type: CareActionId) => {

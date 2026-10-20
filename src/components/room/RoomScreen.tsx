@@ -14,6 +14,7 @@ import { NeedBars } from './NeedBars';
 import { PhaseHeader } from './PhaseHeader';
 import { PhaseChangePopup } from './phase/PhaseChangePopup';
 import { RoomBackground } from './RoomBackground';
+import { RoomUpgrades } from './RoomUpgrades';
 
 // Hauptraum: nur Komposition der Slots. Besitzer je Welle siehe docs/AUFTRAEGE.md
 // (P03, dann P10, dann P31). Andere Aufträge hängen ihre Komponente mit einer Zeile ein.
@@ -32,6 +33,7 @@ export function RoomScreen() {
           <HarvestEntry />
         </SafeAreaView>
         <Lamp />
+        <RoomUpgrades />
         <BudiStage />
         <HealthWatch />
         <ActionTray />

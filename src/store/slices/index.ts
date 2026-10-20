@@ -10,6 +10,7 @@ import { createNeedsSlice } from './needs';
 import { createOnboardingSlice } from './onboarding';
 import { createPlantSlice } from './plant';
 import { createProgressionSlice } from './progression';
+import { createShopSlice } from './shop';
 
 export const slices = {
   plant: createPlantSlice,
@@ -20,6 +21,7 @@ export const slices = {
   onboarding: createOnboardingSlice,
   minigames: createMinigamesSlice,
   harvest: createHarvestSlice,
+  shop: createShopSlice,
 };
 
 type UnionToIntersection<U> = (U extends unknown ? (arg: U) => void : never) extends (
