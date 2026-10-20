@@ -15,10 +15,11 @@ import {
   rescheduleNotifications,
 } from '../lib/notifications';
 import { useGameStore } from '../store/gameStore';
+import { selectDebugMultiplier } from '../store/slices/debug';
 
 function reschedule(): void {
-  const { plant, needs } = useGameStore.getState();
-  rescheduleNotifications(plant, needs, Date.now()).catch(() => undefined);
+  const state = useGameStore.getState();
+  rescheduleNotifications(state.plant, state.needs, Date.now(), selectDebugMultiplier(state)).catch(() => undefined);
 }
 
 export function useNotificationScheduler(): void {

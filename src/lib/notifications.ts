@@ -101,12 +101,13 @@ export async function rescheduleNotifications(
   plant: PlantRecord | null,
   needs: NeedsState,
   nowMs: number,
+  debugMultiplier?: number,
 ): Promise<void> {
   await cancelPendingNotifications(nowMs);
   if (!notificationsEnabled() || !(await hasPermission())) return;
 
   const delivered = readSentLog();
-  const plan = planNotifications({ nowMs, plant, needs, sentMs: delivered });
+  const plan = planNotifications({ nowMs, plant, needs, sentMs: delivered, debugMultiplier });
   for (const n of plan) {
     await Notifications.scheduleNotificationAsync({
       content: notificationContent(n),
