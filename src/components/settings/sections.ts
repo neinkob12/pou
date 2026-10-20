@@ -6,8 +6,10 @@ import type { ComponentType } from 'react';
 import { AboutSection } from './AboutSection';
 import { DebugSection } from './DebugSection';
 import { DevLinksSection } from './DevLinksSection';
+import { NotificationsSection } from './NotificationsSection';
 
 export const settingsSections: { key: string; Component: ComponentType }[] = [
+  { key: 'notifications', Component: NotificationsSection },
   { key: 'about', Component: AboutSection },
   { key: 'dev', Component: DevLinksSection },
   { key: 'debug', Component: DebugSection },

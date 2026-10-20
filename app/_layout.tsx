@@ -9,6 +9,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { TabIcon } from '../src/components/ui/TabIcon';
 import { tabs } from '../src/content/strings';
 import { useAppFonts } from '../src/hooks/useAppFonts';
+import { useNotificationScheduler } from '../src/hooks/useNotificationScheduler';
 import { colors, fonts } from '../src/lib/theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -19,6 +20,7 @@ const hidden = { href: null, tabBarStyle: { display: 'none' } } as const;
 
 export default function RootLayout() {
   const fontsReady = useAppFonts();
+  useNotificationScheduler();
 
   useEffect(() => {
     if (fontsReady) SplashScreen.hideAsync();
