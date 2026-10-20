@@ -1,6 +1,6 @@
 // Plant Budis Benachrichtigungen (Auftrag P18). Einmal global einhängen.
 // - Nach der ersten Pflege (careAction) fragt die App einmal nach der Erlaubnis, nicht beim Start.
-// - Geht die App in den Hintergrund, wird der Plan aus dem Spielstand neu berechnet.
+// - Geht die App in den Hintergrund (oder wird sie inaktiv), wird der Plan aus dem Spielstand neu berechnet.
 // - Kommt sie zurück, wird alles Geplante verworfen (Budi ist ja gerade zu sehen).
 
 import { useEffect } from 'react';
@@ -10,6 +10,7 @@ import { gameEvents } from '../game/events';
 import {
   cancelPendingNotifications,
   configureNotifications,
+  notificationActionFor,
   permissionAsked,
   requestPermission,
   rescheduleNotifications,
@@ -34,8 +35,9 @@ export function useNotificationScheduler(): void {
     });
 
     const appState = AppState.addEventListener('change', (state) => {
-      if (state === 'active') cancelPendingNotifications(clock.now()).catch(() => undefined);
-      else if (state === 'background') reschedule();
+      const action = notificationActionFor(state);
+      if (action === 'cancel') cancelPendingNotifications(clock.now()).catch(() => undefined);
+      else if (action === 'reschedule') reschedule();
     });
 
     return () => {

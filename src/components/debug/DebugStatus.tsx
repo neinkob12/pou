@@ -8,7 +8,7 @@ import { getPlantStatus } from '../../game/timeEngine';
 import { useGameStore } from '../../store/gameStore';
 import { selectDebugMultiplier } from '../../store/slices/debug';
 import { SettingsSection } from '../settings/SettingsSection';
-import { useNow } from './useNow';
+import { FAST_REFRESH_MS, useNow } from '../../hooks/useNow';
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
@@ -21,7 +21,7 @@ function Row({ label, value }: { label: string; value: string }) {
 
 /** Phase, Alter, Restzeit, Münzen, Turbo und Balken der aktuellen Pflanze. */
 export function DebugStatus() {
-  const now = useNow();
+  const now = useNow(FAST_REFRESH_MS);
   const plant = useGameStore((s) => s.plant);
   const coins = useGameStore((s) => s.coins);
   const turbo = useGameStore((s) => s.turbo);

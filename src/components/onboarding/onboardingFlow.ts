@@ -21,6 +21,14 @@ export function onboardingStage(flags: OnboardingFlags): OnboardingStage {
   return 'done';
 }
 
+/**
+ * Darf das Zimmer schon gezeichnet werden (P31)? Nicht vor dem Laden des Spielstands und nicht
+ * ohne Altersbestätigung, sonst blitzt es beim allerersten Start vor der Altersfrage auf.
+ */
+export function canShowRoom(hydrated: boolean, ageConfirmed: boolean): boolean {
+  return hydrated && ageConfirmed;
+}
+
 /** Ohne Altersbestätigung führt jede Route zur Altersfrage. */
 export function shouldRedirectToOnboarding(stage: OnboardingStage, onOnboardingRoute: boolean): boolean {
   return stage === 'age' && !onOnboardingRoute;

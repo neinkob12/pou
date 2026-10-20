@@ -2,7 +2,7 @@ import { ScrollView, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { StrainCard } from '../src/components/album/StrainCard';
-import { useNow } from '../src/components/room/useNow';
+import { useNow } from '../src/hooks/useNow';
 import { BackButton } from '../src/components/ui/BackButton';
 import { seedSelect } from '../src/content/strings';
 import { STRAINS } from '../src/game/config';

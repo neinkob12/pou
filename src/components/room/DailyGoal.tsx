@@ -8,7 +8,7 @@ import { useGameStore } from '../../store/gameStore';
 import { Bar } from '../ui/Bar';
 import { Modal } from '../ui/Modal';
 import { Placeholder } from '../ui/Placeholder';
-import { useNow } from './useNow';
+import { useNow } from '../../hooks/useNow';
 
 /** Tagesziel im Raum (P19): ein Ziel pro Tag mit Fortschritt und Belohnungskiste. */
 export function DailyGoal() {

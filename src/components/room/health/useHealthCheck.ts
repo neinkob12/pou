@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { AppState } from 'react-native';
 
 import { useGameStore } from '../../../store/gameStore';
-import { useNow } from '../useNow';
+import { useNow } from '../../../hooks/useNow';
 import { syncHealth } from './healthLogic';
 import { clock } from '../../../lib/clock';
 

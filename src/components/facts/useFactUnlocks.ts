@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { gameEvents } from '../../game/events';
 import { getPlantStatus } from '../../game/timeEngine';
 import { useGameStore } from '../../store/gameStore';
-import { useNow } from '../room/useNow';
+import { useNow } from '../../hooks/useNow';
 
 /**
  * Schaltet Fakten-Karten frei: bei jedem `phaseChanged` (P11) und zusätzlich aus der aktuellen

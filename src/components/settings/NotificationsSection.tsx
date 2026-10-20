@@ -50,7 +50,7 @@ export function NotificationsSection() {
       {enabled && !granted && permissionAsked() ? (
         <>
           <Text className="font-body text-sm text-ink">{texts.settingsDenied}</Text>
-          <Button label={texts.settingsOpenSystem} variant="secondary" onPress={() => Linking.openSettings()} />
+          <Button label={texts.settingsOpenSystem} variant="secondary" onPress={() => Linking.openSettings().catch((error: unknown) => console.warn('[notifications] Systemeinstellungen nicht geöffnet.', error))} />
         </>
       ) : null}
     </SettingsSection>

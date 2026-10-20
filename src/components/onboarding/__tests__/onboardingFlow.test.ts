@@ -1,4 +1,5 @@
 import {
+  canShowRoom,
   careCompletesStep,
   firstTutorialStep,
   nextTutorialStep,
@@ -71,5 +72,14 @@ describe('Tutorial-Schritte', () => {
 
   it('pflanzt eine Sorte, die von Anfang an frei ist', () => {
     expect(STRAINS[tutorialStrainId()].unlock.type).toBe('start');
+  });
+});
+
+describe('canShowRoom (P31)', () => {
+  it('zeigt das Zimmer erst nach dem Laden und mit Altersbestätigung', () => {
+    expect(canShowRoom(false, false)).toBe(false);
+    expect(canShowRoom(false, true)).toBe(false);
+    expect(canShowRoom(true, false)).toBe(false);
+    expect(canShowRoom(true, true)).toBe(true);
   });
 });

@@ -90,6 +90,17 @@ export async function requestPermission(): Promise<boolean> {
   return status.granted;
 }
 
+/**
+ * Was beim Wechsel des App-Zustands passiert. Neu geplant wird schon bei "inactive", nicht erst bei
+ * "background" (P31): Wischt der Spieler die App im App-Umschalter weg, meldet iOS oft nur noch
+ * "inactive", und ohne Plan käme nie eine Benachrichtigung. Kommt die App zurück, wird ohnehin verworfen.
+ */
+export function notificationActionFor(appState: string): 'cancel' | 'reschedule' | null {
+  if (appState === 'active') return 'cancel';
+  if (appState === 'inactive' || appState === 'background') return 'reschedule';
+  return null;
+}
+
 /** App kommt in den Vordergrund oder Benachrichtigungen sind aus: alles Geplante weg. */
 export async function cancelPendingNotifications(nowMs: number): Promise<void> {
   await Notifications.cancelAllScheduledNotificationsAsync();
