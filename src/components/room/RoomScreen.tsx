@@ -7,6 +7,7 @@ import { BudiStage } from './BudiStage';
 import { CareStageProvider } from './care/CareStage';
 import { useMinigameMoodBonus } from './care/useMinigameMoodBonus';
 import { CoinDisplay } from './CoinDisplay';
+import { DailyGoal } from './DailyGoal';
 import { HealthWatch } from './health/useHealthCheck';
 import { Lamp } from './Lamp';
 import { NeedBars } from './NeedBars';
@@ -28,6 +29,7 @@ export function RoomScreen() {
             <CoinDisplay />
           </View>
           <PhaseHeader />
+          <DailyGoal />
         </SafeAreaView>
         <Lamp />
         <BudiStage />
