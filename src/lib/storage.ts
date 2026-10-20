@@ -8,10 +8,28 @@ import type { HighestSeenStore } from '../game/clock';
 
 export const storage = createMMKV({ id: 'potpou' });
 
+/**
+ * Schreiben, das nie wirft (P31). Ist der Gerätespeicher voll, wirft MMKV; ungefangen würde das
+ * mitten in einer Spielaktion die App beenden. Der Stand bleibt im Speicher, der nächste Schreibvorgang
+ * versucht es neu (der Spielstand wird bei jeder Änderung komplett geschrieben).
+ * Rückgabe: ob geschrieben wurde.
+ */
+export function safeSet(key: string, value: string | number | boolean): boolean {
+  try {
+    storage.set(key, value);
+    return true;
+  } catch (error) {
+    console.warn(`[storage] Schreiben von "${key}" fehlgeschlagen (Speicher voll?).`, error);
+    return false;
+  }
+}
+
 /** Adapter für die Persist-Middleware von Zustand. MMKV ist synchron, Laden passiert sofort. */
 export const mmkvStateStorage: StateStorage = {
   getItem: (key) => storage.getString(key) ?? null,
-  setItem: (key, value) => storage.set(key, value),
+  setItem: (key, value) => {
+    safeSet(key, value);
+  },
   removeItem: (key) => {
     storage.remove(key);
   },
@@ -25,5 +43,7 @@ export const HIGHEST_SEEN_KEY = 'potpou-clock-highest-seen';
 
 export const highestSeenStore: HighestSeenStore = {
   read: () => storage.getNumber(HIGHEST_SEEN_KEY) ?? null,
-  write: (ms) => storage.set(HIGHEST_SEEN_KEY, ms),
+  write: (ms) => {
+    safeSet(HIGHEST_SEEN_KEY, ms);
+  },
 };

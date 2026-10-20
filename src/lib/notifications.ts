@@ -11,7 +11,7 @@ import type { NeedsState } from '../game/needs';
 import { planNotifications, type PlannedNotification } from '../game/notifications';
 import type { PlantRecord } from '../game/timeEngine';
 import { notifications as texts } from '../content/strings';
-import { storage } from './storage';
+import { safeSet, storage } from './storage';
 
 export const NOTIFICATION_KEYS = {
   enabled: 'notifications.enabled',
@@ -51,7 +51,7 @@ function readSentLog(): number[] {
 }
 
 function writeSentLog(log: number[]): void {
-  storage.set(NOTIFICATION_KEYS.sentLog, JSON.stringify(log));
+  safeSet(NOTIFICATION_KEYS.sentLog, JSON.stringify(log));
 }
 
 /** Einmal beim Start: Verhalten im Vordergrund und Android-Kanal. */
@@ -84,7 +84,7 @@ export function permissionAsked(): boolean {
 
 /** Fragt das System nach der Erlaubnis. Nur einmal automatisch, danach über die Einstellungen. */
 export async function requestPermission(): Promise<boolean> {
-  storage.set(NOTIFICATION_KEYS.permissionAsked, true);
+  safeSet(NOTIFICATION_KEYS.permissionAsked, true);
   if (await hasPermission()) return true;
   const status = await Notifications.requestPermissionsAsync();
   return status.granted;

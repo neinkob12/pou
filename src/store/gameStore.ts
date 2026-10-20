@@ -8,7 +8,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { mmkvStateStorage, storage } from '../lib/storage';
+import { mmkvStateStorage, safeSet, storage } from '../lib/storage';
 import { slices, type GameState } from './slices';
 import type { SliceCreator, SliceGet, SliceSet } from './slices/types';
 
@@ -78,7 +78,7 @@ let hydrationFailed = false;
 
 function backupBrokenSave() {
   const raw = storage.getString(SAVE_KEY);
-  if (raw !== undefined) storage.set(SAVE_BACKUP_KEY, raw);
+  if (raw !== undefined) safeSet(SAVE_BACKUP_KEY, raw);
 }
 
 export const useGameStore = create<GameStore>()(
