@@ -1,22 +1,55 @@
-import { View } from 'react-native';
+import { useCallback } from 'react';
+import { Text, View } from 'react-native';
+import { GestureDetector } from 'react-native-gesture-handler';
+import Animated from 'react-native-reanimated';
 
-import { budi, room as roomAssets } from '../../lib/assets';
-import { room } from '../../content/strings';
-import { AssetImage } from '../ui/AssetImage';
+import { care } from '../../content/strings';
+import { useNeeds } from '../../hooks/useNeeds';
+import { Budi } from '../budi/Budi';
+import { ComaOverlay } from '../budi/ComaOverlay';
+import { Pests } from '../budi/Pests';
+import { useCareStage } from './care/CareStage';
+import { JoyBurst } from './care/JoyBurst';
+import { usePetGesture } from './care/usePetGesture';
 
-const PLANT_SIZE = 160;
-const POT_WIDTH = 170;
-const POT_HEIGHT = 130;
-
-// Slot. Später P10 (Gesten, Reaktionen) und P20 (Budi-Grafik als PNG-Ebenen).
-/** Budi in der Mitte: Pflanze (Kreis) auf dem Topf. */
+// Slot (P10). Budi-Grafik, Idle-Animation und Reaktionen (Squash-and-Stretch) aus P20.
+/** Budi in der Mitte: Ziel der Pflege-Werkzeuge, streicheln per Wisch-Geste. */
 export function BudiStage() {
+  const { targetRef, hovering, reaction, react } = useCareStage();
+  const { condition, canCare, care: doCare } = useNeeds();
+
+  const onPet = useCallback(() => {
+    const feedback = doCare('pet');
+    if (feedback) react('pet', feedback);
+  }, [doCare, react]);
+  const pet = usePetGesture(canCare, onPet);
+
+  const joy = reaction?.type === 'pet' && reaction.feedback === 'success' ? reaction.id : 0;
+  const showCondition = condition !== null && condition !== 'ok';
+
   return (
     <View className="flex-1 items-center justify-end pb-4">
-      <AssetImage source={budi.b3_vegetative_small} label={room.plant} color="plantLight" size={PLANT_SIZE} round />
-      <View className="-mt-4">
-        <AssetImage source={roomAssets.u1_pot} label={room.pot} color="terracotta" size={POT_WIDTH} height={POT_HEIGHT} />
-      </View>
+      {showCondition ? (
+        <Text className="mb-2 rounded-full bg-white/80 px-3 py-1 font-body-bold text-sm text-ink">
+          {care.conditions[condition]}
+        </Text>
+      ) : null}
+      <GestureDetector gesture={pet}>
+        <Animated.View
+          ref={targetRef}
+          accessible
+          accessibilityRole="button"
+          accessibilityLabel={care.petLabel}
+          accessibilityState={{ disabled: !canCare }}
+          accessibilityActions={[{ name: 'activate' }]}
+          onAccessibilityAction={() => canCare && onPet()}
+        >
+          <Budi condition={condition} reaction={reaction} hovering={hovering} />
+          <JoyBurst trigger={joy} color="coral" />
+          <Pests />
+          <ComaOverlay condition={condition} />
+        </Animated.View>
+      </GestureDetector>
     </View>
   );
 }
