@@ -6,6 +6,8 @@ import Animated from 'react-native-reanimated';
 import { care } from '../../content/strings';
 import { useNeeds } from '../../hooks/useNeeds';
 import { Budi } from '../budi/Budi';
+import { ComaOverlay } from '../budi/ComaOverlay';
+import { Pests } from '../budi/Pests';
 import { useCareStage } from './care/CareStage';
 import { JoyBurst } from './care/JoyBurst';
 import { usePetGesture } from './care/usePetGesture';
@@ -44,6 +46,8 @@ export function BudiStage() {
         >
           <Budi condition={condition} reaction={reaction} hovering={hovering} />
           <JoyBurst trigger={joy} color="coral" />
+          <Pests />
+          <ComaOverlay condition={condition} />
         </Animated.View>
       </GestureDetector>
     </View>
