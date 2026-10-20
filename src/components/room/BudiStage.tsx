@@ -11,10 +11,9 @@ import { budiSpeak } from '../budi/voice';
 import { ComaOverlay } from '../budi/ComaOverlay';
 import { Pests } from '../budi/Pests';
 import { useCareStage } from './care/CareStage';
-import { JoyBurst } from './care/JoyBurst';
 import { usePetGesture } from './care/usePetGesture';
 
-// Slot (P10). Budi-Grafik, Idle-Animation und Reaktionen (Squash-and-Stretch) aus P20.
+// Slot (P10). Budi-Grafik, Idle-Animation und Reaktionen (inkl. Herzen beim Streicheln) aus P20 und WEB-1.
 /** Budi in der Mitte: Ziel der Pflege-Werkzeuge, streicheln per Wisch-Geste. */
 export function BudiStage() {
   const { targetRef, hovering, reaction, react } = useCareStage();
@@ -27,7 +26,6 @@ export function BudiStage() {
   }, [doCare, react]);
   const pet = usePetGesture(canCare, onPet);
 
-  const joy = reaction?.type === 'pet' && reaction.feedback === 'success' ? reaction.id : 0;
   const showCondition = condition !== null && condition !== 'ok';
 
   return (
@@ -48,7 +46,6 @@ export function BudiStage() {
           onAccessibilityAction={() => canCare && onPet()}
         >
           <Budi condition={condition} reaction={reaction} hovering={hovering} accessory={useEquippedAccessory()} />
-          <JoyBurst trigger={joy} color="coral" />
           <Pests />
           <ComaOverlay condition={condition} />
         </Animated.View>

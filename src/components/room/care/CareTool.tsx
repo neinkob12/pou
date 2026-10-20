@@ -8,6 +8,7 @@ import { care } from '../../../content/strings';
 import { cue } from '../../../lib/audio';
 import type { ColorName } from '../../../lib/theme';
 import { AssetImage } from '../../ui/AssetImage';
+import type { GameIconId } from '../../ui/icons/iconArt';
 import { useCareStage } from './CareStage';
 import { isInsideRect, type CareTool as CareToolId, type Rect } from './careLogic';
 import { playPickupHaptic } from './haptics';
@@ -19,10 +20,10 @@ const HOVER_SLOP = 24;
 const LIFT_SCALE = 0.15;
 const POUR_TILT_DEG: Record<CareToolId, number> = { water: -40, fertilizeGrow: -25, fertilizeBloom: -25 };
 
-const TOOL_LOOK: Record<CareToolId, { asset: CareAssetId; color: ColorName }> = {
-  water: { asset: 'u3_watering_can', color: 'night' },
-  fertilizeGrow: { asset: 'u4_fertilizer_grow', color: 'plantLight' },
-  fertilizeBloom: { asset: 'u4_fertilizer_bloom', color: 'lavender' },
+const TOOL_LOOK: Record<CareToolId, { asset: CareAssetId; color: ColorName; art: GameIconId }> = {
+  water: { asset: 'u3_watering_can', color: 'night', art: 'wateringCan' },
+  fertilizeGrow: { asset: 'u4_fertilizer_grow', color: 'plantLight', art: 'fertilizerGrow' },
+  fertilizeBloom: { asset: 'u4_fertilizer_bloom', color: 'lavender', art: 'fertilizerBloom' },
 };
 
 interface CareToolProps {
@@ -108,6 +109,7 @@ export function CareTool({ tool, disabled, onDrop }: CareToolProps) {
             color={look.color}
             size={TOOL_SIZE}
             round
+            icon={look.art}
           />
           {tool === 'water' ? <WaterDrops visible={over} /> : null}
         </View>

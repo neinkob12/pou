@@ -4,6 +4,7 @@ import {
   canBlink,
   computeBudiLook,
   faceFor,
+  isRipe,
   LATE_PHASE_PROGRESS,
   plantLayerFor,
   plantLayerWithStrain,
@@ -122,5 +123,25 @@ describe('computeBudiLook', () => {
     expect(look.plant?.key).toBe('b07_drying');
     expect(look.pot).toBeNull();
     expect(look.face).toBeNull();
+  });
+});
+
+describe('Schlaf und Reife (WEB-1)', () => {
+  it('nachts schläft Budi, wenn ihm nichts fehlt', () => {
+    expect(faceFor('ok', null, false, true)).toBe('b10_face_snoring');
+    expect(computeBudiLook({ ...base, isNight: true }, none).face).toBe('b10_face_snoring');
+    expect(computeBudiLook({ ...base, isNight: true }, none).blink).toBe(false);
+  });
+
+  it('Durst, Pflege und Werkzeug wecken ihn', () => {
+    expect(faceFor('thirsty', null, false, true)).toBe('b10_face_thirsty');
+    expect(faceFor('ok', { type: 'pet', feedback: 'success' }, false, true)).toBe('b10_face_very_happy');
+    expect(faceFor('ok', null, true, true)).toBe('b10_face_surprised');
+  });
+
+  it('erntereif nur in der Phase ready', () => {
+    expect(isRipe('ready')).toBe(true);
+    expect(isRipe('flowering')).toBe(false);
+    expect(isRipe(null)).toBe(false);
   });
 });

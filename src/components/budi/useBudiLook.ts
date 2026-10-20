@@ -8,8 +8,9 @@ import { budi, type BudiVariantId } from '../../lib/assets';
 import { useGameStore } from '../../store/gameStore';
 import { selectDebugMultiplier } from '../../store/slices/debug';
 import type { CareReaction } from '../room/care/CareStage';
-import { useNow } from '../../hooks/useNow';
-import { computeBudiLook, type BudiLook, type BudiReaction } from './budiLook';
+import { getLightState, isAutoflower } from '../room/phase/lightCycle';
+import { usePlantClock } from '../room/phase/usePlantClock';
+import { computeBudiLook, isRipe, type BudiLook, type BudiReaction } from './budiLook';
 
 /** So lange zeigt Budi nach einer Pflege das Reaktionsgesicht. */
 const REACTION_FACE_MS = 1600;
@@ -44,16 +45,18 @@ export function useBudiLook(
   condition: Condition | null,
   reaction: CareReaction | null,
   hovering: SharedValue<number>,
-): BudiLook {
+): BudiLook & { ripe: boolean } {
   const plant = useGameStore((s) => s.plant);
   const debugMultiplier = useGameStore(selectDebugMultiplier);
-  const now = useNow();
+  // Gleicher Takt wie Lampe und Zimmer, damit Budi mit dem Licht aufwacht (auch im Zeitraffer).
+  const now = usePlantClock(debugMultiplier);
   const fresh = useFreshReaction(reaction);
   const hoverFlag = useHoveringFlag(hovering);
 
   return useMemo(() => {
     const status = plant ? getPlantStatus(plant, now, debugMultiplier) : null;
-    return computeBudiLook(
+    const light = status && plant ? getLightState(status, isAutoflower(plant.strainId)) : null;
+    const look = computeBudiLook(
       {
         phase: status?.phase ?? null,
         phaseProgress: status?.phaseProgress ?? 0,
@@ -61,8 +64,10 @@ export function useBudiLook(
         condition,
         reaction: fresh,
         hovering: hoverFlag,
+        isNight: light ? !light.isDay : false,
       },
       hasAsset,
     );
+    return { ...look, ripe: isRipe(status?.phase ?? null) };
   }, [plant, now, debugMultiplier, condition, fresh, hoverFlag]);
 }

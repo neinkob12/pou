@@ -1,6 +1,7 @@
 import { Image, Text, View, type ImageSourcePropType } from 'react-native';
 
 import { colors, fonts, radii, type ColorName } from '../../lib/theme';
+import { GameIcon, type GameIconId } from './icons/GameIcon';
 import { IconTile } from './IconTile';
 import { Placeholder } from './Placeholder';
 
@@ -15,14 +16,23 @@ interface AssetImageProps {
   size: number;
   height?: number;
   round?: boolean;
+  /** Gezeichnetes Icon (WEB-1) statt Platzhalter, solange die Bilddatei fehlt. */
+  icon?: GameIconId;
   /** Fehlt das Bild: Kachel mit Initialen statt Platzhalter-Text, für kleine Karten-Bilder (WEB-3). */
   tile?: boolean;
 }
 
-/** Bild aus assets.ts oder, solange die Datei fehlt, ein beschrifteter Platzhalter. */
-export function AssetImage({ source, label, color = 'lavender', size, height = size, round, tile }: AssetImageProps) {
+/** Bild aus assets.ts oder, solange die Datei fehlt, ein gezeichnetes Icon oder ein beschrifteter Platzhalter. */
+export function AssetImage({ source, label, color = 'lavender', size, height = size, round, icon, tile }: AssetImageProps) {
   if (source) {
     return <Image source={source} accessibilityLabel={label} style={{ width: size, height }} resizeMode="contain" />;
+  }
+  if (icon) {
+    return (
+      <View accessibilityLabel={label} style={{ width: size, height, alignItems: 'center', justifyContent: 'center' }}>
+        <GameIcon id={icon} size={Math.min(size, height)} />
+      </View>
+    );
   }
   if (tile) return <IconTile label={label} color={color} size={size} height={height} round={round} />;
   if (size > ICON_PLACEHOLDER_MAX) {
