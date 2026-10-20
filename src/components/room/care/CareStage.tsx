@@ -4,6 +4,7 @@ import { useAnimatedRef, useSharedValue, type AnimatedRef, type SharedValue } fr
 
 import type { CareActionId } from '../../../game/events';
 import type { CareFeedback } from './careLogic';
+import { useLightDisturbStress } from './useLightDisturbStress';
 
 /** Letzte Pflege, auf die Budi reagiert. `id` zählt hoch, damit gleiche Aktionen neu abspielen. */
 export interface CareReaction {
@@ -31,6 +32,9 @@ export function CareStageProvider({ children }: { children: ReactNode }) {
   const react = useCallback((type: CareActionId, feedback: CareFeedback) => {
     setReaction((prev) => ({ type, feedback, id: (prev?.id ?? 0) + 1 }));
   }, []);
+  // Gestörte Dunkelphase: Budi zeigt Stress wie nach falscher Pflege (Kopfschütteln, beleidigt).
+  const onDisturbed = useCallback(() => react('pet', 'warning'), [react]);
+  useLightDisturbStress(onDisturbed);
   const value = useMemo(() => ({ targetRef, hovering, reaction, react }), [targetRef, hovering, reaction, react]);
   return <CareStageContext.Provider value={value}>{children}</CareStageContext.Provider>;
 }

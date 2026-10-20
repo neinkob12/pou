@@ -2,9 +2,11 @@
 // Den aktuellen Stand berechnet man mit computeNeeds aus src/game/needs.ts; die Phase kommt
 // aus dem Plant-Slice (Hook), die Modifikatoren aus den Shop-Upgrades (P15).
 
+import { DARK_DISTURB_MOOD_PENALTY, type PhaseId } from '../../game/config';
 import { gameEvents } from '../../game/events';
 import {
   applyCare,
+  applyMoodPenalty,
   createNeeds,
   NO_MODIFIERS,
   reviveNeeds,
@@ -23,6 +25,8 @@ export interface NeedsSlice {
   resetNeeds: (nowMs: number) => void;
   /** Aus dem Koma holen. Kosten (Münzen, Werbung) prüft der Aufrufer. */
   reviveFromComa: (nowMs: number) => void;
+  /** Dunkelphase gestört: Laune sinkt um DARK_DISTURB_MOOD_PENALTY, zählt nicht als Pflege. Rückgabe: ob es gewirkt hat. */
+  disturbMood: (phase: PhaseId, nowMs: number, modifiers?: NeedModifiers) => boolean;
 }
 
 export const createNeedsSlice: SliceCreator<NeedsSlice> = (set, get) => ({
@@ -37,4 +41,11 @@ export const createNeedsSlice: SliceCreator<NeedsSlice> = (set, get) => ({
   },
   resetNeeds: (nowMs) => set({ needs: createNeeds(nowMs) }),
   reviveFromComa: (nowMs) => set({ needs: reviveNeeds(nowMs) }),
+  disturbMood: (phase, nowMs, modifiers = NO_MODIFIERS) => {
+    const before = get().needs;
+    const after = applyMoodPenalty(before, DARK_DISTURB_MOOD_PENALTY, phase, nowMs, modifiers);
+    if (after === before) return false;
+    set({ needs: after });
+    return true;
+  },
 });
