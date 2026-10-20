@@ -1,19 +1,38 @@
-import { View } from 'react-native';
+import { useCallback } from 'react';
+import { Text, View } from 'react-native';
 
-import type { CareActionId } from '../../game/events';
-import { room } from '../../content/strings';
-import { Button } from '../ui/Button';
+import { care } from '../../content/strings';
+import { useNeeds } from '../../hooks/useNeeds';
+import { useCareStage } from './care/CareStage';
+import { CARE_TOOLS, type CareTool as CareToolId } from './care/careLogic';
+import { CareTool } from './care/CareTool';
 
-const ACTIONS: readonly CareActionId[] = ['water', 'fertilizeGrow', 'fertilizeBloom', 'pet'];
-
-// Slot. Später P10: Aktionen über applyCare, Wisch-Gesten, Haptik. Bis dahin ohne Funktion.
-/** Pflege-Aktionen unter Budi. */
+/** Fach unter Budi: Gießkanne und zwei Dünger zum Ziehen, darunter ein Hinweis. */
 export function ActionTray() {
+  const { phase, condition, canCare, care: doCare } = useNeeds();
+  const { react } = useCareStage();
+
+  const onDrop = useCallback(
+    (tool: CareToolId) => {
+      const feedback = doCare(tool);
+      if (feedback) react(tool, feedback);
+    },
+    [doCare, react],
+  );
+
+  let hint = care.hint;
+  if (phase === null) hint = care.hintNoPlant;
+  else if (condition === 'coma') hint = care.hintComa;
+  else if (!canCare) hint = care.hintRest;
+
   return (
-    <View className="flex-row flex-wrap justify-center gap-2 px-4">
-      {ACTIONS.map((action) => (
-        <Button key={action} label={room.actions[action]} variant="secondary" disabled />
-      ))}
+    <View className="items-center gap-2 px-4">
+      <View className="flex-row justify-center gap-8 rounded-3xl bg-white/70 px-6 py-3">
+        {CARE_TOOLS.map((tool) => (
+          <CareTool key={tool} tool={tool} disabled={!canCare} onDrop={() => onDrop(tool)} />
+        ))}
+      </View>
+      <Text className="text-center font-body text-xs text-inkMuted">{hint}</Text>
     </View>
   );
 }

@@ -49,6 +49,39 @@ export const room = {
   coinsLabel: (coins: number) => `${coins} Münzen`,
 };
 
+// Pflege-Gesten und Balken im Raum (P10).
+export const care = {
+  tools: {
+    water: 'Gießkanne (U3)',
+    fertilizeGrow: 'Wachstumsdünger (U4)',
+    fertilizeBloom: 'Blütendünger (U4)',
+  },
+  toolPlaceholder: {
+    water: 'U3',
+    fertilizeGrow: 'U4',
+    fertilizeBloom: 'U4',
+  },
+  toolShort: {
+    water: 'Wasser',
+    fertilizeGrow: 'Wachstum',
+    fertilizeBloom: 'Blüte',
+  },
+  dragHint: 'Zu Budi ziehen',
+  hint: 'Zieh Gießkanne oder Dünger zu Budi. Über Budi wischen zum Streicheln.',
+  hintNoPlant: 'Pflanze zuerst einen Samen.',
+  hintComa: 'Budi liegt im Koma. Pflege wirkt gerade nicht.',
+  hintRest: 'Budi braucht jetzt keine Pflege mehr.',
+  petLabel: 'Budi streicheln',
+  conditions: {
+    ok: 'Budi geht es gut',
+    thirsty: 'Budi hat Durst',
+    hungry: 'Budi hat Hunger',
+    stressed: 'Budi ist gestresst',
+    sick: 'Budi ist krank',
+    coma: 'Budi liegt im Koma',
+  },
+};
+
 export const modal = {
   close: 'Schließen',
 };
@@ -125,10 +158,10 @@ export const debug = {
   resetTitle: 'Spielstand',
   reset: 'Spielstand zurücksetzen',
   resetConfirm: 'Nochmal tippen zum Bestätigen',
-  pendingTitle: 'Kommt später',
   setBars: 'Balken setzen',
+  strainsTitle: 'Sorten',
   unlockStrains: 'Alle Sorten freischalten',
-  pendingHint: 'Wartet auf den zuständigen Auftrag.',
+  unlockEventStrain: 'Kölsche Knospe freischalten',
 };
 
 export const harvestScreen = {
@@ -137,8 +170,127 @@ export const harvestScreen = {
 
 export const seedSelect = {
   title: 'Samen wählen',
+  intro: 'Welcher Samen kommt in den Topf?',
+  plant: 'Pflanzen',
+  potBusy: 'Budi ist noch nicht fertig. Erst ernten und trocknen, dann kommt ein neuer Samen.',
 };
 
+/** Sorten-Album und Level (P16). */
+export const strainsAlbum = {
+  level: (level: number) => `Level ${level}`,
+  xp: (into: number, needed: number) => `${into} / ${needed} XP`,
+  maxLevel: 'Höchstes Level erreicht',
+  seedFragments: (count: number) => `${count} Samen-Fragmente`,
+  harvests: (count: number) => `${count} Ernten`,
+  locked: 'Gesperrt',
+  unlocked: 'Freigeschaltet',
+  floweringWeeks: (weeks: number) => `${weeks} Wochen Blüte`,
+  autoflower: 'Autoflower',
+  portrait: (name: string) => `${name} (U15)`,
+  rarity: {
+    common: 'Gewöhnlich',
+    rare: 'Selten',
+    epic: 'Episch',
+    speed: 'Schnell',
+    legendary: 'Legendär',
+  },
+  special: {
+    gustav: 'Pflegeleicht und gutmütig. Perfekt für den Anfang.',
+    lotte: 'Färbt sich in der Blüte lila und bringt mehr Münzen.',
+    sascha: 'Wird riesig und braucht lange, dafür viel Ertrag.',
+    anton: 'Blüht von selbst, ganz ohne Lichtwechsel. Kleiner, aber flott.',
+    koelsch: 'Spricht Kölsch und ist besonders wertvoll.',
+  },
+  unlockHint: {
+    start: 'Von Anfang an dabei',
+    harvests: (current: number, target: number) => `Freischalten: ${current} / ${target} Ernten`,
+    seedFragments: (current: number, target: number) => `Freischalten: ${current} / ${target} Samen-Fragmente`,
+    level: (target: number) => `Freischalten: ab Level ${target}`,
+    event: 'Freischalten: nur bei einem besonderen Ereignis',
+  },
+};
+
+// Erststart (P26): Altersfrage und Tutorial. Vorschlag des Auftrags, Chef kann umformulieren.
 export const onboarding = {
   title: 'Willkommen',
+  age: {
+    title: 'Willkommen bei PotPou',
+    intro: 'PotPou ist ein Pflanzenspiel für Erwachsene. Du pflegst Budi vom Samen bis zur Ernte.',
+    question: 'Bist du mindestens 18 Jahre alt?',
+    yes: 'Ja, ich bin 18 oder älter',
+    no: 'Nein',
+  },
+  declined: {
+    title: 'Bis bald!',
+    text: 'PotPou gibt es erst ab 18. Budi wünscht dir bis dahin alles Gute und viel Sonne.',
+  },
+  tutorial: {
+    stepCounter: (step: number, total: number) => `${step} von ${total}`,
+    next: 'Weiter',
+    skip: 'Überspringen',
+    done: "Los geht's",
+    steps: {
+      plant: {
+        title: 'Dein erster Samen',
+        text: 'Pflanz einen Samen in den Topf. Daraus wächst Budi, in Echtzeit.',
+        action: 'Samen pflanzen',
+      },
+      water: {
+        title: 'Gießen',
+        text: 'Zieh die Gießkanne unten zu Budi und lass es regnen. Probier es gleich aus.',
+      },
+      bars: {
+        title: 'Die Balken',
+        text: 'Oben siehst du Wasser, Nährstoffe, Licht und Laune. Sinkt ein Balken, braucht Budi dich. Budi wächst auch weiter, wenn die App zu ist.',
+      },
+      minigames: {
+        title: 'Minigames',
+        text: 'Unter "Spiele" sammelst du Münzen und machst Budi gute Laune.',
+        action: 'Zeig mal',
+      },
+    },
+  },
+};
+
+// Rechtliche Links in den Einstellungen (P26).
+export const legal = {
+  title: 'Rechtliches',
+  imprint: 'Impressum',
+  privacy: 'Datenschutz',
+};
+
+/** Platzhalter, bis der Chef die echten Adressen liefert (P26, siehe docs/progress/p26.md). */
+export const legalUrls = {
+  imprint: 'https://example.com/potpou/impressum',
+  privacy: 'https://example.com/potpou/datenschutz',
+};
+
+// Benachrichtigungen (P18): Texte in Budis Stimme und der Einstellungs-Abschnitt.
+export const notifications = {
+  channelName: 'Budi meldet sich',
+  thirsty: [
+    { title: 'Budi hat Durst', body: 'Meine Erde ist trockener als dein Humor. Gießkanne, bitte!' },
+    { title: 'Hallo? Wasser?', body: 'Ich bin eine Pflanze, kein Kaktus. Gieß mich mal.' },
+  ],
+  hungry: [
+    { title: 'Budi hat Hunger', body: 'Mein Magen knurrt. Also, meine Wurzeln. Dünger wäre nett.' },
+    { title: 'Nährstoff-Alarm', body: 'Ich wachse hier nicht von Luft und Liebe. Na gut, ein bisschen schon.' },
+  ],
+  comaWarning: [
+    { title: 'Budi kippt gleich um', body: 'Mir wird schummrig. Schau bitte schnell nach mir!' },
+    { title: 'Letzter Aufruf!', body: 'Noch ein paar Stunden ohne dich und ich mach den Abgang. Dramatisch, aber wahr.' },
+  ],
+  harvestReady: [
+    { title: 'Budi ist erntebereit', body: 'Ich bin fertig! Schnapp dir die Lupe und schau mich an.' },
+    { title: 'Ernte-Zeit!', body: 'Ich hab alles gegeben. Jetzt bist du dran.' },
+  ],
+  phaseChanged: (phaseLabel: string) => ({
+    title: `Budi ist jetzt: ${phaseLabel}`,
+    body: 'Ich bin gewachsen! Komm gucken, bevor ich angebe.',
+  }),
+  settingsTitle: 'Benachrichtigungen',
+  settingsToggle: 'Budi darf sich melden',
+  settingsHint: 'Höchstens 3 pro Tag, nie zwischen 22 und 9 Uhr.',
+  settingsDenied: 'Dein Handy blockiert Benachrichtigungen. Erlaube sie in den Systemeinstellungen.',
+  settingsOpenSystem: 'Systemeinstellungen öffnen',
 };

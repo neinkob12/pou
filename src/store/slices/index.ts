@@ -6,13 +6,17 @@ import { createDebugSlice } from './debug';
 import { createFactsSlice } from './facts';
 import { createHealthSlice } from './health';
 import { createNeedsSlice } from './needs';
+import { createOnboardingSlice } from './onboarding';
 import { createPlantSlice } from './plant';
+import { createProgressionSlice } from './progression';
 
 export const slices = {
   plant: createPlantSlice,
   health: createHealthSlice,
   needs: createNeedsSlice,
+  progression: createProgressionSlice,
   debug: createDebugSlice,
+  onboarding: createOnboardingSlice,
   facts: createFactsSlice,
 };
 
