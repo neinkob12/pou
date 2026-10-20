@@ -246,6 +246,10 @@ export const shop = {
   owned: 'Gekauft',
   level: (level: number, max: number) => `Stufe ${level} von ${max}`,
   notEnoughCoins: 'Zu wenig Münzen',
+  // Shop-Karten (WEB-3).
+  missingCoins: (missing: number) => `Dir fehlen noch ${missing} Münzen`,
+  bought: 'Gekauft!',
+  maxed: 'Voll ausgebaut',
   upgrades: {
     pot: {
       name: 'Größerer Topf',
@@ -415,6 +419,9 @@ export const harvestScreen = {
   dryingDone: 'Fertig getrocknet!',
   collect: 'Einsammeln',
   summaryTitle: 'Ernte fertig!',
+  // Aufdecken der Kiste (WEB-3).
+  revealTitle: 'Deine Ernte ist da!',
+  revealHint: 'Tipp auf die Kiste',
   summaryCrate: 'Erntekiste (B8)',
   summaryStars: (stars: number) => `${stars} von 5 Sternen`,
   starFull: '★',
@@ -450,6 +457,9 @@ export const strainsAlbum = {
   harvests: (count: number) => `${count} Ernten`,
   locked: 'Gesperrt',
   unlocked: 'Freigeschaltet',
+  // Sammelkarte (WEB-3): Schloss-Zeichen und Rätsel-Porträt gesperrter Sorten.
+  lockSymbol: '?',
+  lockedPortrait: 'Noch unbekannt',
   floweringWeeks: (weeks: number) => `${weeks} Wochen Blüte`,
   autoflower: 'Autoflower',
   portrait: (name: string) => `${name} (U15)`,

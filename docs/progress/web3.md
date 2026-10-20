@@ -12,8 +12,8 @@ Branch: `claude/auftrag-41-web-3-web-version-spielablauf-belohnunge` · Auftrag 
 | 4 | Am Rechner | Alles über die volle Breite gezogen (Knöpfe 1200 px breit) | PR 1: Handy-Rahmen |
 | 5 | Phasenwechsel | Phasen-Modal und Fakten-Overlay erscheinen gleichzeitig, das Zimmer ist doppelt abgedunkelt | offen, liegt in `room/phase/` (WEB-1), Rückfrage beim CvD |
 | 6 | Tageskiste | Kiste ist ein Platzhalter-Kasten, Belohnung nur als Text-Modal | offen, liegt in `room/DailyGoal.tsx` (WEB-1), Rückfrage beim CvD |
-| 7 | Ernte | Ergebnis erscheint auf einen Schlag, Sterne und Münzen ohne Inszenierung | nächster PR |
-| 8 | Shop, Album | Karten funktional, aber flach; gesperrte Sorten nur blasser | nächster PR |
+| 7 | Ernte | Ergebnis erscheint auf einen Schlag, Sterne und Münzen ohne Inszenierung | Teil 2: Kiste, Sterne, Hochzählen |
+| 8 | Shop, Album | Karten flach, Platzhalter-Text in 72-px-Bildern unlesbar, gesperrte Sorten nur blasser, Kauf ohne Rückmeldung | Teil 2 |
 | 9 | Zimmer | Erster Start nachts (je nach Uhrzeit) ist sehr dunkel. Spielregel, nicht geändert | zur Info |
 | 10 | Tabs | Wechsel ohne Übergang | PR 1: Überblenden |
 
@@ -39,10 +39,22 @@ Vorher:
 | --- | --- | --- | --- |
 | ![](web3/01-tutorial-budi-spricht.png) | ![](web3/02-tutorial-balken.png) | ![](web3/03-rechner-rahmen.png) | ![](web3/04-fakt-nach-tutorial.png) |
 
+### Teil 2: Ernte als Höhepunkt, Shop und Album
+
+- Ernte-Abschluss (`harvest/HarvestSummary.tsx`): Erntekiste wackelt, "Tipp auf die Kiste" deckt auf (Ernte-Sound), Funken fliegen, Sterne springen einzeln herein, die Münzen zählen hoch (Münz-Sound am Ende), neue Sorte als lila Banner.
+- Bausteine in `src/components/feedback/`: `celebration.ts` (Zeitplan, Hochzählen, Funken; rein, mit Test), `useCountUp`, `useTweenedNumber`, `CountUpText`, `StarRow`, `Sparkles`, `RevealBox`.
+- Münzzähler (`ui/CoinChip.tsx`, auch im Zimmer und Shop): läuft bei jeder Änderung zum neuen Stand und hüpft.
+- Shop: Platzhalter als Kachel mit Initialen (`ui/IconTile.tsx`, nur per `tile`-Prop, Zimmer unverändert), Stufen als Punkte (`shop/LevelPips.tsx`), "Gekauft!"-Plakette und Münz-Sound beim Kauf, "Dir fehlen noch n Münzen", voll ausgebaut grün hinterlegt. Kosmetik-Kauf mit Münz-Sound.
+- Album und Samenwahl (`album/StrainCard.tsx`): Seltenheit als farbige Plakette; gesperrte Sorten als dunkle Rätselkarte mit "?" und Fortschrittsbalken bis zur Freischaltung.
+
+| Kiste | Sterne | Ergebnis | Samenwahl | Shop nach Kauf | Album |
+| --- | --- | --- | --- | --- | --- |
+| ![](web3/05-ernte-kiste.png) | ![](web3/06-ernte-sterne.png) | ![](web3/07-ernte-ergebnis.png) | ![](web3/08-samenwahl.png) | ![](web3/09-shop-gekauft.png) | ![](web3/10-album.png) |
+
 ## Offen
 
 - Phasenwechsel und Tageskiste inszenieren: brauchen Änderungen in `src/components/room/` (WEB-1). Rückfrage beim CvD läuft.
-- Ernte-Feier, Shop und Album, Toasts und Münz-Flug: folgende PRs.
+- Toasts, Feier beim Tagesziel und Phasenwechsel: hängen an der Rückfrage zu `room/`.
 
 ## Fehlende Assets
 
@@ -58,6 +70,7 @@ Vorher:
 2. Privates Fenster am Handy: Altersfrage mit Budi-Kopf, "Ja", Budi sagt "Hallo, ich bin Budi!", "Einpflanzen" tippen. Unter 30 Sekunden.
 3. Durch das Tutorial tippen: Erst danach kommt "Psst, Budi weiß was".
 4. Tabs wechseln: kurzes Überblenden statt hartem Schnitt.
+5. Debug-Menü: +30 Tage zweimal, "Licht auf 12/12", +30 Tage dreimal, "Ernten", +30 Tage zweimal. Dann Ernte > Einsammeln > Kiste antippen: Sterne einzeln, Münzen zählen hoch. Danach im Shop etwas kaufen: Münzzähler läuft runter und hüpft.
 
 ## Entscheidungen
 
