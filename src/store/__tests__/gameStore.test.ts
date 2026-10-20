@@ -13,6 +13,14 @@ describe('gameStore', () => {
     expect(s.plant).toBeNull();
     expect(s.coins).toBe(0);
     expect(s.turbo).toBe(false);
+    expect(s.harvestsTotal).toBe(0);
+  });
+
+  it('zählt Ernten in der Statistik', () => {
+    const s = useGameStore.getState();
+    s.recordHarvest();
+    s.recordHarvest();
+    expect(useGameStore.getState().harvestsTotal).toBe(2);
   });
 
   it('pflanzt einen Samen im normalen Tempo', () => {
