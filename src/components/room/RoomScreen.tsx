@@ -8,6 +8,7 @@ import { CoinDisplay } from './CoinDisplay';
 import { Lamp } from './Lamp';
 import { NeedBars } from './NeedBars';
 import { PhaseHeader } from './PhaseHeader';
+import { PhaseChangePopup } from './phase/PhaseChangePopup';
 import { RoomBackground } from './RoomBackground';
 
 // Hauptraum: nur Komposition der Slots. Besitzer je Welle siehe docs/AUFTRAEGE.md
@@ -28,6 +29,7 @@ export function RoomScreen() {
       <ActionTray />
       <View className="h-3" />
       <BottomNav />
+      <PhaseChangePopup />
     </View>
   );
 }
