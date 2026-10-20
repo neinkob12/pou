@@ -7,6 +7,7 @@ import { BudiStage } from './BudiStage';
 import { CareStageProvider } from './care/CareStage';
 import { useMinigameMoodBonus } from './care/useMinigameMoodBonus';
 import { CoinDisplay } from './CoinDisplay';
+import { HealthWatch } from './health/useHealthCheck';
 import { Lamp } from './Lamp';
 import { NeedBars } from './NeedBars';
 import { PhaseHeader } from './PhaseHeader';
@@ -29,6 +30,7 @@ export function RoomScreen() {
         </SafeAreaView>
         <Lamp />
         <BudiStage />
+        <HealthWatch />
         <ActionTray />
         <View className="h-3" />
         <BottomNav />

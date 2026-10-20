@@ -89,6 +89,12 @@ export const ui: Partial<Record<UiAssetId, ImageSourcePropType>> = {};
 export type CareAssetId = 'u3_watering_can' | 'u4_fertilizer_grow' | 'u4_fertilizer_bloom';
 export const care: Partial<Record<CareAssetId, ImageSourcePropType>> = {};
 
+// --- Gesundheit: Schädlinge und Schimmel auf Budi (P21) ---
+// Schlüssel = ID aus docs/ASSETS.md (U17). Fehlt die Datei, zeigt Budi einen Platzhalter.
+// Datei einhängen: z. B. `u17_spider_mite: require('../../assets/images/u17_spider_mite.png'),`
+export type HealthAssetId = 'u17_spider_mite' | 'u17_fungus_gnat' | 'u17_mold';
+export const health: Partial<Record<HealthAssetId, ImageSourcePropType>> = {};
+
 // --- Minispiele: Sprites und Hintergründe (P08, P12 bis P14, P22) ---
 export const minigames: AssetMap = {};
 

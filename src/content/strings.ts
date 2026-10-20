@@ -82,6 +82,28 @@ export const care = {
   },
 };
 
+// Krankheiten im Raum: Schädlinge, Schimmel, Koma (P21).
+export const health = {
+  pests: {
+    spiderMite: 'Spinnmilbe',
+    fungusGnat: 'Trauermücke',
+  },
+  pestPlaceholder: {
+    spiderMite: 'U17',
+    fungusGnat: 'U17',
+  },
+  pestLabel: (name: string) => `${name} wegtippen`,
+  mold: 'Schimmel',
+  moldPlaceholder: 'U17',
+  moldLabel: (coins: number) => `Schimmel behandeln, ${coins} Münzen`,
+  moldTooPoor: 'Zu wenig Münzen gegen den Schimmel',
+  comaTitle: 'Budi liegt im Koma',
+  comaText: 'Zu lange ohne Pflege. Hol Budi zurück!',
+  revive: (coins: number) => `Wiederbeleben · ${coins} Münzen`,
+  reviveTooPoor: 'Zu wenig Münzen',
+  reviveAd: 'Mit Video wiederbeleben (bald)',
+};
+
 export const modal = {
   close: 'Schließen',
 };
