@@ -49,6 +49,39 @@ export const room = {
   coinsLabel: (coins: number) => `${coins} Münzen`,
 };
 
+// Pflege-Gesten und Balken im Raum (P10).
+export const care = {
+  tools: {
+    water: 'Gießkanne (U3)',
+    fertilizeGrow: 'Wachstumsdünger (U4)',
+    fertilizeBloom: 'Blütendünger (U4)',
+  },
+  toolPlaceholder: {
+    water: 'U3',
+    fertilizeGrow: 'U4',
+    fertilizeBloom: 'U4',
+  },
+  toolShort: {
+    water: 'Wasser',
+    fertilizeGrow: 'Wachstum',
+    fertilizeBloom: 'Blüte',
+  },
+  dragHint: 'Zu Budi ziehen',
+  hint: 'Zieh Gießkanne oder Dünger zu Budi. Über Budi wischen zum Streicheln.',
+  hintNoPlant: 'Pflanze zuerst einen Samen.',
+  hintComa: 'Budi liegt im Koma. Pflege wirkt gerade nicht.',
+  hintRest: 'Budi braucht jetzt keine Pflege mehr.',
+  petLabel: 'Budi streicheln',
+  conditions: {
+    ok: 'Budi geht es gut',
+    thirsty: 'Budi hat Durst',
+    hungry: 'Budi hat Hunger',
+    stressed: 'Budi ist gestresst',
+    sick: 'Budi ist krank',
+    coma: 'Budi liegt im Koma',
+  },
+};
+
 export const modal = {
   close: 'Schließen',
 };
