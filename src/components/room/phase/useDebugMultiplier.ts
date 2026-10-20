@@ -1,6 +1,7 @@
-import { DEBUG_SPEED_MULTIPLIER } from '../../../game/config';
+import { useGameStore } from '../../../store/gameStore';
+import { selectDebugMultiplier } from '../../../store/slices/debug';
 
-/** Zeitraffer aus dem Debug-Menü (P09). Weiche, bis der Debug-Slice auf main ist. */
+/** Zeitraffer aus dem Debug-Menü (P09). Im Release-Build immer 1. */
 export function useDebugMultiplier(): number {
-  return DEBUG_SPEED_MULTIPLIER;
+  return useGameStore(selectDebugMultiplier);
 }

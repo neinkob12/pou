@@ -323,13 +323,52 @@ export const LIGHT_ON_AT_HOUR = 6;
 // Level und Freischaltungen (Auftrag P16)
 // ---------------------------------------------------------------------------
 
-// Werte hier einfügen, z. B. XP_PER_HARVEST, XP_PER_STAR, LEVEL_THRESHOLDS.
+/** Erfahrung je abgeschlossener Ernte, egal wie gut. */
+export const XP_PER_HARVEST = 50;
+/** Zusätzliche Erfahrung je Qualitätsstern der Ernte (5 Sterne = +100). */
+export const XP_PER_STAR = 20;
+
+/**
+ * Erfahrung, ab der ein Level erreicht ist. Index 0 = Level 1. Eine 3-Sterne-Ernte bringt 110 XP,
+ * Level 5 (Auto-Anton) also nach rund 6 Ernten. Über dem letzten Eintrag gibt es kein höheres Level.
+ */
+export const LEVEL_XP_THRESHOLDS: readonly number[] = [0, 100, 250, 450, 700, 1000, 1400, 1900, 2500, 3200];
 
 // ---------------------------------------------------------------------------
 // Tagesziele und Benachrichtigungen (Aufträge P18, P19)
 // ---------------------------------------------------------------------------
 
-// Werte hier einfügen, z. B. NOTIFICATIONS_MAX_PER_DAY, QUIET_HOURS, DAILY_GOAL_POOL.
+// Benachrichtigungen (P18)
+
+/** Höchstens so viele Benachrichtigungen pro Kalendertag (Ortszeit). */
+export const NOTIFICATIONS_MAX_PER_DAY = 3;
+
+/** Ruhezeit in vollen Stunden Ortszeit: ab `startHour` bis `endHour` am nächsten Morgen keine Benachrichtigung. */
+export const NOTIFICATION_QUIET_HOURS = { startHour: 22, endHour: 9 } as const;
+
+/** So viele echte Stunden im Voraus wird geplant. Danach erst wieder beim nächsten Öffnen. */
+export const NOTIFICATION_HORIZON_REAL_HOURS = 72;
+
+/** Frühestens so viele Minuten nach dem Schließen der App kommt eine Benachrichtigung. */
+export const NOTIFICATION_MIN_DELAY_MINUTES = 30;
+
+/** Warnung vor dem Koma: so viele echte Stunden, bevor COMA_AFTER_REAL_HOURS erreicht ist. */
+export const NOTIFICATION_COMA_WARNING_HOURS_BEFORE = 4;
+
+/** Muss eine Warnung wegen der Ruhezeit vorgezogen werden: so viele Minuten vor Beginn der Ruhezeit. */
+export const NOTIFICATION_BEFORE_QUIET_MINUTES = 30;
+
+/** Mindestabstand zwischen zwei Benachrichtigungen. Liegen zwei näher beieinander, fällt die unwichtigere weg. */
+export const NOTIFICATION_MIN_GAP_MINUTES = 60;
+
+/** Rangfolge, wenn mehr als NOTIFICATIONS_MAX_PER_DAY an einem Tag anstehen (kleiner = wichtiger). */
+export const NOTIFICATION_PRIORITY = {
+  comaWarning: 0,
+  harvestReady: 1,
+  thirsty: 2,
+  hungry: 3,
+  phaseChanged: 4,
+} as const;
 
 // ---------------------------------------------------------------------------
 // Kosmetik und Saisonpass (Aufträge P25, P33)
