@@ -95,3 +95,33 @@ export const seedSelect = {
 export const onboarding = {
   title: 'Willkommen',
 };
+
+// Benachrichtigungen (P18): Texte in Budis Stimme und der Einstellungs-Abschnitt.
+export const notifications = {
+  channelName: 'Budi meldet sich',
+  thirsty: [
+    { title: 'Budi hat Durst', body: 'Meine Erde ist trockener als dein Humor. Gießkanne, bitte!' },
+    { title: 'Hallo? Wasser?', body: 'Ich bin eine Pflanze, kein Kaktus. Gieß mich mal.' },
+  ],
+  hungry: [
+    { title: 'Budi hat Hunger', body: 'Mein Magen knurrt. Also, meine Wurzeln. Dünger wäre nett.' },
+    { title: 'Nährstoff-Alarm', body: 'Ich wachse hier nicht von Luft und Liebe. Na gut, ein bisschen schon.' },
+  ],
+  comaWarning: [
+    { title: 'Budi kippt gleich um', body: 'Mir wird schummrig. Schau bitte schnell nach mir!' },
+    { title: 'Letzter Aufruf!', body: 'Noch ein paar Stunden ohne dich und ich mach den Abgang. Dramatisch, aber wahr.' },
+  ],
+  harvestReady: [
+    { title: 'Budi ist erntebereit', body: 'Ich bin fertig! Schnapp dir die Lupe und schau mich an.' },
+    { title: 'Ernte-Zeit!', body: 'Ich hab alles gegeben. Jetzt bist du dran.' },
+  ],
+  phaseChanged: (phaseLabel: string) => ({
+    title: `Budi ist jetzt: ${phaseLabel}`,
+    body: 'Ich bin gewachsen! Komm gucken, bevor ich angebe.',
+  }),
+  settingsTitle: 'Benachrichtigungen',
+  settingsToggle: 'Budi darf sich melden',
+  settingsHint: 'Höchstens 3 pro Tag, nie zwischen 22 und 9 Uhr.',
+  settingsDenied: 'Dein Handy blockiert Benachrichtigungen. Erlaube sie in den Systemeinstellungen.',
+  settingsOpenSystem: 'Systemeinstellungen öffnen',
+};
