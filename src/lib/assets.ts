@@ -121,12 +121,43 @@ export const minigames: AssetMap = {};
 // Schlüssel = ID aus docs/ASSETS.md plus Kurzname. Die Dateien in assets/sounds/ sind bis zur
 // Lieferung stille Platzhalter unter den endgültigen Namen: echten Sound einfach drüberkopieren.
 // Abgespielt wird nur über src/lib/audio.ts.
-export type SoundId = 's3_tap' | 's4_coins' | 's5_smash_hit' | 's6_jump' | 's11_music_minigames' | 's12_ouch';
+export type SoundId =
+  | 's1_water'
+  | 's2_feed'
+  | 's3_tap'
+  | 's4_coins'
+  | 's5_smash_hit'
+  | 's6_jump'
+  | 's7_phase_change'
+  | 's8_harvest'
+  | 's9_voice_happy_1'
+  | 's9_voice_happy_2'
+  | 's9_voice_happy_3'
+  | 's9_voice_question_1'
+  | 's9_voice_question_2'
+  | 's9_voice_grumpy_1'
+  | 's9_voice_grumpy_2'
+  | 's10_music_room'
+  | 's11_music_minigames'
+  | 's12_ouch';
 export const sounds: Record<SoundId, number> & SoundMap = {
+  s1_water: require('../../assets/sounds/s1_water.m4a'),
+  s2_feed: require('../../assets/sounds/s2_feed.m4a'),
   s3_tap: require('../../assets/sounds/s3_tap.m4a'),
   s4_coins: require('../../assets/sounds/s4_coins.m4a'),
   s5_smash_hit: require('../../assets/sounds/s5_smash_hit.m4a'),
   s6_jump: require('../../assets/sounds/s6_jump.m4a'),
+  s7_phase_change: require('../../assets/sounds/s7_phase_change.m4a'),
+  s8_harvest: require('../../assets/sounds/s8_harvest.m4a'),
+  // S9 Budi-Stimme: kurze Kauderwelsch-Laute je Stimmung (src/components/budi/voice.ts).
+  s9_voice_happy_1: require('../../assets/sounds/s9_voice_happy_1.m4a'),
+  s9_voice_happy_2: require('../../assets/sounds/s9_voice_happy_2.m4a'),
+  s9_voice_happy_3: require('../../assets/sounds/s9_voice_happy_3.m4a'),
+  s9_voice_question_1: require('../../assets/sounds/s9_voice_question_1.m4a'),
+  s9_voice_question_2: require('../../assets/sounds/s9_voice_question_2.m4a'),
+  s9_voice_grumpy_1: require('../../assets/sounds/s9_voice_grumpy_1.m4a'),
+  s9_voice_grumpy_2: require('../../assets/sounds/s9_voice_grumpy_2.m4a'),
+  s10_music_room: require('../../assets/sounds/s10_music_room.m4a'),
   s11_music_minigames: require('../../assets/sounds/s11_music_minigames.m4a'),
   s12_ouch: require('../../assets/sounds/s12_ouch.m4a'),
 };

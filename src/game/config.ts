@@ -609,6 +609,29 @@ export const DAILY_GOAL_CHEST_COINS = 60;
 // Werte hier einfügen, z. B. COSMETIC_ITEMS mit Münzpreis oder Produkt-ID.
 
 // ---------------------------------------------------------------------------
+// Audio (Auftrag P30)
+// ---------------------------------------------------------------------------
+
+/** Raum-Musik, Pflege-Effekte und Budi-Stimme (src/lib/audio.ts, src/components/budi/voice.ts). */
+export const AUDIO = {
+  /** Raum-Musik (S10), 0 bis 1. Leiser als die Minigame-Musik, sie läuft im Hintergrund lange mit. */
+  roomMusicVolume: 0.25,
+  /** Mehrere Phasenwechsel auf einmal (App war lange zu): die Fanfare nur einmal in diesem Abstand. */
+  phaseCueGapMs: 3000,
+  voice: {
+    /** Abspielrate = Tonhöhe. Schlechte Laune tief, gute Laune hoch, dazwischen linear. */
+    pitchMin: 0.85,
+    pitchMax: 1.25,
+    /** Zufällige Abweichung je Laut (±), damit Budi nicht wie ein Automat klingt. */
+    pitchJitter: 0.05,
+    /** Laune (0 bis 100) ab der Budi fröhlich plappert. */
+    happyFromMood: 70,
+    /** Laune unter der Budi grummelt. Dazwischen klingt er fragend. */
+    grumpyBelowMood: 30,
+  },
+} as const;
+
+// ---------------------------------------------------------------------------
 // Minigames
 // ---------------------------------------------------------------------------
 
