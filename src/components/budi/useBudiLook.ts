@@ -8,8 +8,8 @@ import { budi, type BudiVariantId } from '../../lib/assets';
 import { useGameStore } from '../../store/gameStore';
 import { selectDebugMultiplier } from '../../store/slices/debug';
 import type { CareReaction } from '../room/care/CareStage';
-import { useNow } from '../../hooks/useNow';
 import { getLightState, isAutoflower } from '../room/phase/lightCycle';
+import { usePlantClock } from '../room/phase/usePlantClock';
 import { computeBudiLook, isRipe, type BudiLook, type BudiReaction } from './budiLook';
 
 /** So lange zeigt Budi nach einer Pflege das Reaktionsgesicht. */
@@ -48,7 +48,8 @@ export function useBudiLook(
 ): BudiLook & { ripe: boolean } {
   const plant = useGameStore((s) => s.plant);
   const debugMultiplier = useGameStore(selectDebugMultiplier);
-  const now = useNow();
+  // Gleicher Takt wie Lampe und Zimmer, damit Budi mit dem Licht aufwacht (auch im Zeitraffer).
+  const now = usePlantClock(debugMultiplier);
   const fresh = useFreshReaction(reaction);
   const hoverFlag = useHoveringFlag(hovering);
 
