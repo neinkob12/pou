@@ -1,6 +1,8 @@
 # PotPou: 30 Sessions bis zum App-Store-Launch
 
-So benutzt du diese Datei:
+**Büro-Betrieb:** Wenn mehrere Sessions parallel arbeiten, gilt die Reihenfolge aus `docs/AUFTRAEGE.md`, nicht die hier. Die Prompts unten bleiben die fachliche Vorlage; jeder Auftrag in `AUFTRAEGE.md` nennt, welche Session er umsetzt und welche Teile davon.
+
+So benutzt du diese Datei allein (ohne Büro):
 
 - Eine Session = ein Teilziel, ca. 1 bis 3 Stunden. Starte jede Session in Claude Code frisch (`/clear`), damit der Kontext sauber bleibt.
 - Kopiere den Prompt-Block der Session als erste Nachricht.
