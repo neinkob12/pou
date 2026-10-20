@@ -3,10 +3,12 @@ import { useState, type ReactNode } from 'react';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { CountdownOverlay } from './CountdownOverlay';
+import { MINIGAME_FEEL } from '../../../game/config';
+import { CountdownOverlay, GoFlash } from './CountdownOverlay';
 import { ExtraLifeOverlay } from './ExtraLifeOverlay';
 import { GameOverOverlay } from './GameOverOverlay';
 import { PauseOverlay } from './PauseOverlay';
+import { useKeyDown } from './input/useKeyboard';
 import { ScoreHud } from './ScoreHud';
 import { useMinigameSession, type MinigameSession, type MinigameSessionOptions } from './useMinigameSession';
 
@@ -22,23 +24,36 @@ function Round({ title, children, onPlayAgain, ...options }: MinigameShellProps 
   const { phase, result } = session;
   const exit = () => (router.canGoBack() ? router.back() : router.replace('/minigames'));
 
+  // Am Rechner: Esc oder P pausiert und setzt fort, Enter startet nach dem Ende neu.
+  useKeyDown((key) => {
+    if (key === 'Escape' || key === 'p' || key === 'P') {
+      if (phase === 'paused') session.resume();
+      else if (phase === 'playing' || phase === 'countdown') session.pause();
+    } else if (key === 'Enter' && result) {
+      onPlayAgain();
+    }
+  });
+
   return (
     <SafeAreaView className="flex-1 bg-cream" edges={['top', 'bottom']}>
-      <ScoreHud
-        title={title}
-        score={session.score}
-        secondsLeft={session.secondsLeft}
-        canPause={phase === 'playing' || phase === 'countdown'}
-        onPause={session.pause}
-      />
-      <View className="flex-1">
-        {children(session)}
-        {phase === 'countdown' && <CountdownOverlay value={session.countdown} />}
-        {phase === 'paused' && <PauseOverlay onResume={session.resume} onQuit={session.quit} />}
-        {session.extraLifeOffered && (
-          <ExtraLifeOverlay onAccept={session.acceptExtraLife} onDecline={session.declineExtraLife} />
-        )}
-        {result && <GameOverOverlay result={result} onPlayAgain={onPlayAgain} onExit={exit} />}
+      <View className="w-full flex-1 self-center" style={{ maxWidth: MINIGAME_FEEL.playfieldMaxWidth }}>
+        <ScoreHud
+          title={title}
+          score={session.score}
+          secondsLeft={session.secondsLeft}
+          canPause={phase === 'playing' || phase === 'countdown'}
+          onPause={session.pause}
+        />
+        <View className="flex-1">
+          {children(session)}
+          {phase === 'countdown' && <CountdownOverlay value={session.countdown} />}
+          <GoFlash phase={phase} />
+          {phase === 'paused' && <PauseOverlay onResume={session.resume} onQuit={session.quit} />}
+          {session.extraLifeOffered && (
+            <ExtraLifeOverlay onAccept={session.acceptExtraLife} onDecline={session.declineExtraLife} />
+          )}
+          {result && <GameOverOverlay result={result} onPlayAgain={onPlayAgain} onExit={exit} />}
+        </View>
       </View>
     </SafeAreaView>
   );

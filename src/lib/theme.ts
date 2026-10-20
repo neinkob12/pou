@@ -50,3 +50,19 @@ export const radii = {
 } as const;
 
 export const theme = { colors, fonts, fontSizes, spacing, radii } as const;
+
+// Minigame-Farben (Auftrag 40, WEB-2): hellere und dunklere Töne der Palette für Hintergründe,
+// Figuren und Effekte. Wasser bekommt ein eigenes Blau, die Palette hat keins.
+export const gameColors = {
+  creamDeep: '#FBE3BC',
+  lampLight: '#FFF1BF',
+  lavenderLight: '#DCCFF7',
+  coralLight: '#FFC4CC',
+  leafLight: '#A9DE9C',
+  leafVein: '#5DA455',
+  soil: '#7A4A30',
+  water: '#5DB7E8',
+  waterDark: '#2F7FB8',
+  sky: '#DDF0F8',
+  salt: '#F6F6F2',
+} as const;

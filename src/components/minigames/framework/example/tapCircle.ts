@@ -47,7 +47,21 @@ export function isHit(circle: TapCircle, px: number, py: number, slop: number = 
 }
 
 /** Braucht das Feld einen neuen Kreis (keiner da oder zu lange stehen geblieben)? */
-export function needsRespawn(circle: TapCircle, elapsedMs: number, lifetimeMs: number = TAP_CIRCLE.lifetimeMs): boolean {
+export function needsRespawn(
+  circle: TapCircle,
+  elapsedMs: number,
+  lifetimeMs: number = TAP_CIRCLE.lifetimeMs,
+): boolean {
   'worklet';
   return circle.r <= 0 || elapsedMs - circle.spawnedAtMs >= lifetimeMs;
+}
+
+/**
+ * Wie lange ein Kreis stehen bleibt, der zur Spielzeit `spawnedAtMs` erscheint: wird über die Runde
+ * kürzer (Auftrag 40), damit das Spiel zum Ende hin anzieht.
+ */
+export function lifetimeAt(spawnedAtMs: number, cfg: typeof TAP_CIRCLE = TAP_CIRCLE): number {
+  'worklet';
+  const t = Math.min(1, Math.max(0, spawnedAtMs / (cfg.durationSeconds * 1000)));
+  return cfg.lifetimeMs + (cfg.lifetimeEndMs - cfg.lifetimeMs) * t;
 }
