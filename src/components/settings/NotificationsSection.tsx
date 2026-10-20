@@ -14,6 +14,7 @@ import { storage } from '../../lib/storage';
 import { colors } from '../../lib/theme';
 import { Button } from '../ui/Button';
 import { SettingsSection } from './SettingsSection';
+import { clock } from '../../lib/clock';
 
 /** Schalter für Budis Benachrichtigungen (P18). Geplant wird beim Schließen der App. */
 export function NotificationsSection() {
@@ -28,7 +29,7 @@ export function NotificationsSection() {
   const toggle = (value: boolean) => {
     setStored(value);
     if (!value) {
-      cancelPendingNotifications(Date.now()).catch(() => undefined);
+      cancelPendingNotifications(clock.now()).catch(() => undefined);
       return;
     }
     // Wer selbst einschaltet, bevor Budi gepflegt wurde, darf sofort gefragt werden.

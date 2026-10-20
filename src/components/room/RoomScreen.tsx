@@ -1,6 +1,8 @@
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { FactUnlockPopup } from '../facts/FactUnlockPopup';
+import { HarvestEntry } from '../harvest/HarvestEntry';
 import { ActionTray } from './ActionTray';
 import { BottomNav } from './BottomNav';
 import { BudiStage } from './BudiStage';
@@ -14,6 +16,7 @@ import { NeedBars } from './NeedBars';
 import { PhaseHeader } from './PhaseHeader';
 import { PhaseChangePopup } from './phase/PhaseChangePopup';
 import { RoomBackground } from './RoomBackground';
+import { RoomUpgrades } from './RoomUpgrades';
 
 // Hauptraum: nur Komposition der Slots. Besitzer je Welle siehe docs/AUFTRAEGE.md
 // (P03, dann P10, dann P31). Andere Aufträge hängen ihre Komponente mit einer Zeile ein.
@@ -30,13 +33,16 @@ export function RoomScreen() {
           </View>
           <PhaseHeader />
           <DailyGoal />
+          <HarvestEntry />
         </SafeAreaView>
         <Lamp />
+        <RoomUpgrades />
         <BudiStage />
         <HealthWatch />
         <ActionTray />
         <View className="h-3" />
         <BottomNav />
+        <FactUnlockPopup />
         <PhaseChangePopup />
       </View>
     </CareStageProvider>

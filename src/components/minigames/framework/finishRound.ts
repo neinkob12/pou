@@ -4,6 +4,7 @@
 import { gameEvents } from '../../../game/events';
 import { useGameStore } from '../../../store/gameStore';
 import { coinsForScore } from './session';
+import { clock } from '../../../lib/clock';
 
 export interface RoundResult {
   gameId: string;
@@ -13,7 +14,7 @@ export interface RoundResult {
   isNewHighscore: boolean;
 }
 
-export function finishRound(gameId: string, score: number, nowMs: number = Date.now()): RoundResult {
+export function finishRound(gameId: string, score: number, nowMs: number = clock.now()): RoundResult {
   const store = useGameStore.getState();
   const coins = coinsForScore(score);
   if (coins > 0) store.addCoins(coins);

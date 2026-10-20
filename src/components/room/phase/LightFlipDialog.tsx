@@ -5,6 +5,7 @@ import { flipLight } from '../../../game/timeEngine';
 import { useGameStore } from '../../../store/gameStore';
 import { Button } from '../../ui/Button';
 import { Modal } from '../../ui/Modal';
+import { clock } from '../../../lib/clock';
 
 interface LightFlipDialogProps {
   visible: boolean;
@@ -17,7 +18,7 @@ export function LightFlipDialog({ visible, debugMultiplier, onClose }: LightFlip
   const confirm = () => {
     const { plant, setPlant } = useGameStore.getState();
     // flipLight prüft canFlipLight selbst und gibt sonst die Pflanze unverändert zurück.
-    if (plant) setPlant(flipLight(plant, Date.now(), debugMultiplier));
+    if (plant) setPlant(flipLight(plant, clock.now(), debugMultiplier));
     onClose();
   };
   return (

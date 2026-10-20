@@ -5,9 +5,11 @@
 import type { HealthCheckOptions, HealthState, Pest } from '../../../game/health';
 import { neglectFromNeeds } from '../../../game/health';
 import { computeNeeds, NO_MODIFIERS, type NeedsState } from '../../../game/needs';
+import type { UpgradeEffects } from '../../../game/shop';
 import { getPlantStatus, type PlantRecord } from '../../../game/timeEngine';
 import type { GameState } from '../../../store/slices';
 import { selectDebugMultiplier } from '../../../store/slices/debug';
+import { selectUpgradeEffects } from '../../../store/slices/shop';
 
 /**
  * Hook-Punkt für P29: Sobald Rewarded Ads da sind, liefert P29 hier `true` (Anzeige geladen,
@@ -17,17 +19,23 @@ export function isRewardedReviveReady(): boolean {
   return false;
 }
 
-/** Optionen für runHealthChecks: Vernachlässigung je Fenster aus den Balken (P04). */
+/**
+ * Optionen für runHealthChecks: Vernachlässigung je Fenster aus den Balken (P04),
+ * Nützlings-Kit und Entfeuchter aus den Shop-Upgrades (P15).
+ */
 export function healthCheckOptions(
   plant: PlantRecord,
   needs: NeedsState,
   debugMultiplier: number,
+  upgrades?: UpgradeEffects,
 ): HealthCheckOptions {
   return {
     neglect: (atMs) => {
       const { phase } = getPlantStatus(plant, atMs, debugMultiplier);
-      return neglectFromNeeds(computeNeeds(needs, atMs, NO_MODIFIERS, phase));
+      return neglectFromNeeds(computeNeeds(needs, atMs, upgrades?.needModifiers ?? NO_MODIFIERS, phase));
     },
+    pestChanceMultiplier: upgrades?.pestChanceMultiplier,
+    hasDehumidifier: upgrades?.hasDehumidifier,
     debugMultiplier,
   };
 }
@@ -48,7 +56,11 @@ export function syncHealth(state: GameState, nowMs: number): void {
     state.resetHealth(Math.max(nowMs, plant.plantedAtMs));
     return;
   }
-  state.checkHealth(plant, nowMs, healthCheckOptions(plant, state.needs, selectDebugMultiplier(state)));
+  state.checkHealth(
+    plant,
+    nowMs,
+    healthCheckOptions(plant, state.needs, selectDebugMultiplier(state), selectUpgradeEffects(state)),
+  );
 }
 
 /** Wiederbeleben gegen Münzen: erst bezahlen (P05), dann die Balken auffüllen (P04). */
