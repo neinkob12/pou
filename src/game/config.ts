@@ -53,6 +53,42 @@ export const BASE_PHASES = {
 export const READY_GRACE_DAYS = 7;
 
 // ---------------------------------------------------------------------------
+// Minigames: Schädlings-Smash (Auftrag P12)
+// ---------------------------------------------------------------------------
+
+/** Whack-a-Mole auf dem Blatt. Zeiten in Spiel-Millisekunden, Tempo steigt linear bis Rundenende. */
+export const PEST_SMASH = {
+  durationSeconds: 45,
+  /** Löcher auf dem Blatt: Spalten mal Reihen. */
+  gridCols: 3,
+  gridRows: 4,
+  /** Abstand zwischen zwei Tieren am Anfang und am Ende der Runde. */
+  spawnIntervalStartMs: 900,
+  spawnIntervalEndMs: 380,
+  /** So lange bleibt ein Tier sichtbar, am Anfang und am Ende der Runde. */
+  lifetimeStartMs: 1500,
+  lifetimeEndMs: 700,
+  /** Anteil Marienkäfer unter allen Tieren. Rest teilen sich Spinnmilbe und Trauermücke. */
+  ladybugChance: 0.2,
+  /** Anteil Spinnmilben unter den Schädlingen. */
+  miteShareOfPests: 0.5,
+  pointsPerPest: 1,
+  /** Marienkäfer getroffen: so viele Punkte weg (nie unter 0) und Kombo vorbei. */
+  ladybugPenalty: 3,
+  /** Treffer innerhalb dieser Zeit nach dem letzten zählen zur Kombo. */
+  comboWindowMs: 900,
+  /** Alle so viele Treffer in Folge steigt der Multiplikator um 1. */
+  comboStep: 5,
+  maxComboMultiplier: 3,
+  /** Getroffenes Tier bleibt so lange als "getroffen" stehen. */
+  hitShowMs: 250,
+  /** Tipp zählt im Umkreis von so viel Prozent der Lochbreite um die Lochmitte. */
+  hitRadiusFactor: 0.45,
+  /** Ab so vielen Punkten gibt es den Schädlingsschutz (PEST_PROTECTION_REAL_HOURS) dazu. */
+  protectionMinScore: 10,
+} as const;
+
+// ---------------------------------------------------------------------------
 // Sorten
 // ---------------------------------------------------------------------------
 
@@ -341,6 +377,34 @@ export const SEED_FRAGMENTS_BY_STARS: Record<1 | 2 | 3 | 4 | 5, number> = {
   4: 2,
   5: 3,
 };
+
+/**
+ * Trichom-Lupe (P24): Erkennungsspiel in der Phase "ready". Der Spieler tippt die milchigen
+ * Köpfchen an. Mit jedem Pflanzentag in "ready" werden mehr Köpfchen bernsteinfarben;
+ * nach READY_GRACE_DAYS sinkt der Lupen-Wert je Tag um latePenaltyPerDay.
+ */
+export const TRICHOME_LUPE = {
+  heads: 12,
+  clearHeads: 2,
+  /** Bernstein-Anteil am Anfang von "ready" und Zuwachs je Pflanzentag, gedeckelt bei maxAmberShare. */
+  amberShareStart: 0.1,
+  amberSharePerDay: 0.04,
+  maxAmberShare: 0.6,
+  /** Abzug vom Lupen-Wert (0 bis 1) je falsch getipptem Köpfchen. */
+  wrongTapPenalty: 0.2,
+  latePenaltyPerDay: 0.1,
+  /** Lupen-Wert, wenn ohne Lupe geerntet wurde (z. B. über das Debug-Menü). */
+  skippedScore: 0.5,
+} as const;
+
+/**
+ * Trocknen (P24): Die Trockenzeit ist in Fenster geteilt, je Fenster zählt einmal Wenden.
+ * Trocknungswert = baseScore + (1 − baseScore) × gewendete Fenster / Fenster.
+ */
+export const DRYING_TURNS = {
+  windows: 3,
+  baseScore: 0.4,
+} as const;
 
 // ---------------------------------------------------------------------------
 // Licht und Phasen: Lichtplan, Tag/Nacht im Raum (Auftrag P11)

@@ -1,11 +1,12 @@
-import { BackButton } from '../../src/components/ui/BackButton';
-import { ScreenPlaceholder } from '../../src/components/ui/ScreenPlaceholder';
-import { minigames } from '../../src/content/strings';
+import { MinigameShell } from '../../src/components/minigames/framework/MinigameShell';
+import { SmashGame } from '../../src/components/minigames/smash/SmashGame';
+import { smashGame } from '../../src/content/strings';
+import { PEST_SMASH } from '../../src/game/config';
 
 export default function SmashRoute() {
   return (
-    <ScreenPlaceholder title={minigames.smash}>
-      <BackButton />
-    </ScreenPlaceholder>
+    <MinigameShell gameId="smash" title={smashGame.title} durationSeconds={PEST_SMASH.durationSeconds}>
+      {(session) => <SmashGame session={session} />}
+    </MinigameShell>
   );
 }

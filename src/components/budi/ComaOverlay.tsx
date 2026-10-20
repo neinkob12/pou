@@ -8,6 +8,7 @@ import { useGameStore } from '../../store/gameStore';
 import { playCareHaptic } from '../room/care/haptics';
 import { isRewardedReviveReady, reviveAfterRewardedAd, reviveWithCoins } from '../room/health/healthLogic';
 import { Button } from '../ui/Button';
+import { clock } from '../../lib/clock';
 
 /** Wie stark Budi im Koma ausgegraut wird. */
 const COMA_GREY_OPACITY = 0.55;
@@ -22,10 +23,10 @@ export function ComaOverlay({ condition }: { condition: Condition | null }) {
 
   const affordable = coins >= COMA_REVIVE_COINS;
   const adReady = isRewardedReviveReady();
-  const onRevive = () => playCareHaptic(reviveWithCoins(useGameStore.getState(), Date.now()) ? 'success' : 'error');
+  const onRevive = () => playCareHaptic(reviveWithCoins(useGameStore.getState(), clock.now()) ? 'success' : 'error');
   const onAd = () => {
     // Hook-Punkt P29: erst die Rewarded Ad zeigen, bei Belohnung dann wiederbeleben.
-    reviveAfterRewardedAd(useGameStore.getState(), Date.now());
+    reviveAfterRewardedAd(useGameStore.getState(), clock.now());
     playCareHaptic('success');
   };
 
