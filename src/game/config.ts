@@ -333,3 +333,12 @@ export const MINIGAME_REWARDS = {
   maxCoinsPerRound: 50,
   moodPerRound: 15,
 } as const;
+
+/** Fakten-Quiz (Auftrag P17). Punkte × coinsPerPoint ergibt die Münzen (P08). */
+export const FACT_QUIZ = {
+  questionsPerRound: 3,
+  pointsPerCorrect: 10,
+  /** Bei voller Punktzahl werden die Punkte und damit die Münzen mit diesem Faktor multipliziert. */
+  perfectMultiplier: 2,
+  durationSeconds: 45,
+} as const;
