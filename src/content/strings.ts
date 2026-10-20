@@ -153,6 +153,17 @@ export const tapGame = {
   circleLabel: 'Kreis',
 };
 
+// Budi Jump (Auftrag P14)
+export const jumpGame = {
+  hintTilt: 'Neig das Handy, damit Budi zur Seite hüpft.',
+  hintTap: 'Halt links oder rechts gedrückt, damit Budi zur Seite hüpft.',
+  tiltUnavailable: 'Kein Bewegungssensor gefunden. Budi hört aufs Tippen.',
+  controlsTitle: 'Steuerung bei Budi Jump',
+  controlTilt: 'Neigen',
+  controlTap: 'Tippen',
+  controlsHint: 'Neigen: Handy kippen. Tippen: linke oder rechte Bildschirmhälfte halten.',
+};
+
 export const shop = {
   title: 'Shop',
 };

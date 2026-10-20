@@ -225,6 +225,48 @@ export const PRICES_EUR = {
 } as const;
 
 // ---------------------------------------------------------------------------
+// Minigames: Budi Jump (Auftrag P14)
+// ---------------------------------------------------------------------------
+
+/**
+ * Budi Jump: Endlos-Springer nach oben. Welt-Einheiten: die Bildschirmbreite ist immer 100,
+ * damit das Spiel auf jedem Handy gleich schwer ist. y zählt nach oben.
+ */
+export const BUDI_JUMP = {
+  worldWidth: 100,
+  /** Fallbeschleunigung in Einheiten pro Sekunde². */
+  gravity: 260,
+  /** Absprung-Geschwindigkeit bei Landung auf einem Blatt. Sprunghöhe = v² / (2 · gravity) ≈ 59. */
+  jumpVelocity: 175,
+  /** Höchste Seitwärts-Geschwindigkeit (Einheiten pro Sekunde). */
+  maxSideSpeed: 95,
+  /** Wie schnell Budi die Ziel-Geschwindigkeit erreicht (Anteil pro Sekunde, höher = direkter). */
+  sideResponse: 12,
+  /** Fester Physik-Schritt in ms (120 Hz), unabhängig von der Bildrate. */
+  stepMs: 1000 / 120,
+  budiRadius: 6,
+  platformWidth: 20,
+  platformHeight: 3,
+  /** Abstand der Blätter: am Start und ab difficultyHeight. Max bleibt unter der Sprunghöhe. */
+  gapStart: { min: 14, max: 24 },
+  gapHard: { min: 28, max: 46 },
+  /** Ab dieser Höhe gelten die schweren Abstände voll. */
+  difficultyHeight: 3000,
+  /** Budi bleibt höchstens so weit (Anteil der Sichthöhe) über dem unteren Rand, dann zieht die Kamera mit. */
+  cameraFollow: 0.45,
+  /** So weit über dem sichtbaren oberen Rand werden schon Blätter erzeugt. */
+  spawnAhead: 40,
+  /** Höhe in Einheiten pro Punkt. */
+  heightPerPoint: 10,
+  /** Neigung in g, ab der Budi volle Geschwindigkeit hat. */
+  tiltFullAt: 0.35,
+  /** Neigungen darunter zählen nicht (Zittern der Hand). */
+  tiltDeadZone: 0.04,
+  /** Takt des Beschleunigungssensors in ms. */
+  sensorIntervalMs: 16,
+} as const;
+
+// ---------------------------------------------------------------------------
 // Gesundheit: Schädlinge, Schimmel, Koma (Auftrag P05, UI P21)
 // ---------------------------------------------------------------------------
 
