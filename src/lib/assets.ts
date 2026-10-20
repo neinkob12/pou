@@ -29,6 +29,11 @@ export type UiAssetId =
   | 'u12_settings';
 export const ui: Partial<Record<UiAssetId, ImageSourcePropType>> = {};
 
+// --- Pflege: Gießkanne, Dünger (P10) ---
+// Schlüssel = ID aus docs/ASSETS.md. Fehlt die Datei, zeigt das Werkzeug einen Platzhalter.
+export type CareAssetId = 'u3_watering_can' | 'u4_fertilizer_grow' | 'u4_fertilizer_bloom';
+export const care: Partial<Record<CareAssetId, ImageSourcePropType>> = {};
+
 // --- Minispiele: Sprites und Hintergründe (P08, P12 bis P14, P22) ---
 export const minigames: AssetMap = {};
 
