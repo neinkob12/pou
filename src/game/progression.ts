@@ -4,6 +4,7 @@
 // gespeichert. Gespeichert werden nur Ereignis-Freischaltungen (Kölsche Knospe).
 
 import {
+  DEBUG_SPEED_MULTIPLIER,
   LEVEL_XP_THRESHOLDS,
   QUALITY_STARS,
   SEED_FRAGMENTS_BY_STARS,
@@ -124,6 +125,10 @@ export function unlockByEvent(stats: ProgressStats, strainId: StrainId): Progres
 }
 
 /** Ein neuer Samen darf nur in einen leeren Topf oder nach dem Trocknen (sonst geht die Ernte verloren). */
-export function canPlantNewSeed(plant: PlantRecord | null, nowMs: number): boolean {
-  return plant === null || getPlantStatus(plant, nowMs).phase === 'done';
+export function canPlantNewSeed(
+  plant: PlantRecord | null,
+  nowMs: number,
+  debugMultiplier: number = DEBUG_SPEED_MULTIPLIER,
+): boolean {
+  return plant === null || getPlantStatus(plant, nowMs, debugMultiplier).phase === 'done';
 }

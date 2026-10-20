@@ -10,14 +10,16 @@ import { canPlantNewSeed, isStrainUnlocked, STRAIN_ORDER } from '../src/game/pro
 import { usePlantNewSeed } from '../src/hooks/usePlantNewSeed';
 import { useProgressStats } from '../src/hooks/useProgressStats';
 import { useGameStore } from '../src/store/gameStore';
+import { selectDebugMultiplier } from '../src/store/slices/debug';
 
 /** Samenauswahl nach der Ernte (P24 navigiert hierher) oder beim ersten Samen. */
 export default function SeedSelectRoute() {
   const stats = useProgressStats();
   const plant = useGameStore((s) => s.plant);
   const plantNewSeed = usePlantNewSeed();
+  const debugMultiplier = useGameStore(selectDebugMultiplier);
   const nowMs = useNow();
-  const potFree = canPlantNewSeed(plant, nowMs);
+  const potFree = canPlantNewSeed(plant, nowMs, debugMultiplier);
 
   return (
     <SafeAreaView className="flex-1 bg-cream" edges={['top']}>

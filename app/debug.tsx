@@ -1,11 +1,9 @@
-import { BackButton } from '../src/components/ui/BackButton';
-import { ScreenPlaceholder } from '../src/components/ui/ScreenPlaceholder';
-import { debug } from '../src/content/strings';
+import { Redirect } from 'expo-router';
+
+import { DebugMenu } from '../src/components/debug/DebugMenu';
 
 export default function DebugRoute() {
-  return (
-    <ScreenPlaceholder title={debug.title}>
-      <BackButton />
-    </ScreenPlaceholder>
-  );
+  // Im Release-Build führt auch ein direkter Link nur zurück ins Zimmer.
+  if (!__DEV__) return <Redirect href="/" />;
+  return <DebugMenu />;
 }
