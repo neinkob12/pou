@@ -7,14 +7,16 @@ interface BadgeProps {
   color?: ColorName;
   /** Heller Text auf dunkler Fläche. */
   light?: boolean;
+  /** Mittig statt links, etwa in zentrierten Karten. */
+  center?: boolean;
 }
 
 /** Kleine Plakette mit Kontur (WEB-5): Seltenheit, Stufe, "Neu", "Gekauft". */
-export function Badge({ label, color = 'lamp', light = false }: BadgeProps) {
+export function Badge({ label, color = 'lamp', light = false, center = false }: BadgeProps) {
   return (
     <View
       style={{
-        alignSelf: 'flex-start',
+        alignSelf: center ? 'center' : 'flex-start',
         backgroundColor: colors[color],
         borderRadius: radii.pill,
         borderWidth: surface.line,

@@ -85,7 +85,7 @@ export function HarvestSummary({ result }: { result: HarvestResult }) {
           <Animated.View entering={ZoomIn.springify().damping(10)}>
             <Text className="font-heading text-3xl text-ink">{harvestScreen.summaryTitle}</Text>
           </Animated.View>
-          <Badge label={STRAINS[result.strainId].name} color="plantLight" />
+          <Badge label={STRAINS[result.strainId].name} color="plantLight" center />
           <View
             style={{ height: GLOW_SIZE * 0.6, alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center' }}
           >
@@ -132,7 +132,7 @@ export function HarvestSummary({ result }: { result: HarvestResult }) {
         <Animated.View key={id} entering={ZoomIn.delay(afterCoins).springify().damping(9)} style={{ width: '100%' }}>
           <Card tone="rare">
             <View className="items-center gap-1">
-              <Badge label={screenUi.newBadge} color="lavender" light />
+              <Badge label={screenUi.newBadge} color="lavender" light center />
               <Text className="text-center font-heading text-lg text-ink">
                 {harvestScreen.summaryNewStrain(STRAINS[id].name)}
               </Text>
