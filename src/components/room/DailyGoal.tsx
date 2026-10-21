@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { dailyGoals } from '../../content/strings';
 import { canClaimChest, goalTemplate } from '../../game/dailyGoals';
 import { gameEvents } from '../../game/events';
 import { clock } from '../../lib/clock';
 import { useGameStore } from '../../store/gameStore';
-import { Bar } from '../ui/Bar';
-import { Placeholder } from '../ui/Placeholder';
 import { useNow } from '../../hooks/useNow';
+import { Bar } from '../ui/Bar';
+import { DailyChest } from './DailyChest';
 
 /** Tagesziel im Raum (P19): ein Ziel pro Tag mit Fortschritt und Belohnungskiste. */
 export function DailyGoal() {
@@ -43,9 +43,7 @@ export function DailyGoal() {
         <Bar value={goal.progress / target} color="lavender" accessibilityLabel={label} />
       </View>
       {claimable ? (
-        <Pressable accessibilityRole="button" accessibilityLabel={dailyGoals.openChest} onPress={openChest}>
-          <Placeholder label={dailyGoals.chestPlaceholder} color="lamp" width={56} height={48} />
-        </Pressable>
+        <DailyChest onPress={openChest} />
       ) : null}
     </View>
   );
