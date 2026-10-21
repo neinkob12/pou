@@ -5,6 +5,7 @@ import { Tabs } from 'expo-router/js-tabs';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppFrame } from '../src/components/frame/AppFrame';
 import { OnboardingGate } from '../src/components/onboarding/OnboardingGate';
@@ -21,10 +22,13 @@ SplashScreen.preventAutoHideAsync();
 // Gehört P01. Alle Routen sind hier registriert; Screens ohne Tab nutzen HIDDEN_TAB_OPTIONS.
 // Fehlt eine Route, den Leiter fragen, statt dieses Layout zu ändern.
 const hidden = HIDDEN_TAB_OPTIONS;
+/** Tab-Leiste ohne Sicherheitsabstand unten: Platz für Icon-Pille und Beschriftung (WEB-5). */
+const TAB_BAR_HEIGHT = 62;
 
 export default function RootLayout() {
   const fontsReady = useAppFonts();
   const skiaReady = useSkiaReady();
+  const insets = useSafeAreaInsets();
   useNotificationScheduler();
 
   useEffect(() => {
@@ -49,7 +53,9 @@ export default function RootLayout() {
               backgroundColor: colors.white,
               borderTopWidth: surface.line,
               borderTopColor: colors.plantDark,
+              height: TAB_BAR_HEIGHT + insets.bottom,
               paddingTop: 6,
+              paddingBottom: insets.bottom + 6,
             },
             tabBarLabelStyle: { fontFamily: fonts.bodyBold, fontSize: 11 },
             animation: 'fade',

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Pressable, Text } from 'react-native';
 
-import { artColors, colors, surface } from '../../lib/theme';
+import { artColors, colors, radii, spacing, surface } from '../../lib/theme';
 
 type Variant = 'primary' | 'secondary' | 'success';
 
@@ -17,10 +17,15 @@ interface ButtonProps {
 }
 
 const LOOK: Record<Variant, { bg: string; edge: string; text: string }> = {
-  primary: { bg: 'bg-coral', edge: artColors.curtainShade, text: 'text-white' },
-  secondary: { bg: 'bg-white', edge: colors.plantDark, text: 'text-ink' },
-  success: { bg: 'bg-plantLight', edge: colors.plantDark, text: 'text-ink' },
+  primary: { bg: colors.coral, edge: artColors.curtainShade, text: 'text-white' },
+  secondary: { bg: colors.white, edge: colors.plantDark, text: 'text-ink' },
+  success: { bg: colors.plantLight, edge: colors.plantDark, text: 'text-ink' },
 };
+
+const SIZES = {
+  md: { minHeight: 48, paddingHorizontal: spacing.md + 4, paddingVertical: spacing.sm + 4 },
+  sm: { minHeight: 40, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
+} as const;
 
 /**
  * Runder Standard-Button: Koralle für Hauptaktionen, Weiß für Nebenaktionen, Grün für "fertig".
@@ -28,7 +33,6 @@ const LOOK: Record<Variant, { bg: string; edge: string; text: string }> = {
  */
 export function Button({ label, onPress, disabled = false, variant = 'primary', leading, size = 'md' }: ButtonProps) {
   const look = LOOK[variant];
-  const height = size === 'sm' ? 'min-h-10 px-4 py-2' : 'min-h-12 px-5 py-3';
   return (
     <Pressable
       accessibilityRole="button"
@@ -36,9 +40,15 @@ export function Button({ label, onPress, disabled = false, variant = 'primary', 
       accessibilityLabel={label}
       disabled={disabled}
       onPress={onPress}
-      className={`flex-row items-center justify-center gap-2 rounded-full ${height} ${disabled ? '' : look.bg}`}
+      // Nur style, kein className: NativeWind verwirft im Web sonst die Style-Funktion (Kontur, Einsinken).
       style={({ pressed }) => ({
-        backgroundColor: disabled ? surface.cardMuted : undefined,
+        ...SIZES[size],
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: spacing.sm,
+        borderRadius: radii.pill,
+        backgroundColor: disabled ? surface.cardMuted : look.bg,
         borderWidth: surface.line,
         borderColor: disabled ? surface.cardEdgeMuted : colors.plantDark,
         borderBottomWidth: pressed || disabled ? surface.line : surface.edge,

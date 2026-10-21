@@ -2,11 +2,11 @@ import { View } from 'react-native';
 
 import { radii, surface } from '../../lib/theme';
 import { BudiAvatar } from '../feedback/BudiAvatar';
-import { GameIcon, type GameIconId } from './icons/GameIcon';
+import type { GameIconId } from './icons/GameIcon';
 
-const ICON_SIZE = 26;
-const PILL_WIDTH = 52;
-const PILL_HEIGHT = 32;
+const ICON_SIZE = 22;
+const PILL_WIDTH = 48;
+const PILL_HEIGHT = 28;
 
 type TabIconId = GameIconId | 'budi';
 
@@ -20,6 +20,10 @@ interface TabIconProps {
  */
 export function tabIcon(id: TabIconId) {
   function Icon({ focused }: TabIconProps) {
+    // Erst beim Rendern laden: app/_layout.tsx importiert diese Datei, bevor CanvasKit im Browser
+    // bereit ist, und ein Skia-Modul darf vorher nicht ausgewertet werden (src/lib/skiaWeb.web.ts).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- verzögertes Laden, siehe oben
+    const { GameIcon } = require('./icons/GameIcon') as typeof import('./icons/GameIcon');
     return (
       <View
         style={{
