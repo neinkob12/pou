@@ -22,3 +22,14 @@ export function frameLayout(windowWidth: number, windowHeight: number): FrameLay
   const height = Math.max(Math.min(windowHeight - 2 * FRAME_MARGIN, FRAME_MAX_HEIGHT), 0);
   return { framed: true, width: FRAME_WIDTH, height };
 }
+
+// WEB-5: Titel und Hinweise neben dem Rahmen, wenn links genug Platz ist.
+/** Ab dieser Fensterbreite steht der Titel links neben dem Rahmen, sonst klein oben links. */
+export const BRAND_BESIDE_FROM_WIDTH = 1000;
+/** Breite der Titelspalte neben dem Rahmen. */
+export const BRAND_WIDTH = 320;
+
+/** Steht der Titel neben dem Rahmen (true) oder klein in der Ecke (false)? */
+export function brandBeside(windowWidth: number): boolean {
+  return windowWidth >= BRAND_BESIDE_FROM_WIDTH;
+}

@@ -17,7 +17,7 @@ export function ControlsSection() {
 
   return (
     <SettingsSection title={texts.controlsTitle}>
-      <View className="flex-row gap-2" accessibilityRole="radiogroup">
+      <View className="flex-row gap-1 rounded-full bg-cream p-1" accessibilityRole="radiogroup">
         {OPTIONS.map(({ value, label }) => {
           const selected = control === value;
           return (
@@ -26,9 +26,9 @@ export function ControlsSection() {
               accessibilityRole="radio"
               accessibilityState={{ selected }}
               onPress={() => setControl(value)}
-              className={`flex-1 items-center rounded-full px-4 py-3 active:opacity-70 ${selected ? 'bg-coral' : 'bg-cream'}`}
+              className={`min-h-10 flex-1 items-center justify-center rounded-full px-4 active:opacity-70 ${selected ? 'bg-plantDark' : ''}`}
             >
-              <Text className={`font-body-bold text-base ${selected ? 'text-white' : 'text-ink'}`}>{label}</Text>
+              <Text className={`font-body-bold text-base ${selected ? 'text-white' : 'text-inkMuted'}`}>{label}</Text>
             </Pressable>
           );
         })}

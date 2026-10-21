@@ -1,5 +1,8 @@
 import { useState, type ComponentType } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
+
+import { colors, surface } from '../../lib/theme';
 
 export interface AlbumTab {
   key: string;
@@ -7,14 +10,20 @@ export interface AlbumTab {
   Component: ComponentType;
 }
 
-/** Einfache Umschaltung zwischen den Album-Tabs. */
+const FADE_MS = 180;
+
+/** Umschaltung zwischen zwei Tabs als Schalter mit Kontur (WEB-5); der Inhalt blendet über. */
 export function AlbumTabs({ tabs }: { tabs: AlbumTab[] }) {
   const [activeKey, setActiveKey] = useState(tabs[0]?.key);
   const active = tabs.find((t) => t.key === activeKey) ?? tabs[0];
 
   return (
     <View className="gap-4">
-      <View className="flex-row gap-2">
+      <View
+        accessibilityRole="tablist"
+        className="flex-row gap-1 rounded-full bg-white p-1"
+        style={{ borderWidth: surface.line, borderColor: colors.plantDark }}
+      >
         {tabs.map((tab) => {
           const selected = tab.key === active?.key;
           return (
@@ -23,16 +32,18 @@ export function AlbumTabs({ tabs }: { tabs: AlbumTab[] }) {
               accessibilityRole="tab"
               accessibilityState={{ selected }}
               onPress={() => setActiveKey(tab.key)}
-              className={`flex-1 items-center rounded-full py-2 ${selected ? 'bg-plantDark' : 'bg-white'}`}
+              className={`min-h-10 flex-1 items-center justify-center rounded-full ${selected ? 'bg-plantDark' : 'active:bg-cream'}`}
             >
-              <Text className={`font-body-bold text-base ${selected ? 'text-white' : 'text-ink'}`}>
-                {tab.label}
-              </Text>
+              <Text className={`font-body-bold text-base ${selected ? 'text-white' : 'text-inkMuted'}`}>{tab.label}</Text>
             </Pressable>
           );
         })}
       </View>
-      {active ? <active.Component /> : null}
+      {active ? (
+        <Animated.View key={active.key} entering={FadeIn.duration(FADE_MS)}>
+          <active.Component />
+        </Animated.View>
+      ) : null}
     </View>
   );
 }

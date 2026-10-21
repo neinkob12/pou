@@ -1,36 +1,55 @@
+import type { ReactNode } from 'react';
 import { Pressable, Text } from 'react-native';
 
-import { artColors, colors } from '../../lib/theme';
+import { artColors, colors, surface } from '../../lib/theme';
+
+type Variant = 'primary' | 'secondary' | 'success';
 
 interface ButtonProps {
   label: string;
   onPress?: () => void;
   disabled?: boolean;
-  variant?: 'primary' | 'secondary';
+  variant?: Variant;
+  /** Kleines Bild vor dem Text, etwa die Münze am Preis (WEB-5). */
+  leading?: ReactNode;
+  /** Kompakt für Karten: 40 statt 48 hoch. */
+  size?: 'md' | 'sm';
 }
 
-/** Kante unten: der Knopf wirkt gedrückt-bar (WEB-1). Beim Drücken sinkt er ein. */
-const EDGE = 4;
+const LOOK: Record<Variant, { bg: string; edge: string; text: string }> = {
+  primary: { bg: 'bg-coral', edge: artColors.curtainShade, text: 'text-white' },
+  secondary: { bg: 'bg-white', edge: colors.plantDark, text: 'text-ink' },
+  success: { bg: 'bg-plantLight', edge: colors.plantDark, text: 'text-ink' },
+};
 
-/** Runder Standard-Button: Koralle für Hauptaktionen, Weiß für Nebenaktionen. Mindestens 48 hoch. */
-export function Button({ label, onPress, disabled = false, variant = 'primary' }: ButtonProps) {
-  const primary = variant === 'primary';
+/**
+ * Runder Standard-Button: Koralle für Hauptaktionen, Weiß für Nebenaktionen, Grün für "fertig".
+ * Kontur und Kante unten, sinkt beim Drücken ein (WEB-1). Gesperrt wirkt er stumpf statt blass (WEB-5).
+ */
+export function Button({ label, onPress, disabled = false, variant = 'primary', leading, size = 'md' }: ButtonProps) {
+  const look = LOOK[variant];
+  const height = size === 'sm' ? 'min-h-10 px-4 py-2' : 'min-h-12 px-5 py-3';
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ disabled }}
+      accessibilityLabel={label}
       disabled={disabled}
       onPress={onPress}
-      className={`min-h-12 items-center justify-center rounded-full px-5 py-3 ${primary ? 'bg-coral' : 'bg-white'} ${disabled ? 'opacity-50' : ''}`}
+      className={`flex-row items-center justify-center gap-2 rounded-full ${height} ${disabled ? '' : look.bg}`}
       style={({ pressed }) => ({
-        borderWidth: 2,
-        borderColor: colors.plantDark,
-        borderBottomWidth: pressed ? 2 : EDGE,
-        borderBottomColor: primary ? artColors.curtainShade : colors.plantDark,
-        transform: [{ translateY: pressed ? EDGE - 2 : 0 }],
+        backgroundColor: disabled ? surface.cardMuted : undefined,
+        borderWidth: surface.line,
+        borderColor: disabled ? surface.cardEdgeMuted : colors.plantDark,
+        borderBottomWidth: pressed || disabled ? surface.line : surface.edge,
+        borderBottomColor: disabled ? surface.cardEdgeMuted : look.edge,
+        transform: [{ translateY: pressed && !disabled ? surface.edge - surface.line : 0 }],
       })}
     >
-      <Text className={`font-body-bold text-base ${primary ? 'text-white' : 'text-ink'}`}>{label}</Text>
+      {leading}
+      <Text className={`font-body-bold ${size === 'sm' ? 'text-sm' : 'text-base'} ${disabled ? 'text-inkMuted' : look.text}`}>
+        {label}
+      </Text>
     </Pressable>
   );
 }

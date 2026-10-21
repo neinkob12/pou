@@ -8,13 +8,13 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { AppFrame } from '../src/components/frame/AppFrame';
 import { OnboardingGate } from '../src/components/onboarding/OnboardingGate';
-import { TabIcon } from '../src/components/ui/TabIcon';
+import { tabIcon } from '../src/components/ui/TabIcon';
 import { tabs } from '../src/content/strings';
 import { useAppFonts } from '../src/hooks/useAppFonts';
 import { useNotificationScheduler } from '../src/hooks/useNotificationScheduler';
 import { HIDDEN_TAB_OPTIONS } from '../src/lib/hiddenTab';
 import { useSkiaReady } from '../src/lib/skiaWeb';
-import { colors, fonts } from '../src/lib/theme';
+import { colors, fonts, surface } from '../src/lib/theme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -44,17 +44,22 @@ export default function RootLayout() {
             headerShown: false,
             tabBarActiveTintColor: colors.coral,
             tabBarInactiveTintColor: colors.inkMuted,
-            tabBarStyle: { backgroundColor: colors.white },
-            tabBarLabelStyle: { fontFamily: fonts.bodyBold },
-            tabBarIcon: TabIcon,
+            // Tab-Leiste im Stil der Zimmer-Navigation (WEB-5): Kontur oben, gezeichnete Icons.
+            tabBarStyle: {
+              backgroundColor: colors.white,
+              borderTopWidth: surface.line,
+              borderTopColor: colors.plantDark,
+              paddingTop: 6,
+            },
+            tabBarLabelStyle: { fontFamily: fonts.bodyBold, fontSize: 11 },
             animation: 'fade',
           }}
         >
-          <Tabs.Screen name="index" options={{ title: tabs.room }} />
-          <Tabs.Screen name="minigames" options={{ title: tabs.minigames }} />
-          <Tabs.Screen name="shop" options={{ title: tabs.shop }} />
-          <Tabs.Screen name="album" options={{ title: tabs.album }} />
-          <Tabs.Screen name="settings" options={{ title: tabs.settings }} />
+          <Tabs.Screen name="index" options={{ title: tabs.room, tabBarIcon: tabIcon('budi') }} />
+          <Tabs.Screen name="minigames" options={{ title: tabs.minigames, tabBarIcon: tabIcon('minigames') }} />
+          <Tabs.Screen name="shop" options={{ title: tabs.shop, tabBarIcon: tabIcon('shop') }} />
+          <Tabs.Screen name="album" options={{ title: tabs.album, tabBarIcon: tabIcon('album') }} />
+          <Tabs.Screen name="settings" options={{ title: tabs.settings, tabBarIcon: tabIcon('settings') }} />
           <Tabs.Screen name="debug" options={hidden} />
           <Tabs.Screen name="harvest" options={hidden} />
           <Tabs.Screen name="seed-select" options={hidden} />
