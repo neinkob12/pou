@@ -1,4 +1,7 @@
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
+
+import { colors, spacing, tones } from '../../lib/theme';
+import { GameText } from './GameText';
 
 interface SectionTitleProps {
   title: string;
@@ -6,12 +9,18 @@ interface SectionTitleProps {
   meta?: string;
 }
 
-/** Zwischenüberschrift innerhalb eines Screens (WEB-5). */
+/** Zwischenüberschrift innerhalb eines Screens in Spielschrift (ART-1). */
 export function SectionTitle({ title, meta }: SectionTitleProps) {
   return (
-    <View className="flex-row items-end justify-between gap-2 px-1 pt-1">
-      <Text className="font-heading text-xl text-ink">{title}</Text>
-      {meta ? <Text className="font-body-bold text-sm text-inkMuted">{meta}</Text> : null}
+    <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: spacing.sm, paddingHorizontal: spacing.xs, paddingTop: spacing.xs }}>
+      <GameText variant="heading" color={tones.cream.text}>
+        {title}
+      </GameText>
+      {meta ? (
+        <GameText variant="small" color={colors.inkMuted}>
+          {meta}
+        </GameText>
+      ) : null}
     </View>
   );
 }

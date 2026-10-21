@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { surface } from '../../lib/theme';
-import { BackButton } from './BackButton';
+import { ScreenTitle } from './ScreenTitle';
 
 interface ScreenProps {
   title: string;
@@ -29,20 +29,7 @@ export function Screen({ title, subtitle, back = false, right, children }: Scree
           gap: surface.gap,
         }}
       >
-        <View className="gap-1">
-          {back ? (
-            <View className="pb-1">
-              <BackButton />
-            </View>
-          ) : null}
-          <View className="min-h-11 flex-row items-center justify-between gap-3">
-            <Text accessibilityRole="header" className="flex-1 font-heading text-3xl text-ink">
-              {title}
-            </Text>
-            {right}
-          </View>
-          {subtitle ? <Text className="font-body text-base text-inkMuted">{subtitle}</Text> : null}
-        </View>
+        <ScreenTitle title={title} subtitle={subtitle} back={back} right={right} />
         {children}
       </ScrollView>
     </SafeAreaView>

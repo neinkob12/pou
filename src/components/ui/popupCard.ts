@@ -1,13 +1,14 @@
 import type { ViewStyle } from 'react-native';
 
-import { colors, surface } from '../../lib/theme';
+import { gameRadii, insets, outline, shadows } from '../../lib/theme';
 
-/** Kontur und Kante der Popup-Karten (Modal, Fakten-Popup), wie die Karten der Screens (WEB-5). */
+/** Kontur, Kante und Schatten der Popup-Karten (Modal, Fakten-Popup) im Spiel-Look (ART-1). */
 export const popupCardStyle: ViewStyle = {
-  borderWidth: surface.line,
-  borderBottomWidth: surface.edge,
-  borderColor: colors.plantDark,
-  boxShadow: '0 16px 40px rgba(0, 0, 0, 0.3)',
+  borderRadius: gameRadii.modal,
+  borderWidth: outline.thick,
+  borderBottomWidth: outline.thick + 4,
+  borderColor: outline.color,
+  boxShadow: `${shadows.pop}, ${insets.highlight}`,
 };
 
 /** Größte Breite einer Popup-Karte, entspricht max-w-md. */

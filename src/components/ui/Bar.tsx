@@ -1,18 +1,38 @@
+import { useEffect } from 'react';
 import { View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
-import { colors, radii, type ColorName } from '../../lib/theme';
+import { gameRadii, gloss, insets, outline, shadows, springs, tones, type ColorName, type ToneName } from '../../lib/theme';
+import { gradientStyle, toneGradient } from './game/gradient';
+import { clamp01, toneForColor } from './toneMap';
 
 interface BarProps {
   /** 0 bis 1, wird auf diesen Bereich begrenzt. */
   value: number;
-  color: ColorName;
+  /** Alte Palettenfarbe, wird auf einen Spiel-Farbton abgebildet. */
+  color?: ColorName;
+  /** Spiel-Farbton direkt, hat Vorrang vor color. */
+  tone?: ToneName;
   height?: number;
   accessibilityLabel?: string;
 }
 
-/** Fortschritts- oder Bedürfnisbalken. */
-export function Bar({ value, color, height = 12, accessibilityLabel }: BarProps) {
-  const clamped = Math.min(1, Math.max(0, value));
+/**
+ * Leiste im Spiel-Look (ART-1): dunkle Rinne mit Kontur, Füllung mit Verlauf und Glanzstreifen.
+ * Ändert sich der Wert, füllt sie sich mit Federung nach.
+ */
+export function Bar({ value, color = 'plantLight', tone, height = 16, accessibilityLabel }: BarProps) {
+  const clamped = clamp01(value);
+  const t = tones[tone ?? toneForColor(color)];
+  const fill = useSharedValue(clamped);
+
+  useEffect(() => {
+    fill.set(withSpring(clamped, springs.fill));
+  }, [clamped, fill]);
+
+  const fillStyle = useAnimatedStyle(() => ({ width: `${Math.max(0, Math.min(1, fill.value)) * 100}%` }));
+  const inner = Math.max(0, height - outline.regular * 2);
+
   return (
     <View
       accessibilityLabel={accessibilityLabel}
@@ -20,16 +40,33 @@ export function Bar({ value, color, height = 12, accessibilityLabel }: BarProps)
       accessibilityValue={{ min: 0, max: 100, now: Math.round(clamped * 100) }}
       style={{
         height,
-        borderRadius: radii.pill,
-        backgroundColor: colors.cream,
-        borderWidth: 1.5,
-        borderColor: colors.plantDark,
+        borderRadius: gameRadii.pill,
+        borderWidth: outline.thin,
+        borderColor: outline.color,
+        backgroundColor: insets.barTrack,
+        boxShadow: shadows.inset,
         overflow: 'hidden',
+        padding: 1,
       }}
     >
-      <View style={{ width: `${clamped * 100}%`, height: '100%', backgroundColor: colors[color], borderRadius: radii.pill }}>
-        <View style={{ marginTop: height * 0.15, marginHorizontal: height * 0.3, height: height * 0.25, borderRadius: radii.pill, backgroundColor: colors.white, opacity: 0.45 }} />
-      </View>
+      <Animated.View
+        style={[
+          { height: '100%', minWidth: clamped > 0 ? inner : 0, borderRadius: gameRadii.pill, overflow: 'hidden' },
+          gradientStyle(toneGradient(t), t.base),
+          fillStyle,
+        ]}
+      >
+        <View
+          style={{
+            marginTop: Math.max(1, inner * 0.14),
+            marginHorizontal: Math.max(3, inner * 0.35),
+            height: Math.max(2, inner * 0.24),
+            borderRadius: gameRadii.pill,
+            backgroundColor: gloss.color,
+            opacity: gloss.opacity,
+          }}
+        />
+      </Animated.View>
     </View>
   );
 }

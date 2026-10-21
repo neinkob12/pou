@@ -1,18 +1,11 @@
 import type { ReactNode } from 'react';
-import { Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Animated, Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { colors, radii, spacing, surface } from '../../lib/theme';
+import { cardTones, depth, gameRadii, insets, outline, shadows, spacing, tones } from '../../lib/theme';
+import { gradientStyle } from './game/gradient';
+import { usePressSpring } from './game/usePressSpring';
 
-export type CardTone = 'plain' | 'muted' | 'success' | 'rare' | 'highlight' | 'night';
-
-const TONES: Record<CardTone, { bg: string; border: string; edge: string; dashed?: boolean }> = {
-  plain: { bg: colors.white, border: colors.plantDark, edge: colors.plantDark },
-  muted: { bg: surface.cardMuted, border: surface.cardEdgeMuted, edge: surface.cardEdgeMuted, dashed: true },
-  success: { bg: surface.leafSoft, border: colors.plantDark, edge: colors.plantDark },
-  rare: { bg: surface.lavenderSoft, border: colors.plantDark, edge: colors.plantDark },
-  highlight: { bg: surface.lampSoft, border: colors.plantDark, edge: colors.plantDark },
-  night: { bg: colors.night, border: colors.ink, edge: colors.ink },
-};
+export type CardTone = keyof typeof cardTones;
 
 interface CardProps {
   children: ReactNode;
@@ -27,8 +20,8 @@ interface CardProps {
 }
 
 /**
- * Karte im PotPou-Stil (WEB-5): runde Ecken, dunkelgrüne Kontur und eine Kante unten wie ein
- * Sticker. Mit onPress sinkt sie beim Drücken ein wie ein Knopf. Grundlage aller Screens.
+ * Karte im Spiel-Look (ART-1): zarter Verlauf, dicke Kontur, dicke Unterkante wie ein Sticker,
+ * Lichtkante innen oben und weicher Schatten. Mit onPress federt sie beim Drücken wie ein Knopf.
  */
 export function Card({
   children,
@@ -40,44 +33,45 @@ export function Card({
   accessibilityLabel,
   accessibilityRole,
 }: CardProps) {
-  const t = TONES[tone];
-  const base: ViewStyle = {
-    backgroundColor: t.bg,
-    borderRadius: radii.lg,
-    borderWidth: surface.line,
-    borderStyle: t.dashed ? 'dashed' : 'solid',
-    borderColor: selected ? colors.coral : t.border,
-    borderBottomColor: selected ? colors.coral : t.edge,
+  const t = cardTones[tone];
+  const muted = tone === 'muted';
+  const border = selected ? tones.coral.edge : t.border;
+  const press = usePressSpring({ sink: depth.sm, quiet: false });
+  const body: ViewStyle = {
+    ...gradientStyle(`linear-gradient(180deg, ${t.top} 0%, ${t.bottom} 100%)`, t.bottom),
+    borderRadius: gameRadii.card,
+    borderWidth: selected ? outline.thick : outline.regular,
+    borderStyle: muted ? 'dashed' : 'solid',
+    borderColor: border,
+    borderBottomWidth: muted ? outline.regular : outline.regular + depth.sm,
+    boxShadow: muted ? undefined : insets.highlight,
     padding,
     gap: spacing.sm,
   };
+  const shell: ViewStyle = { borderRadius: gameRadii.card, boxShadow: muted ? undefined : shadows.card };
+
   if (!onPress) {
     return (
-      <View
-        accessibilityLabel={accessibilityLabel}
-        accessibilityRole={accessibilityRole}
-        style={[base, { borderBottomWidth: t.dashed ? surface.line : surface.edge }, style]}
-      >
-        {children}
+      <View style={[shell, style]}>
+        <View accessibilityLabel={accessibilityLabel} accessibilityRole={accessibilityRole} style={[body, { flexGrow: 1 }]}>
+          {children}
+        </View>
       </View>
     );
   }
   return (
-    <Pressable
-      accessibilityRole={accessibilityRole ?? 'button'}
-      accessibilityLabel={accessibilityLabel}
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      style={({ pressed }) => [
-        base,
-        {
-          borderBottomWidth: pressed ? surface.line : surface.edge,
-          transform: [{ translateY: pressed ? surface.edge - surface.line : 0 }],
-        },
-        style,
-      ]}
-    >
-      {children}
-    </Pressable>
+    <Animated.View style={[shell, style, press.outerStyle]}>
+      <Pressable
+        accessibilityRole={accessibilityRole ?? 'button'}
+        accessibilityLabel={accessibilityLabel}
+        accessibilityState={{ selected }}
+        onPress={onPress}
+        onPressIn={press.onPressIn}
+        onPressOut={press.onPressOut}
+        style={[body, { flexGrow: 1 }]}
+      >
+        {children}
+      </Pressable>
+    </Animated.View>
   );
 }

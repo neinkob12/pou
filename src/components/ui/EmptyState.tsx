@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -8,9 +8,11 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { colors } from '../../lib/theme';
 import { BudiAvatar } from '../feedback/BudiAvatar';
 import { Button } from './Button';
 import { Card } from './Card';
+import { GameText } from './GameText';
 
 const BOB_PX = 4;
 const BOB_MS = 1200;
@@ -25,10 +27,10 @@ interface EmptyStateProps {
 export function EmptyState({ title, text, action }: EmptyStateProps) {
   const y = useSharedValue(0);
   useEffect(() => {
-    y.value = withRepeat(
+    y.set(withRepeat(
       withSequence(withTiming(-BOB_PX, { duration: BOB_MS }), withTiming(0, { duration: BOB_MS })),
       -1,
-    );
+    ));
   }, [y]);
   const bob = useAnimatedStyle(() => ({ transform: [{ translateY: y.value }] }));
 
@@ -38,8 +40,12 @@ export function EmptyState({ title, text, action }: EmptyStateProps) {
         <Animated.View style={bob}>
           <BudiAvatar size={72} />
         </Animated.View>
-        <Text className="text-center font-heading text-2xl text-ink">{title}</Text>
-        <Text className="text-center font-body text-base text-inkMuted">{text}</Text>
+        <GameText variant="heading" align="center">
+          {title}
+        </GameText>
+        <GameText align="center" color={colors.inkMuted}>
+          {text}
+        </GameText>
         {action ? (
           <View className="w-full pt-1">
             <Button label={action.label} onPress={action.onPress} />

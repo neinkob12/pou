@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
-import { Pressable, View } from 'react-native';
-import Animated from 'react-native-reanimated';
+import { Animated, Pressable, View } from 'react-native';
 
 import { outline, shadows, spacing } from '../../lib/theme';
 import { BUTTON_SIZES, buttonTone, needsTextShadow, type ButtonSize, type ButtonVariant } from './buttonLook';

@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
-import { Pressable, View } from 'react-native';
-import Animated from 'react-native-reanimated';
+import { Animated, Pressable, View } from 'react-native';
 
 import { depth, outline, shadows, tones, type ToneName } from '../../lib/theme';
 import { GlossFill } from './game/GlossFill';

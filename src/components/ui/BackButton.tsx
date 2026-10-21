@@ -1,36 +1,23 @@
 import { useRouter } from 'expo-router';
-import { Pressable, Text } from 'react-native';
+import { View } from 'react-native';
 
 import { common, screenUi } from '../../content/strings';
-import { colors, radii, spacing, surface } from '../../lib/theme';
+import { tones } from '../../lib/theme';
+import { Button } from './Button';
+import { GameText } from './GameText';
 
-/** Zurück zum vorherigen Screen, sonst zum Zimmer. Kleine Pille mit Kontur wie die Knöpfe (WEB-5). */
+/** Zurück zum vorherigen Screen, sonst zum Zimmer. Kleiner 3D-Knopf in Creme (ART-1). */
 export function BackButton() {
   const router = useRouter();
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={common.back}
-      onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
-      hitSlop={8}
-      // Nur style, kein className: NativeWind verwirft im Web sonst die Style-Funktion.
-      style={({ pressed }) => ({
-        minHeight: 40,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: spacing.xs,
-        alignSelf: 'flex-start',
-        borderRadius: radii.pill,
-        backgroundColor: colors.white,
-        paddingHorizontal: spacing.md,
-        borderWidth: surface.line,
-        borderColor: colors.plantDark,
-        borderBottomWidth: pressed ? surface.line : surface.edge - 1,
-        transform: [{ translateY: pressed ? 1 : 0 }],
-      })}
-    >
-      <Text className="font-heading text-lg text-plantDark">{screenUi.backArrow}</Text>
-      <Text className="font-body-bold text-sm text-ink">{common.back}</Text>
-    </Pressable>
+    <View style={{ alignSelf: 'flex-start' }}>
+      <Button
+        size="sm"
+        variant="secondary"
+        label={common.back}
+        leading={<GameText variant="heading" color={tones.cream.text}>{screenUi.backArrow}</GameText>}
+        onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+      />
+    </View>
   );
 }
