@@ -23,7 +23,10 @@
     "web": {
       "favicon": "./assets/icon/favicon.png",
       "bundler": "metro",
-      "output": "single"
+      "output": "single",
+      "lang": "de",
+      "themeColor": "#FFF4E0",
+      "description": "PotPou: Pflege Budi vom Samen bis zur Ernte."
     },
     "plugins": [
       "expo-router",
