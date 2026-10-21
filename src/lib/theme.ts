@@ -128,3 +128,12 @@ export const gameColors = {
   sky: '#DDF0F8',
   salt: '#F6F6F2',
 } as const;
+
+// Sonder-Elemente der Minigames (Auftrag 45, WEB-7): Gold für Bonus-Figuren, Panzer der Milbe.
+export const funColors = {
+  gold: '#F5B82E',
+  goldDeep: '#B9800F',
+  goldLight: '#FFE7A3',
+  shell: '#8C6A5A',
+  shellLight: '#B89786',
+} as const;

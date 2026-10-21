@@ -2,7 +2,7 @@
 // UI-Thread. Die Physik läuft in festen Schritten (stepMs), damit Sprünge auf 60- und 120-Hz-Geräten gleich sind.
 // Zustand und Startwelt: jumpWorld.ts, Strecke (Blätter, Typen, Lichtpunkte): jumpLevel.ts.
 
-import { BUDI_JUMP } from '../../../game/config';
+import { BUDI_JUMP, MINIGAME_FUN } from '../../../game/config';
 import { fillPlatforms } from './jumpLevel';
 import type { JumpConfig, JumpWorld, LightPoint, Platform } from './jumpWorld';
 
@@ -35,16 +35,47 @@ function dropBroken(platforms: Platform[], dt: number, cfg: JumpConfig): Platfor
   return platforms.map((p) => (p.broken ? { ...p, y: p.y - cfg.brokenFallSpeed * dt } : p));
 }
 
-/** Ein fester Physik-Schritt. `targetVx` kommt aus der Steuerung (Einheiten pro Sekunde). */
-export function physicsStep(world: JumpWorld, targetVx: number, viewHeight: number, cfg: JumpConfig = BUDI_JUMP): JumpWorld {
+/** Wander-Blätter gleiten seitlich und prallen an den Rändern ab (Auftrag 45). */
+export function moveLeaves(platforms: Platform[], dt: number, cfg: JumpConfig = BUDI_JUMP): Platform[] {
   'worklet';
+  if (!platforms.some((p) => p.vx)) return platforms;
+  const half = cfg.platformWidth / 2;
+  return platforms.map((p) => {
+    if (!p.vx || p.broken) return p;
+    const x = p.x + p.vx * dt;
+    if (x < half) return { ...p, x: half + (half - x), vx: -p.vx };
+    if (x > cfg.worldWidth - half) return { ...p, x: 2 * (cfg.worldWidth - half) - x, vx: -p.vx };
+    return { ...p, x };
+  });
+}
+
+/** Berührt Budi einen Sonnenstrahl? */
+export function touchesBoost(x: number, y: number, boost: LightPoint, cfg: JumpConfig = BUDI_JUMP): boolean {
+  'worklet';
+  const reach = cfg.budiRadius + MINIGAME_FUN.jump.boostRadius;
+  const dx = x - boost.x;
+  const dy = y - boost.y;
+  return dx * dx + dy * dy <= reach * reach;
+}
+
+/** Ein fester Physik-Schritt. `targetVx` kommt aus der Steuerung (Einheiten pro Sekunde). */
+export function physicsStep(
+  world: JumpWorld,
+  targetVx: number,
+  viewHeight: number,
+  cfg: JumpConfig = BUDI_JUMP,
+): JumpWorld {
+  'worklet';
+  const fun = MINIGAME_FUN.jump;
   const dt = cfg.stepMs / 1000;
   const blend = Math.min(1, cfg.sideResponse * dt);
   const vx = world.vx + (targetVx - world.vx) * blend;
-  let vy = world.vy - cfg.gravity * dt;
+  // Sonnenstrahl (Auftrag 45): trägt Budi mit festem Tempo nach oben, solange er wirkt.
+  let boostMs = Math.max(0, (world.boostMs ?? 0) - cfg.stepMs);
+  let vy = (world.boostMs ?? 0) > 0 ? fun.boostVelocity : world.vy - cfg.gravity * dt;
   let x = world.x + vx * dt;
   let y = world.y + vy * dt;
-  let platforms = dropBroken(world.platforms, dt, cfg);
+  let platforms = moveLeaves(dropBroken(world.platforms, dt, cfg), dt, cfg);
 
   // Links raus, rechts wieder rein.
   if (x < 0) x += cfg.worldWidth;
@@ -75,10 +106,34 @@ export function physicsStep(world: JumpWorld, targetVx: number, viewHeight: numb
     lights = left;
   }
 
+  let boosts = world.boosts;
+  let boostsCollected = world.boostsCollected ?? 0;
+  if (boosts && boosts.some((b) => touchesBoost(x, y, b, cfg))) {
+    const left = boosts.filter((b) => !touchesBoost(x, y, b, cfg));
+    boostsCollected += boosts.length - left.length;
+    boosts = left;
+    boostMs = fun.boostMs;
+  }
+
   const maxY = Math.max(world.maxY, y);
   const cameraY = Math.max(world.cameraY, y - viewHeight * cfg.cameraFollow);
   const fallen = y + cfg.budiRadius < cameraY;
-  return { ...world, x, y, vx, vy, platforms, lights, lightsCollected, maxY, cameraY, fallen };
+  return {
+    ...world,
+    x,
+    y,
+    vx,
+    vy,
+    platforms,
+    lights,
+    lightsCollected,
+    maxY,
+    cameraY,
+    fallen,
+    boosts,
+    boostMs,
+    boostsCollected,
+  };
 }
 
 /**

@@ -9,6 +9,8 @@ export interface TapCircle {
   r: number;
   /** Spielzeit (ms), zu der der Kreis erschienen ist. */
   spawnedAtMs: number;
+  /** Goldene Knospe (Auftrag 45): mehr Punkte, steht kürzer. */
+  golden?: boolean;
 }
 
 export const NO_CIRCLE: TapCircle = { x: 0, y: 0, r: 0, spawnedAtMs: 0 };

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Text, View } from 'react-native';
 
-import { minigameFeel, minigameFramework as t } from '../../../content/strings';
+import { minigameFeel, minigameFramework as t, minigameFun } from '../../../content/strings';
 import { GameButton } from './GameButton';
 import type { RoundResult } from './finishRound';
 import { Overlay } from './Overlay';
@@ -26,8 +26,8 @@ function Row({ label, value }: { label: string; value: string | number }) {
 /** Ein Tipp je Runde, zufällig aus den Tipps des Spiels (Auftrag 40). */
 function useTip(gameId: string): string | null {
   const [tip] = useState(() => {
-    const list = minigameFeel.tips[gameId];
-    return list && list.length > 0 ? list[Math.floor(Math.random() * list.length)] : null;
+    const list = [...(minigameFeel.tips[gameId] ?? []), ...(minigameFun.tips[gameId] ?? [])];
+    return list.length > 0 ? list[Math.floor(Math.random() * list.length)] : null;
   });
   return tip;
 }

@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
 import { useDerivedValue, type SharedValue } from 'react-native-reanimated';
 
 import { DROPS_GAME } from '../../../game/config';
-import { colors, gameColors } from '../../../lib/theme';
+import { colors, funColors, gameColors } from '../../../lib/theme';
 import { potSquash } from './dropsFeel';
 import { potTop, type DropKind, type DropsField } from './dropsLogic';
 
@@ -37,10 +37,16 @@ function useKindPath(field: SharedValue<DropsField>, kind: DropKind, highlight =
       if (d.kind !== kind) continue;
       const { x, y } = d;
       if (highlight) {
-        if (kind !== 'salt') b.addCircle(x - R * 0.3, y - R * 0.05, R * 0.22);
+        if (kind !== 'salt' && kind !== 'leaf') b.addCircle(x - R * 0.3, y - R * 0.05, R * 0.22);
         continue;
       }
-      if (kind === 'water') {
+      if (kind === 'leaf') {
+        // Schutzblatt (Auftrag 45): spitzes Blatt, etwas größer als ein Tropfen.
+        b.moveTo(x - R * 1.3, y + R * 0.5);
+        b.cubicTo(x - R * 0.9, y - R * 1.2, x + R * 0.9, y - R * 1.3, x + R * 1.3, y - R * 0.6);
+        b.cubicTo(x + R * 0.9, y + R * 0.9, x - R * 0.4, y + R * 1.2, x - R * 1.3, y + R * 0.5);
+        b.close();
+      } else if (kind === 'water' || kind === 'golden') {
         b.moveTo(x, y - R * 1.35);
         b.cubicTo(x + R * 1.1, y - R * 0.15, x + R * 0.95, y + R, x, y + R);
         b.cubicTo(x - R * 0.95, y + R, x - R * 1.1, y - R * 0.15, x, y - R * 1.35);
@@ -127,6 +133,16 @@ export function DropsCanvas({ field, size, now, lastCatchMs, children }: DropsCa
   const salt = useKindPath(field, 'salt');
   const waterShine = useKindPath(field, 'water', true);
   const fertilizerShine = useKindPath(field, 'fertilizer', true);
+  const golden = useKindPath(field, 'golden');
+  const goldenShine = useKindPath(field, 'golden', true);
+  const leaf = useKindPath(field, 'leaf');
+  const goldenGlow = useDerivedValue(() => {
+    const b = Skia.PathBuilder.Make();
+    for (const d of field.get().drops) if (d.kind === 'golden') b.addCircle(d.x, d.y, R * 1.9);
+    return b.detach();
+  });
+  const shield = useDerivedValue(() => (field.get().shield ? 1 : 0));
+  const shieldPulse = useDerivedValue(() => 0.35 + 0.15 * Math.sin(now.get() / 160));
   const pot = useDerivedValue(() => {
     const squash = potSquash(now.get() - lastCatchMs.get());
     return [
@@ -142,6 +158,26 @@ export function DropsCanvas({ field, size, now, lastCatchMs, children }: DropsCa
       <Sky size={size} />
       <Group transform={pot}>
         <Pot />
+        {/* Schutzblatt im Topf (Auftrag 45): grüne Blase um den Topf */}
+        <Group opacity={shield}>
+          <Oval
+            x={-PW * 0.75}
+            y={-PH * 0.6}
+            width={PW * 1.5}
+            height={PH * 1.9}
+            color={colors.plantLight}
+            opacity={shieldPulse}
+          />
+          <Oval
+            x={-PW * 0.75}
+            y={-PH * 0.6}
+            width={PW * 1.5}
+            height={PH * 1.9}
+            color={colors.plantDark}
+            style="stroke"
+            strokeWidth={2}
+          />
+        </Group>
       </Group>
       <Path path={water} color={gameColors.water} />
       <Path path={water} color={gameColors.waterDark} style="stroke" strokeWidth={1.5} />
@@ -149,6 +185,12 @@ export function DropsCanvas({ field, size, now, lastCatchMs, children }: DropsCa
       <Path path={fertilizer} color={colors.plantLight} />
       <Path path={fertilizer} color={colors.plantDark} style="stroke" strokeWidth={1.5} />
       <Path path={fertilizerShine} color={colors.white} opacity={0.6} />
+      <Path path={goldenGlow} color={funColors.goldLight} opacity={0.55} />
+      <Path path={golden} color={funColors.gold} />
+      <Path path={golden} color={funColors.goldDeep} style="stroke" strokeWidth={1.5} />
+      <Path path={goldenShine} color={colors.white} opacity={0.8} />
+      <Path path={leaf} color={colors.plantLight} />
+      <Path path={leaf} color={colors.plantDark} style="stroke" strokeWidth={2} />
       <Path path={salt} color={gameColors.salt} />
       <Path path={salt} color={colors.ink} style="stroke" strokeWidth={2} />
       {children}
