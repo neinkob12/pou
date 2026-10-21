@@ -1,21 +1,50 @@
-import { Link, type Href } from 'expo-router';
-import { Pressable, Text } from 'react-native';
+import { useRouter, type Href } from 'expo-router';
+import { Animated, Pressable } from 'react-native';
 
 import { screenUi } from '../../content/strings';
+import { depth, gameRadii, insets, outline, spacing, tones } from '../../lib/theme';
+import { GameText } from './GameText';
+import { gradientStyle, toneGradient } from './game/gradient';
+import { usePressSpring } from './game/usePressSpring';
 
 interface NavLinkProps {
   href: Href;
   label: string;
 }
 
-/** Listen-Link als Zeile mit Pfeil (WEB-5), etwa in den Einstellungen. */
+/** Listen-Link als 3D-Zeile mit Pfeil (ART-1), etwa in den Einstellungen. Federt beim Tippen. */
 export function NavLink({ href, label }: NavLinkProps) {
+  const router = useRouter();
+  const press = usePressSpring({ sink: depth.sm });
   return (
-    <Link href={href} asChild>
-      <Pressable className="min-h-12 flex-row items-center justify-between rounded-2xl bg-cream px-4 py-3 active:opacity-70">
-        <Text className="font-body-bold text-base text-ink">{label}</Text>
-        <Text className="font-heading text-xl text-plantDark">{screenUi.chevron}</Text>
+    <Animated.View style={press.outerStyle}>
+      <Pressable
+        accessibilityRole="link"
+        accessibilityLabel={label}
+        onPress={() => router.push(href)}
+        onPressIn={press.onPressIn}
+        onPressOut={press.onPressOut}
+        style={[
+          gradientStyle(toneGradient(tones.cream), tones.cream.base),
+          {
+            minHeight: 52,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingHorizontal: spacing.md,
+            borderRadius: gameRadii.button,
+            borderWidth: outline.thin,
+            borderBottomWidth: outline.thin + depth.sm,
+            borderColor: outline.color,
+            boxShadow: insets.highlight,
+          },
+        ]}
+      >
+        <GameText variant="bodyBold">{label}</GameText>
+        <GameText variant="title" color={tones.coral.edge}>
+          {screenUi.chevron}
+        </GameText>
       </Pressable>
-    </Link>
+    </Animated.View>
   );
 }

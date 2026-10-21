@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
-import { Text, View } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring } from 'react-native-reanimated';
 
 import { ui } from '../../lib/assets';
+import { springs } from '../../lib/theme';
 import { useTweenedNumber } from '../feedback/useTweenedNumber';
 import { AssetImage } from './AssetImage';
+import { Chip } from './Chip';
 
 const BUMP_SCALE = 1.25;
 
@@ -13,27 +14,25 @@ interface CoinChipProps {
   accessibilityLabel?: string;
 }
 
-/** Münzanzeige als Pille: Münz-Icon (U9) und Betrag. Ändert sich der Stand, zählt er und hüpft (WEB-3). */
+/** Münzanzeige als Zähler-Pille (ART-1). Ändert sich der Stand, zählt er hoch und hüpft mit Federung. */
 export function CoinChip({ coins, accessibilityLabel }: CoinChipProps) {
   const { shown, changes } = useTweenedNumber(coins);
   const scale = useSharedValue(1);
 
   useEffect(() => {
     if (changes === 0) return;
-    scale.value = withSequence(withTiming(BUMP_SCALE, { duration: 120 }), withSpring(1, { damping: 8 }));
+    scale.set(withSequence(withSpring(BUMP_SCALE, springs.press), withSpring(1, springs.release)));
   }, [changes, scale]);
 
   const style = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
   return (
-    <Animated.View style={style}>
-      <View
+    <Animated.View style={[{ alignSelf: 'flex-start' }, style]}>
+      <Chip
         accessibilityLabel={accessibilityLabel}
-        className="min-h-11 flex-row items-center gap-2 rounded-full border-2 border-plantDark bg-white px-3 py-1"
-      >
-        <AssetImage source={ui.u9_coin} label="U9" color="coral" size={24} round icon="coin" />
-        <Text className="font-body-bold text-base text-ink">{shown}</Text>
-      </View>
+        icon={<AssetImage source={ui.u9_coin} label="U9" color="coral" size={28} round icon="coin" />}
+        value={shown}
+      />
     </Animated.View>
   );
 }

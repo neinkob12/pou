@@ -305,3 +305,25 @@ export const pressScale = {
   down: 0.95,
   up: 1.04,
 } as const;
+
+/** Kartenflächen im Spiel-Look: zarter Verlauf oben hell, Kontur und dicke Unterkante. */
+export const cardTones = {
+  plain: { top: '#FFFFFF', bottom: '#FFF6E6', border: outline.color },
+  muted: { top: '#FBEBD0', bottom: '#F3DDB8', border: '#CDB08A' },
+  success: { top: '#EEFAE6', bottom: '#D6F0C9', border: outline.color },
+  rare: { top: '#F4EEFF', bottom: '#E2D6FB', border: outline.color },
+  highlight: { top: '#FFF8D6', bottom: '#FFE9A3', border: outline.color },
+  night: { top: '#3E4880', bottom: '#2A3157', border: '#151A38' },
+} as const;
+
+/** Innenkante oben (Licht) und Rinne der Leisten. */
+export const insets = {
+  highlight: 'inset 0 3px 0 rgba(255,255,255,0.75)',
+  barTrack: '#E8D3B0',
+  barTrackLight: '#F3E4CB',
+} as const;
+
+/** Abdunklung hinter Popups. */
+export const overlay = {
+  backdrop: 'rgba(20,24,40,0.55)',
+} as const;
