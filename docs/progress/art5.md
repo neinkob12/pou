@@ -30,6 +30,7 @@ Vorher = Stand nach WEB-5 (Bilder in `web5/`), nachher = dieser Branch mit `main
 - **Ernte**: Kiste springt auf, Kamera wackelt, Konfetti, nach dem Hochzählen Münzregen. Neue Sorte als eigene Karte mit Strahlen und Funken (`harvest/NewStrainBanner.tsx`).
 - **Kauf** (Upgrades und Kosmetik): Karte ploppt, Funken spritzen, Münze steigt aus dem Bild (`shop/PurchaseBurst.tsx`).
 - **Feiern im Zimmer** (`feedback/CelebrationLayer.tsx`, `CelebrationCard.tsx`): Phase, Tageskiste und neu **Level-Aufstieg** (`useLevelUps.ts`, hört auf die Erfahrung im Spielstand, nicht beim Laden). Abdunkeln, große kreisende Strahlen, Konfetti, Karte federt herein und wackelt, Budi hüpft, Kiste mit Münzregen.
+- **Sortenkarten** (`album/StrainCard.tsx`): Porträts von ART-2 statt Buchstaben-Kachel, gesperrte Sorten mit Schloss-Grafik.
 - **Rahmen am Rechner** (`frame/AppFrame.web.tsx`, `FrameBrand.tsx`): Verlauf mit Lampenlicht, Farbflecken und Blattmuster, Gehäuse mit dicker Kontur und Glanz, gelber Titel in Spielschrift, hüpfender Budi.
 - **Ladebildschirm** (`public/index.html`): orange Verlauf mit kreisenden Strahlen, "PotPou" in Fredoka mit Kontur, Topf hüpft mit Squash & Stretch und Schatten, dicker gestreifter Ladebalken. Skripte und Preload unverändert.
 - Prüfung: `bash scripts/check.sh` grün (676 Tests), Web- und Android-Export bauen. 390 x 844 und 1280 x 800 ohne Konsolenfehler (nur die bekannten Dokument-404 bei Direktaufruf am lokalen Server, siehe WEB-6).
