@@ -1,30 +1,30 @@
-// Farben der Icons (ART-2). Grundlage ist die Palette aus src/lib/theme.ts; hier stehen nur
-// Ableitungen und die wenigen Zusatztöne, die Gegenstände brauchen. Nur Grafik, kein Spielwert.
+// Farben der Icons (ART-2). Grundlage sind die Spiel-Tokens von ART-1 in src/lib/theme.ts (tones,
+// outline, gloss); hier stehen nur Zuordnungen und wenige Zusatztöne für Gegenstände. Nur Grafik.
 
-import { artColors, colors } from '../../../lib/theme';
-import { darken, mix } from './tint';
+import { artColors, colors, gloss, outline, tones } from '../../../lib/theme';
+import { mix } from './tint';
 
 export const iconInk = {
-  /** Kontur: Budis Waldgrün, etwas tiefer, damit sie auch auf Dunkel trägt. */
-  outline: darken(colors.plantDark, 0.25),
-  gloss: colors.white,
-  shadow: 'rgba(24,44,30,0.38)',
+  /** Dieselbe dunkle Kontur wie Knöpfe und Karten. */
+  outline: outline.color,
+  gloss: gloss.color,
+  shadow: 'rgba(31,58,39,0.38)',
 } as const;
 
 /** Schlagschatten unter jedem Icon (Einheiten von 100). */
 export const ICON_SHADOW = { dy: 3.5, blur: 2.2, scale: 0.9 } as const;
 
 export const iconColors = {
-  water: '#4FB6F5',
-  waterDeep: '#2B86D9',
-  leaf: colors.plantLight,
+  water: tones.sky.base,
+  waterDeep: tones.sky.edge,
+  leaf: tones.leaf.base,
   leafDeep: artColors.leafShade,
-  sun: '#FFC93C',
-  sunRay: '#FF9F2E',
-  heart: '#FF5C77',
-  coin: '#FFC93C',
-  coinRim: '#F09A1E',
-  coinFace: '#FFDD6E',
+  sun: tones.gold.base,
+  sunRay: tones.gold.dark,
+  heart: tones.coral.base,
+  coin: tones.gold.base,
+  coinRim: tones.gold.dark,
+  coinFace: tones.gold.light,
   star: '#FFD23F',
   metal: '#7D8FA0',
   metalLight: '#B9C7D3',
@@ -32,8 +32,8 @@ export const iconColors = {
   wood: artColors.wood,
   woodDeep: artColors.woodShade,
   gem: '#59D3E8',
-  lavender: colors.lavender,
-  coral: colors.coral,
+  lavender: tones.grape.base,
+  coral: tones.coral.base,
   cream: colors.cream,
   paper: '#FFF7E8',
   paperShade: '#EAD9BC',

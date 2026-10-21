@@ -31,7 +31,7 @@ Im Spiel (Browser, 390 x 844). Vorher-Stand siehe `docs/progress/web4.md` (Shop,
 ## Fertig
 
 - `src/components/ui/icons/shapes.tsx`: Grundformen neu. `Shape` und `Dot` mit Kontur (7 Einheiten), Verlauf und automatischem Glanzlicht, `Line` (Strich mit Kontur), `Sparkle` (Funkeln), `IconFrame` (Schlagschatten für das ganze Icon).
-- `tint.ts`: Farbmischung und Umriss eines Pfads (für Verläufe), mit Test. `iconPalette.ts`: Icon-Farben, abgeleitet aus `theme.ts`.
+- `tint.ts`: Farbmischung und Umriss eines Pfads (für Verläufe), mit Test. `iconPalette.ts`: Icon-Farben aus den ART-1-Tokens (`tones`, `outline`, `gloss`) in `theme.ts`.
 - `hudIcons.tsx`: Tabs (Spiele, Shop, Album, Einstellungen), Münze, Stern, Schloss, Samen, Samen-Fragment (U10), Edelstein.
 - `careIcons.tsx`: Wasser, Dünger, Licht, Laune, Gießkanne, Wachstums- und Blütendünger, Spinnmilbe, Trauermücke, Schimmel.
 - `itemArt.tsx`: Kiste zu und offen (U13), Lupe, Schere, Töpfe Stufe 1 bis 3, LED, Ventilator, Bio-Erde, Marienkäfer, alle mit dem neuen Look.
