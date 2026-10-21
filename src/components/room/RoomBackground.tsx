@@ -52,9 +52,8 @@ export function RoomForeground() {
   if (roomAssets.h1_day) return null;
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill} onLayout={onLayout}>
-      {size.width > 0 ? (
-        <DayNightFade isDay={isDay} render={(d) => <RoomForegroundScene width={size.width} height={size.height} isDay={d} />} />
-      ) : null}
+      {/* Ohne Überblendung: eine bildschirmgroße, durchsichtige Ebene über Budi kostet jeden Frame. */}
+      {size.width > 0 ? <RoomForegroundScene width={size.width} height={size.height} isDay={isDay} /> : null}
     </View>
   );
 }

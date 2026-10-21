@@ -52,14 +52,14 @@ export const RoomForegroundScene = memo(function RoomForegroundScene({ width, he
   const l = roomLayout(width, height);
   const p = roomPalette(isDay);
   return (
-    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+    <>
       <RoomCanvas u={width / 100} box={plantBox(l)}>
         <ForegroundPlant l={l} p={p} />
       </RoomCanvas>
       <RoomCanvas u={width / 100} box={cushionBox(l)}>
         <ForegroundCushion l={l} p={p} />
       </RoomCanvas>
-    </View>
+    </>
   );
 });
 
