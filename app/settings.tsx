@@ -1,13 +1,13 @@
 import { settingsSections } from '../src/components/settings/sections';
-import { Screen } from '../src/components/ui/Screen';
+import { GameScreen } from '../src/components/frame/GameScreen';
 import { settings } from '../src/content/strings';
 
 export default function SettingsRoute() {
   return (
-    <Screen title={settings.title}>
+    <GameScreen backdrop="settings" title={settings.title}>
       {settingsSections.map(({ key, Component }) => (
         <Component key={key} />
       ))}
-    </Screen>
+    </GameScreen>
   );
 }

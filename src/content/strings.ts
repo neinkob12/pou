@@ -716,6 +716,10 @@ export const celebrations = {
   continue: 'Weiter',
   coins: (coins: number) => `+${coins} Münzen`,
   chestText: 'Morgen hab ich wieder was für dich.',
+  // ART-5: Level-Aufstieg
+  levelTitle: 'Level geschafft!',
+  level: (level: number) => `Level ${level}`,
+  levelText: 'Du wirst richtig gut im Gärtnern. Schau ins Album, was neu ist.',
 };
 
 // Galerie der Oberflächen-Bausteine im Debug-Menü (ART-1, Auftrag 46).

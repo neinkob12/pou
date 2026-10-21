@@ -2,6 +2,14 @@ import { centerOf, getCoinAnchor, setCoinAnchor } from '../coinTarget';
 import { dismissCelebration, enqueueCelebration, type Celebration } from '../celebrationQueue';
 
 describe('enqueueCelebration', () => {
+  it('reiht einen Level-Aufstieg hinter die laufende Feier (ART-5)', () => {
+    const q = enqueueCelebration([{ kind: 'phase', phase: 'flowering' }], { kind: 'level', level: 3 });
+    expect(q).toEqual([
+      { kind: 'phase', phase: 'flowering' },
+      { kind: 'level', level: 3 },
+    ]);
+  });
+
   it('hängt Feiern der Reihe nach an', () => {
     const q = enqueueCelebration(enqueueCelebration([], { kind: 'chest', coins: 60 }), {
       kind: 'phase',

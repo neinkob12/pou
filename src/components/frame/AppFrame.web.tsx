@@ -9,17 +9,22 @@ const BEZEL = 12;
 const BRAND_GAP = 72;
 const SIDE_KEY_WIDTH = 4;
 
-// Hintergrund am Rechner: Verlauf in Waldgrün mit feinem Punktraster (nur CSS, kein Bild).
+// Hintergrund am Rechner (ART-5): satter Spiel-Verlauf mit warmem Lampenlicht, weichen Farbflecken
+// und einem Muster aus kleinen Blättern (nur CSS, kein Bild).
+const LEAF_TILE =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cpath d='M20 10 Q30 20 20 34 Q10 20 20 10Z' fill='%237BC96F' fill-opacity='0.13'/%3E%3Cpath d='M48 38 L50 44 L56 46 L50 48 L48 54 L46 48 L40 46 L46 44Z' fill='%23FFD45C' fill-opacity='0.16'/%3E%3C/svg%3E\")";
 const BACKDROP = {
   position: 'fixed',
   inset: 0,
   backgroundColor: surface.frameBgBottom,
   backgroundImage: [
-    `radial-gradient(${surface.frameDot} 1.5px, transparent 1.5px)`,
-    `radial-gradient(ellipse at 30% 20%, rgba(255,212,92,0.12), transparent 55%)`,
-    `linear-gradient(160deg, ${surface.frameBgTop}, ${surface.frameBgBottom})`,
+    LEAF_TILE,
+    `radial-gradient(ellipse at 28% 18%, rgba(255,212,92,0.32), transparent 50%)`,
+    `radial-gradient(circle at 85% 85%, rgba(169,139,232,0.30), transparent 45%)`,
+    `radial-gradient(circle at 70% 10%, rgba(255,122,138,0.22), transparent 40%)`,
+    `linear-gradient(160deg, #2F7A45, ${surface.frameBgTop} 45%, ${surface.frameBgBottom})`,
   ].join(', '),
-  backgroundSize: '22px 22px, 100% 100%, 100% 100%',
+  backgroundSize: '64px 64px, 100% 100%, 100% 100%, 100% 100%, 100% 100%',
 } as const;
 
 /** Seitentaste am Gehäuse, rein zur Zierde. */
@@ -40,7 +45,7 @@ function SideKey({ side, top, height }: { side: 'left' | 'right'; top: number; h
 }
 
 /**
- * Web-Version: Am Handy füllt das Spiel den Bildschirm. Am Rechner (WEB-3, WEB-5 überarbeitet) steht
+ * Web-Version: Am Handy füllt das Spiel den Bildschirm. Am Rechner (WEB-3, WEB-5, ART-5 überarbeitet) steht
  * es in einem Handy-Gehäuse vor einem grünen Verlauf, links daneben Titel und kurze Hinweise.
  */
 export function AppFrame({ children }: { children: ReactNode }) {
@@ -61,9 +66,12 @@ export function AppFrame({ children }: { children: ReactNode }) {
             padding: BEZEL,
             borderRadius: shellRadius,
             backgroundColor: surface.frameShell,
-            borderWidth: 1,
-            borderColor: surface.frameShellLight,
-            boxShadow: '0 30px 80px rgba(0, 0, 0, 0.55), inset 0 0 0 2px rgba(255,255,255,0.06)',
+            backgroundImage: `linear-gradient(145deg, ${surface.frameShellLight}, ${surface.frameShell} 40%)`,
+            borderWidth: 3,
+            borderColor: colors.ink,
+            // Weicher Schlagschatten, farbiger Schein und Glanzkante wie ein Spielzeug-Gehäuse.
+            boxShadow:
+              '0 34px 80px rgba(0,0,0,0.55), 0 0 0 8px rgba(123,201,111,0.18), inset 0 2px 0 rgba(255,255,255,0.18)',
           }}
         >
           <SideKey side="left" top={120} height={36} />

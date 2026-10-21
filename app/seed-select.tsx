@@ -1,9 +1,9 @@
 import { Text } from 'react-native';
 
 import { StrainCard } from '../src/components/album/StrainCard';
+import { GameScreen } from '../src/components/frame/GameScreen';
 import { Appear } from '../src/components/ui/Appear';
 import { Card } from '../src/components/ui/Card';
-import { Screen } from '../src/components/ui/Screen';
 import { useNow } from '../src/hooks/useNow';
 import { screenUi, seedSelect } from '../src/content/strings';
 import { STRAINS } from '../src/game/config';
@@ -23,7 +23,7 @@ export default function SeedSelectRoute() {
   const potFree = canPlantNewSeed(plant, nowMs, debugMultiplier);
 
   return (
-    <Screen title={seedSelect.title} subtitle={screenUi.seedSelectSubtitle} back>
+    <GameScreen backdrop="seeds" title={seedSelect.title} subtitle={screenUi.seedSelectSubtitle} back>
       <Card tone={potFree ? 'highlight' : 'muted'}>
         <Text className="font-body-bold text-base text-ink">{potFree ? seedSelect.intro : seedSelect.potBusy}</Text>
       </Card>
@@ -37,6 +37,6 @@ export default function SeedSelectRoute() {
           />
         </Appear>
       ))}
-    </Screen>
+    </GameScreen>
   );
 }

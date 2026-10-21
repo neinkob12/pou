@@ -1,7 +1,7 @@
 import { AlbumTabs } from '../src/components/album/AlbumTabs';
+import { GameScreen } from '../src/components/frame/GameScreen';
 import { KnowledgeTab } from '../src/components/album/KnowledgeTab';
 import { StrainsTab } from '../src/components/album/StrainsTab';
-import { Screen } from '../src/components/ui/Screen';
 import { album } from '../src/content/strings';
 
 const albumTabs = [
@@ -11,8 +11,8 @@ const albumTabs = [
 
 export default function AlbumRoute() {
   return (
-    <Screen title={album.title}>
+    <GameScreen backdrop="album" title={album.title}>
       <AlbumTabs tabs={albumTabs} />
-    </Screen>
+    </GameScreen>
   );
 }

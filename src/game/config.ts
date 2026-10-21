@@ -780,6 +780,27 @@ export const MINIGAME_FUN = {
   },
 } as const;
 
+/**
+ * Grafik und Effekte der Minigames (Auftrag 51, ART-6). Nur Darstellung: keine Punkte, keine Münzen,
+ * keine Regeln. Die Zeitlupe hält wie das kurze Anhalten (MINIGAME_FEEL.hitStopMs) die Spielzeit an.
+ */
+export const MINIGAME_ART = {
+  /** Zeitlupe bei Kombos: alle so viele Treffer in Folge, so lange (echte ms), mit diesem Tempo. */
+  slowMoEveryCombo: 5,
+  slowMoMs: 420,
+  slowMoFactor: 0.35,
+  /** Schockwellen-Ring bei Treffern: Lebensdauer und Endradius (dp). */
+  ringLifeMs: 380,
+  ringRadius: 46,
+  /** Weißer Blitz über dem Feld bei Kombo-Stufen und Sonderpunkten. */
+  flashMs: 260,
+  flashOpacity: 0.45,
+  /** Zahl in der Kopfzeile springt bei neuen Punkten so stark auf. */
+  scoreBump: 1.35,
+  /** Ergebnis: Punkte zählen in so vielen ms hoch. */
+  countUpMs: 900,
+} as const;
+
 /** Beispielspiel "Tipp den Kreis" (Auftrag P08). */
 export const TAP_CIRCLE = {
   durationSeconds: 30,

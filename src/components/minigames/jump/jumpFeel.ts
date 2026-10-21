@@ -78,3 +78,10 @@ export function budiShape(
   const stretch = Math.min(0.15, (Math.abs(vy) / cfg.springVelocity) * 0.15);
   return { sx: 1 - stretch * 0.6, sy: 1 + stretch };
 }
+
+/** Auftrag 51: Deckkraft von Abend (0 bis 1 bis zur halben Schwierigkeitshöhe) und Nacht (danach). */
+export function skyBlend(cameraY: number, cfg: typeof BUDI_JUMP = BUDI_JUMP): { dusk: number; night: number } {
+  'worklet';
+  const h = Math.max(0, cameraY) / cfg.difficultyHeight;
+  return { dusk: Math.min(1, h / 0.5), night: Math.min(1, Math.max(0, (h - 0.5) / 0.5)) };
+}

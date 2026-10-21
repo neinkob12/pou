@@ -1,16 +1,16 @@
 // Punkte-Popups über dem Spielfeld (Auftrag 40): "+1", "x2", "-3". Steigen auf und verblassen.
 
 import { useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
 import { MINIGAME_FEEL } from '../../../../game/config';
-import { fonts } from '../../../../lib/theme';
+import { StrokeText } from '../StrokeText';
 import type { Popup } from './useFx';
 
 /** Breite des Textfelds, damit der Text mittig über dem Treffer steht. */
-const BOX = 120;
+const BOX = 160;
 
 function PopupText({ popup, onDone }: { popup: Popup; onDone: (id: number) => void }) {
   const t = useSharedValue(0);
@@ -24,16 +24,23 @@ function PopupText({ popup, onDone }: { popup: Popup; onDone: (id: number) => vo
 
   const style = useAnimatedStyle(() => {
     const v = t.get();
-    const pop = v < 0.15 ? 0.6 + (v / 0.15) * 0.6 : 1.2 - Math.min(0.2, (v - 0.15) * 0.8);
+    // Knallt mit Überschwingen auf, steigt, wackelt kurz und verblasst.
+    const pop = v < 0.12 ? 0.3 + (v / 0.12) * 1.1 : v < 0.25 ? 1.4 - ((v - 0.12) / 0.13) * 0.4 : 1;
     return {
       opacity: v < 0.7 ? 1 : 1 - (v - 0.7) / 0.3,
-      transform: [{ translateY: -MINIGAME_FEEL.popupRise * v }, { scale: pop }],
+      transform: [
+        { translateY: -MINIGAME_FEEL.popupRise * v },
+        { scale: pop },
+        { rotate: `${Math.sin(v * 12) * 6 * (1 - v)}deg` },
+      ],
     };
   });
 
   return (
     <Animated.View style={[styles.box, { left: popup.x - BOX / 2, top: popup.y - 20 }, style]}>
-      <Text style={[styles.text, { color: popup.color, fontSize: popup.big ? 30 : 22 }]}>{popup.text}</Text>
+      <StrokeText size={popup.big ? 32 : 24} color={popup.color}>
+        {popup.text}
+      </StrokeText>
     </Animated.View>
   );
 }
@@ -50,10 +57,4 @@ export function PopupLayer({ popups, onDone }: { popups: Popup[]; onDone: (id: n
 
 const styles = StyleSheet.create({
   box: { position: 'absolute', width: BOX, alignItems: 'center' },
-  text: {
-    fontFamily: fonts.headingBold,
-    textShadowColor: 'rgba(43,43,43,0.35)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 2,
-  },
 });
