@@ -1,7 +1,5 @@
-import { Circle, Group, LinearGradient, Path, RadialGradient, Rect, RoundedRect, Text, vec, type SkFont } from '@shopify/react-native-skia';
+import { Circle, Group, LinearGradient, Oval, Path, RadialGradient, Rect, RoundedRect, Text, vec, type SkFont } from '@shopify/react-native-skia';
 
-import { FaceArt } from '../../budi/art/FaceArt';
-import { POT_BODY } from '../../budi/art/PotArt';
 import { artColors, colors } from '../../../lib/theme';
 import { iconColors as c, iconInk } from './iconPalette';
 import { Dot, Line, Shape, Sparkle } from './shapes';
@@ -36,6 +34,31 @@ function Burst() {
   );
 }
 
+// Eigene Topfform und eigenes Gesicht, damit das Logo nicht an Budis Spielgrafik hängt.
+const POT_BODY = 'M22 66 L78 66 Q80 66 79.6 68 L74.6 93.5 Q74 97 70.5 97 L29.5 97 Q26 97 25.4 93.5 L20.4 68 Q20 66 22 66 Z';
+const FACE = { eyeY: 78, eyeDx: 9.5, eyeRx: 4.2, eyeRy: 5 } as const;
+
+/** Fröhliches Gesicht auf dem Topf: große Augen mit Glanz, Bäckchen, offenes Lachen. */
+function HappyFace() {
+  const { eyeY, eyeDx, eyeRx, eyeRy } = FACE;
+  return (
+    <Group>
+      {[-1, 1].map((s) => (
+        <Group key={s}>
+          <Oval x={50 + s * eyeDx - eyeRx} y={eyeY - eyeRy} width={eyeRx * 2} height={eyeRy * 2} color={artColors.eye} />
+          <Oval x={50 + s * eyeDx - eyeRx * 0.6} y={eyeY} width={eyeRx * 1.2} height={eyeRy * 0.8} color={artColors.iris} opacity={0.6} />
+          <Circle cx={50 + s * eyeDx + eyeRx * 0.3} cy={eyeY - eyeRy * 0.4} r={eyeRx * 0.42} color={iconInk.gloss} />
+          <Circle cx={50 + s * eyeDx - eyeRx * 0.35} cy={eyeY + eyeRy * 0.42} r={eyeRx * 0.2} color={iconInk.gloss} />
+          <Oval x={50 + s * 17 - 4.5} y={eyeY + 4} width={9} height={4.5} color={artColors.cheek} opacity={0.85} />
+        </Group>
+      ))}
+      <Path path="M44 84 L56 84 C56 90 53 92 50 92 C47 92 44 90 44 84 Z" color={iconInk.outline} style="stroke" strokeWidth={1.6} strokeJoin="round" />
+      <Path path="M44 84 L56 84 C56 90 53 92 50 92 C47 92 44 90 44 84 Z" color={artColors.mouth} />
+      <Oval x={46.5} y={88} width={7} height={3.4} color={artColors.tongue} />
+    </Group>
+  );
+}
+
 /** Budi als Logo: kräftiger Topf mit fröhlichem Gesicht, drei Fächerblätter. Budi-Leinwand 100 × 100. */
 export function BudiMark({ mono = false }: { mono?: boolean }) {
   return (
@@ -54,10 +77,7 @@ export function BudiMark({ mono = false }: { mono?: boolean }) {
       </RoundedRect>
       <RoundedRect x={20} y={59} width={36} height={2.6} r={1.3} color={iconInk.gloss} opacity={0.6} />
       {mono ? null : (
-        <Group>
-          <FaceArt face="b10_face_happy" part="rest" />
-          <FaceArt face="b10_face_happy" part="eyes" />
-        </Group>
+        <HappyFace />
       )}
     </Group>
   );
