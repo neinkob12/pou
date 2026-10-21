@@ -2,7 +2,7 @@ import { Text, View } from 'react-native';
 
 import { celebrations, dailyGoals, lightPhase } from '../../content/strings';
 import { cue } from '../../lib/audio';
-import { colors, surface } from '../../lib/theme';
+import { depth, outline, tones } from '../../lib/theme';
 import { Button } from '../ui/Button';
 import { Bouncy } from './Bouncy';
 import { BudiAvatar } from './BudiAvatar';
@@ -50,8 +50,14 @@ export function CelebrationCard({ celebration: c, onClose, onCoinsCounted }: Cel
       {c.kind === 'level' ? (
         <>
           <View
-            className="rounded-full bg-lavender px-6 py-2"
-            style={{ borderWidth: surface.line, borderBottomWidth: surface.edge, borderColor: colors.plantDark }}
+            className="rounded-full px-6 py-2"
+            style={{
+              backgroundColor: tones.grape.base,
+              borderWidth: outline.regular,
+              borderBottomWidth: outline.regular + depth.md,
+              borderColor: outline.color,
+              borderBottomColor: tones.grape.edge,
+            }}
           >
             <Text className="font-heading text-4xl text-white">{celebrations.level(c.level)}</Text>
           </View>

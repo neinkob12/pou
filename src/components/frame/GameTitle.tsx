@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Text, View } from 'react-native';
 
-import { colors, fonts, spacing } from '../../lib/theme';
+import { colors, outline, spacing, typography } from '../../lib/theme';
 import { BackButton } from '../ui/BackButton';
 import { BackdropNote } from './BackdropNote';
 
@@ -35,11 +35,11 @@ export function GameTitle({ title, subtitle, back = false, right }: GameTitlePro
           accessibilityRole="header"
           style={{
             flex: 1,
-            fontFamily: fonts.headingBold,
+            ...typography.display,
             fontSize: TITLE_SIZE,
             lineHeight: TITLE_SIZE + 6,
             color: colors.white,
-            textShadowColor: colors.plantDark,
+            textShadowColor: outline.color,
             textShadowOffset: { width: 0, height: TITLE_DEPTH },
             textShadowRadius: 0.1,
           }}

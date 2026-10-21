@@ -4,7 +4,7 @@ import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated';
 
 import { celebrations } from '../../content/strings';
 import { gameEvents } from '../../game/events';
-import { colors, surface } from '../../lib/theme';
+import { depth, gameRadii, outline, shadows } from '../../lib/theme';
 import { PUFF_MS } from '../room/phase/Puff';
 import { CelebrationCard } from './CelebrationCard';
 import { dismissCelebration, enqueueCelebration, type Celebration } from './celebrationQueue';
@@ -118,9 +118,11 @@ export function CelebrationLayer() {
                 onLayout={measure}
                 className="w-full max-w-md items-center gap-3 self-center rounded-3xl bg-cream p-6"
                 style={{
-                  borderWidth: surface.line + 1,
-                  borderBottomWidth: surface.edge + 3,
-                  borderColor: colors.plantDark,
+                  borderWidth: outline.regular,
+                  borderBottomWidth: outline.regular + depth.lg,
+                  borderColor: outline.color,
+                  borderRadius: gameRadii.modal,
+                  boxShadow: shadows.pop,
                 }}
               >
                 <CelebrationCard

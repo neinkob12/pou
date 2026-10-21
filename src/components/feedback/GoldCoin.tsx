@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 
-import { artColors, colors } from '../../lib/theme';
+import { colors, outline, tones } from '../../lib/theme';
 
 /**
  * Münze im Spiele-Look (ART-5): Gold mit dunkler Kontur, dunklerer Unterkante und Glanzpunkt oben
@@ -14,11 +14,11 @@ export function GoldCoin({ size }: { size: number }) {
         width: size,
         height: size,
         borderRadius: size / 2,
-        backgroundColor: artColors.gold,
+        backgroundColor: tones.gold.base,
         borderWidth: ring,
-        borderColor: colors.plantDark,
+        borderColor: outline.color,
         borderBottomWidth: ring * 1.8,
-        borderBottomColor: artColors.goldShade,
+        borderBottomColor: tones.gold.edge,
         alignItems: 'center',
         justifyContent: 'center',
       }}
@@ -29,7 +29,7 @@ export function GoldCoin({ size }: { size: number }) {
           height: size * 0.42,
           borderRadius: size,
           borderWidth: Math.max(1, size * 0.07),
-          borderColor: artColors.goldShade,
+          borderColor: tones.gold.dark,
         }}
       />
       <View
