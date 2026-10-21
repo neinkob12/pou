@@ -1,9 +1,11 @@
 // Regeln von "Tropfen fangen", ohne React. Die 'worklet'-Funktionen laufen auch im Frame-Callback
 // auf dem UI-Thread (Reanimated); in Tests sind sie normale Funktionen.
 
-import { DROPS_GAME } from '../../../game/config';
+import { DROPS_GAME, MINIGAME_FUN } from '../../../game/config';
 
-export type DropKind = 'water' | 'fertilizer' | 'salt';
+/** `golden`: Bonus-Tropfen, `leaf`: Schutzblatt (Auftrag 45). */
+export type DropKind = 'water' | 'fertilizer' | 'salt' | 'golden' | 'leaf';
+type DropsFun = typeof MINIGAME_FUN.drops;
 
 export interface Drop {
   id: number;
@@ -23,12 +25,18 @@ export interface DropsField {
   /** Spielzeit (ms), zu der der nächste Tropfen fällt. */
   nextSpawnMs: number;
   nextId: number;
+  /** Schutzblatt im Topf: das nächste Salz kostet kein Leben (Auftrag 45). */
+  shield?: boolean;
 }
 
 /** Was in einem Frame-Schritt passiert ist, damit die Oberfläche reagieren kann. */
 export interface DropsStepEvents {
   points: number;
   livesLost: number;
+  /** Nur gesetzt, wenn es passiert ist (Auftrag 45): goldene Tropfen, Schutzblatt gefangen, Salz abgehalten. */
+  golden?: number;
+  shieldGained?: boolean;
+  shieldUsed?: boolean;
 }
 
 export type DropsConfig = typeof DROPS_GAME;
@@ -70,6 +78,46 @@ export function pickKind(rand: number, cfg: DropsConfig = DROPS_GAME): DropKind 
   return 'salt';
 }
 
+/** Läuft gerade ein Regenschauer (Auftrag 45)? Kurze Fenster in festem Abstand, nicht am Anfang. */
+export function inShower(elapsedMs: number, fun: DropsFun = MINIGAME_FUN.drops): boolean {
+  'worklet';
+  return elapsedMs >= fun.showerEveryMs && elapsedMs % fun.showerEveryMs < fun.showerMs;
+}
+
+/** Anteil Salz unter den normalen Tropfen: steigt mit der Spielzeit (Auftrag 45). */
+export function saltShare(
+  elapsedMs: number,
+  cfg: DropsConfig = DROPS_GAME,
+  fun: DropsFun = MINIGAME_FUN.drops,
+): number {
+  'worklet';
+  const t = Math.min(1, Math.max(0, elapsedMs / fun.saltRampMs));
+  return cfg.spawnWeights.salt + (fun.saltShareEnd - cfg.spawnWeights.salt) * t;
+}
+
+/**
+ * Art eines neuen Tropfens mit den Sonder-Tropfen (Auftrag 45). Bei 0 genau wie `pickKind`.
+ * Gold und Schutzblatt nehmen den unteren Teil der Zufallszahl, der Rest verteilt sich nach spawnWeights,
+ * nur dass der Salz-Anteil mit der Zeit wächst.
+ */
+export function spawnKind(
+  rand: number,
+  elapsedMs: number,
+  cfg: DropsConfig = DROPS_GAME,
+  fun: DropsFun = MINIGAME_FUN.drops,
+): DropKind {
+  'worklet';
+  const gold = elapsedMs >= fun.goldenFromMs ? fun.goldenChance : 0;
+  const leaf = elapsedMs >= fun.leafFromMs ? fun.leafChance : 0;
+  if (rand < gold) return 'golden';
+  if (rand < gold + leaf) return 'leaf';
+  const r = (rand - gold - leaf) / (1 - gold - leaf);
+  const salt = saltShare(elapsedMs, cfg, fun);
+  if (r >= 1 - salt) return 'salt';
+  const { water, fertilizer } = cfg.spawnWeights;
+  return (r / (1 - salt)) * (water + fertilizer) < water ? 'water' : 'fertilizer';
+}
+
 /** Topf folgt dem Finger, bleibt aber ganz im Feld. */
 export function clampPot(x: number, width: number, cfg: DropsConfig = DROPS_GAME): number {
   'worklet';
@@ -103,12 +151,17 @@ export function stepField(
   randKind: number,
   randX: number,
   cfg: DropsConfig = DROPS_GAME,
+  fun: DropsFun = MINIGAME_FUN.drops,
 ): { field: DropsField; events: DropsStepEvents } {
   'worklet';
   let { nextSpawnMs, nextId, lives, caughtWater, caughtFertilizer } = field;
+  let shield = field.shield === true;
   const drops: Drop[] = [];
   let points = 0;
   let livesLost = 0;
+  let golden = 0;
+  let shieldGained = false;
+  let shieldUsed = false;
 
   const dy = (fallSpeed(elapsedMs, cfg) * dtMs) / 1000;
   const catchY = potTop(height, cfg);
@@ -117,7 +170,19 @@ export function stepField(
     const crossed = d.y < catchY && y >= catchY;
     if (crossed && isOverPot(d.x, field.potX, cfg)) {
       if (d.kind === 'salt') {
-        livesLost += 1;
+        if (shield) {
+          shield = false;
+          shieldUsed = true;
+        } else {
+          livesLost += 1;
+        }
+      } else if (d.kind === 'leaf') {
+        shield = true;
+        shieldGained = true;
+      } else if (d.kind === 'golden') {
+        points += fun.goldenPoints;
+        golden += 1;
+        caughtWater += 1;
       } else {
         points += cfg.pointsPerDrop;
         if (d.kind === 'water') caughtWater += 1;
@@ -132,15 +197,22 @@ export function stepField(
   if (elapsedMs >= nextSpawnMs) {
     const r = cfg.dropRadius;
     const x = r + randX * Math.max(0, width - 2 * r);
-    drops.push({ id: nextId, kind: pickKind(randKind, cfg), x, y: -r });
+    drops.push({ id: nextId, kind: spawnKind(randKind, elapsedMs, cfg, fun), x, y: -r });
     nextId += 1;
-    nextSpawnMs = elapsedMs + spawnInterval(elapsedMs, cfg);
+    const gap = spawnInterval(elapsedMs, cfg);
+    nextSpawnMs = elapsedMs + (inShower(elapsedMs, fun) ? gap * fun.showerSpawnFactor : gap);
   }
 
   lives = Math.max(0, lives - livesLost);
   return {
-    field: { drops, potX: field.potX, lives, caughtWater, caughtFertilizer, nextSpawnMs, nextId },
-    events: { points, livesLost },
+    field: { drops, potX: field.potX, lives, caughtWater, caughtFertilizer, nextSpawnMs, nextId, shield },
+    events: {
+      points,
+      livesLost,
+      golden: golden > 0 ? golden : undefined,
+      shieldGained: shieldGained || undefined,
+      shieldUsed: shieldUsed || undefined,
+    },
   };
 }
 

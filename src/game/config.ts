@@ -705,12 +705,79 @@ export const MINIGAME_FEEL = {
   keyboardPotSpeed: 620,
   /** Punkte für 1, 2 und 3 Sterne je Spiel. */
   stars: {
-    tap: [15, 35, 50],
-    smash: [20, 50, 70],
+    // Auftrag 45: mit den neuen Elementen neu gemessen (docs/progress/web7.md).
+    tap: [12, 35, 55],
+    smash: [20, 55, 90],
     drops: [20, 45, 80],
-    jump: [80, 250, 600],
+    jump: [80, 180, 600],
     quiz: [10, 20, 60],
   } as Record<string, readonly [number, number, number]>,
+} as const;
+
+/**
+ * Spielspaß der Minigames (Auftrag 45, WEB-7): neue Elemente und Steigerung je Spiel. Ändert weder
+ * die Münzformel noch MINIGAME_REWARDS; Sonderpunkte sind selten, Wirkung auf die Münzen gemessen
+ * mit dem Bot (docs/progress/web7.md). Zeiten in Spiel-Millisekunden, Längen wie im jeweiligen Spiel.
+ */
+export const MINIGAME_FUN = {
+  /** "Rekord!"-Banner und Ereignis-Banner (Endspurt, Schwarm, Schauer) so lange zeigen. */
+  bannerMs: 1300,
+  tap: {
+    /** Goldene Knospe: Anteil der neuen Knospen, ab dieser Spielzeit, Punkte, kürzere Standzeit. */
+    goldenChance: 0.08,
+    goldenFromMs: 4000,
+    goldenPoints: 3,
+    goldenLifetimeFactor: 0.65,
+    /** Endspurt: die letzten Sekunden, goldene Knospen kommen dann öfter. */
+    finaleSeconds: 8,
+    finaleGoldenChance: 0.2,
+  },
+  smash: {
+    /** Panzermilbe: braucht zwei Treffer, bringt dann Extrapunkte. Anteil unter den Schädlingen. */
+    armoredChance: 0.1,
+    armoredFromMs: 8000,
+    armoredHits: 2,
+    armoredBonus: 0,
+    armoredLifetimeFactor: 1.5,
+    /** Schwarm: zu diesen Spielzeiten tauchen auf einen Schlag so viele Trauermücken auf. */
+    swarmAtMs: [15000, 30000],
+    swarmSize: 3,
+  },
+  drops: {
+    /** Goldener Tropfen: Anteil der neuen Tropfen ab dieser Spielzeit, Punkte (zählt als Wasser). */
+    goldenChance: 0.05,
+    goldenFromMs: 8000,
+    goldenPoints: 3,
+    /** Schutzblatt: gefangen schützt es vor dem nächsten Salz. */
+    leafChance: 0.015,
+    leafFromMs: 20000,
+    /** Salz-Anteil steigt von spawnWeights.salt bis saltShareEnd, erreicht nach saltRampMs. */
+    saltShareEnd: 0.38,
+    saltRampMs: 90000,
+    /** Regenschauer: alle so viele ms für eine kurze Zeit doppelt so viele Tropfen. */
+    showerEveryMs: 30000,
+    showerMs: 3000,
+    showerSpawnFactor: 0.4,
+  },
+  jump: {
+    /** Wander-Blätter gleiten hin und her: Anteil ab movingFromHeight, steigt bis difficultyHeight. */
+    movingFromHeight: 500,
+    movingChance: { start: 0.05, hard: 0.3 },
+    /** Tempo der Wander-Blätter (Welt-Einheiten pro Sekunde): unten und ganz oben. */
+    movingSpeed: { start: 18, hard: 40 },
+    /** Sonnenstrahl: Chance je Blatt ab dieser Höhe, trägt Budi so lange mit diesem Tempo nach oben. */
+    boostChance: 0.025,
+    boostFromHeight: 600,
+    boostMs: 1300,
+    boostVelocity: 230,
+    boostRadius: 4,
+  },
+  quiz: {
+    /** Bedenkzeit je Frage in Sekunden: wird von Frage zu Frage knapper. Leer gelaufen zählt als falsch. */
+    questionSeconds: [16, 12, 9],
+    /** 50:50-Joker je Runde: nimmt eine falsche Antwort weg. */
+    jokersPerRound: 1,
+  },
 } as const;
 
 /** Beispielspiel "Tipp den Kreis" (Auftrag P08). */

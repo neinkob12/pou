@@ -16,6 +16,8 @@ export interface Platform {
   kind: PlatformKind;
   /** Brechendes Blatt nach der Landung: fällt, trägt nicht mehr. */
   broken: boolean;
+  /** Wander-Blatt (Auftrag 45): gleitet mit diesem Tempo seitlich, prallt an den Rändern ab. */
+  vx?: number;
 }
 
 /** Sammelbarer Lichtpunkt (Mittelpunkt). */
@@ -46,6 +48,12 @@ export interface JumpWorld {
   restMs: number;
   /** Budi ist unten rausgefallen. */
   fallen: boolean;
+  /** Sonnenstrahlen zum Einsammeln (Auftrag 45). */
+  boosts?: LightPoint[];
+  /** Restzeit (ms), in der ein Sonnenstrahl Budi nach oben trägt. */
+  boostMs?: number;
+  /** In dieser Runde eingesammelte Sonnenstrahlen. */
+  boostsCollected?: number;
 }
 
 /** Zufallszahl in [0, 1) und neuer Zustand (mulberry32). */

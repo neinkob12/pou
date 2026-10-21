@@ -1,10 +1,12 @@
 // Regeln von "Schädlings-Smash", ohne React. Die 'worklet'-Funktionen laufen im Frame-Callback
 // und beim Tippen auf dem UI-Thread. Zufall kommt als Zahl in [0, 1) rein, damit alles testbar bleibt.
 
-import { PEST_SMASH } from '../../../game/config';
+import { MINIGAME_FUN, PEST_SMASH } from '../../../game/config';
 
 export type SmashConfig = typeof PEST_SMASH;
-export type CritterKind = 'mite' | 'gnat' | 'ladybug';
+type SmashFun = typeof MINIGAME_FUN.smash;
+/** `armored`: Panzermilbe (Auftrag 45), braucht zwei Treffer. */
+export type CritterKind = 'mite' | 'gnat' | 'ladybug' | 'armored';
 
 export interface Critter {
   id: number;
@@ -15,6 +17,8 @@ export interface Critter {
   lifetimeMs: number;
   /** Spielzeit des Treffers, null solange nicht getroffen. */
   hitAtMs: number | null;
+  /** Panzermilbe: so viele Treffer fehlen noch (fehlt das Feld: einer). */
+  hitsLeft?: number;
 }
 
 export interface SmashState {
@@ -24,6 +28,8 @@ export interface SmashState {
   /** Treffer in Folge; 0 = keine Kombo. */
   combo: number;
   lastHitAtMs: number | null;
+  /** So viele Schwärme sind schon gekommen (Auftrag 45). */
+  swarms?: number;
 }
 
 export interface TapOutcome {
@@ -31,11 +37,20 @@ export interface TapOutcome {
   /** Punkte für diesen Tipp (negativ bei Marienkäfer), 0 bei Fehltipp. */
   points: number;
   kind: CritterKind | null;
+  /** Panzer angeknackst, das Tier bleibt sitzen (Auftrag 45). */
+  cracked?: boolean;
 }
 
 export function createSmashState(): SmashState {
   'worklet';
-  return { critters: [], nextId: 1, nextSpawnAtMs: 0, combo: 0, lastHitAtMs: null };
+  return {
+    critters: [],
+    nextId: 1,
+    nextSpawnAtMs: 0,
+    combo: 0,
+    lastHitAtMs: null,
+    swarms: 0,
+  };
 }
 
 export function holeCount(cfg: SmashConfig = PEST_SMASH): number {
@@ -74,6 +89,21 @@ export function critterKindFor(rand: number, cfg: SmashConfig = PEST_SMASH): Cri
   return pestRand < cfg.miteShareOfPests ? 'mite' : 'gnat';
 }
 
+/**
+ * Panzermilbe statt Spinnmilbe (Auftrag 45)? Nutzt dieselbe Zufallszahl wie `critterKindFor`, damit
+ * die Panzermilben ein Teil der Milben sind und die Anteile der anderen Tiere bleiben.
+ */
+export function isArmoredRoll(
+  rand: number,
+  elapsedMs: number,
+  cfg: SmashConfig = PEST_SMASH,
+  fun: SmashFun = MINIGAME_FUN.smash,
+): boolean {
+  'worklet';
+  if (elapsedMs < fun.armoredFromMs || rand < cfg.ladybugChance) return false;
+  return (rand - cfg.ladybugChance) / (1 - cfg.ladybugChance) < fun.armoredChance;
+}
+
 /** Freies Loch per Zufall, -1 wenn alle belegt sind. */
 export function pickFreeHole(rand: number, critters: readonly Critter[], holes: number): number {
   'worklet';
@@ -106,6 +136,7 @@ export function stepSmash(
   randKind: number,
   randHole: number,
   cfg: SmashConfig = PEST_SMASH,
+  fun: SmashFun = MINIGAME_FUN.smash,
 ): SmashState {
   'worklet';
   const critters = state.critters.filter((c) =>
@@ -123,13 +154,16 @@ export function stepSmash(
   if (elapsedMs >= nextSpawnAtMs) {
     const hole = pickFreeHole(randHole, critters, holeCount(cfg));
     if (hole >= 0) {
+      const armored = isArmoredRoll(randKind, elapsedMs, cfg, fun);
+      const lifetimeMs = critterLifetimeMs(elapsedMs, cfg);
       critters.push({
         id: nextId,
-        kind: critterKindFor(randKind, cfg),
+        kind: armored ? 'armored' : critterKindFor(randKind, cfg),
         hole,
         spawnedAtMs: elapsedMs,
-        lifetimeMs: critterLifetimeMs(elapsedMs, cfg),
+        lifetimeMs: armored ? lifetimeMs * fun.armoredLifetimeFactor : lifetimeMs,
         hitAtMs: null,
+        ...(armored ? { hitsLeft: fun.armoredHits } : {}),
       });
       nextId += 1;
       nextSpawnAtMs = elapsedMs + spawnIntervalMs(elapsedMs, cfg);
@@ -137,8 +171,28 @@ export function stepSmash(
     }
   }
 
+  // Schwarm (Auftrag 45): zu festen Zeiten mehrere Trauermücken auf einmal.
+  let swarms = state.swarms ?? 0;
+  if (swarms < fun.swarmAtMs.length && elapsedMs >= fun.swarmAtMs[swarms]) {
+    swarms += 1;
+    changed = true;
+    for (let i = 0; i < fun.swarmSize; i += 1) {
+      const hole = pickFreeHole((randHole + i * 0.37) % 1, critters, holeCount(cfg));
+      if (hole < 0) break;
+      critters.push({
+        id: nextId,
+        kind: 'gnat',
+        hole,
+        spawnedAtMs: elapsedMs,
+        lifetimeMs: critterLifetimeMs(elapsedMs, cfg),
+        hitAtMs: null,
+      });
+      nextId += 1;
+    }
+  }
+
   if (!changed) return state;
-  return { ...state, critters, combo, nextId, nextSpawnAtMs };
+  return { ...state, critters, combo, nextId, nextSpawnAtMs, swarms };
 }
 
 /**
@@ -151,22 +205,44 @@ export function tapHole(
   elapsedMs: number,
   currentScore: number,
   cfg: SmashConfig = PEST_SMASH,
+  fun: SmashFun = MINIGAME_FUN.smash,
 ): TapOutcome {
   'worklet';
   const target = state.critters.find((c) => c.hole === hole && isActive(c, elapsedMs));
   if (!target) return { state, points: 0, kind: null };
 
+  const quick = state.lastHitAtMs !== null && elapsedMs - state.lastHitAtMs <= cfg.comboWindowMs;
+  // Panzermilbe mit Panzer: Treffer knackt ihn und hält die Kombo am Leben, bringt aber noch nichts.
+  if ((target.hitsLeft ?? 1) > 1) {
+    const cracked = state.critters.map((c) => (c.id === target.id ? { ...c, hitsLeft: (c.hitsLeft ?? 1) - 1 } : c));
+    const combo = quick ? state.combo : 0;
+    return {
+      state: { ...state, critters: cracked, combo, lastHitAtMs: elapsedMs },
+      points: 0,
+      kind: target.kind,
+      cracked: true,
+    };
+  }
+
   const critters = state.critters.map((c) => (c.id === target.id ? { ...c, hitAtMs: elapsedMs } : c));
   if (target.kind === 'ladybug') {
     const penalty = Math.min(cfg.ladybugPenalty, Math.max(0, currentScore));
     const points = penalty > 0 ? -penalty : 0;
-    return { state: { ...state, critters, combo: 0, lastHitAtMs: null }, points, kind: target.kind };
+    return {
+      state: { ...state, critters, combo: 0, lastHitAtMs: null },
+      points,
+      kind: target.kind,
+    };
   }
 
-  const quick = state.lastHitAtMs !== null && elapsedMs - state.lastHitAtMs <= cfg.comboWindowMs;
   const combo = quick ? state.combo + 1 : 1;
-  const points = cfg.pointsPerPest * comboMultiplier(combo, cfg);
-  return { state: { ...state, critters, combo, lastHitAtMs: elapsedMs }, points, kind: target.kind };
+  const bonus = target.kind === 'armored' ? fun.armoredBonus : 0;
+  const points = (cfg.pointsPerPest + bonus) * comboMultiplier(combo, cfg);
+  return {
+    state: { ...state, critters, combo, lastHitAtMs: elapsedMs },
+    points,
+    kind: target.kind,
+  };
 }
 
 export interface HoleLayout {
@@ -183,7 +259,11 @@ export function holeLayout(hole: number, width: number, height: number, cfg: Sma
   const row = Math.floor(hole / cfg.gridCols);
   const cellW = width / cfg.gridCols;
   const cellH = height / cfg.gridRows;
-  return { x: (col + 0.5) * cellW, y: (row + 0.5) * cellH, cell: Math.min(cellW, cellH) / 2 };
+  return {
+    x: (col + 0.5) * cellW,
+    y: (row + 0.5) * cellH,
+    cell: Math.min(cellW, cellH) / 2,
+  };
 }
 
 /** Welches Loch liegt unter dem Finger? -1, wenn keins nah genug ist. */

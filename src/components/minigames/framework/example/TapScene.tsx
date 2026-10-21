@@ -4,9 +4,10 @@
 import { Circle, Group, LinearGradient, Oval, Path, Rect, Skia, vec } from '@shopify/react-native-skia';
 import { useDerivedValue, type SharedValue } from 'react-native-reanimated';
 
-import { colors, gameColors } from '../../../../lib/theme';
+import { colors, funColors, gameColors } from '../../../../lib/theme';
 import type { MinigameClock } from '../session';
-import { lifetimeAt, type TapCircle } from './tapCircle';
+import type { TapCircle } from './tapCircle';
+import { circleLifetime } from './tapGolden';
 
 /** Lichtflecken im Hintergrund: Lage als Anteil der Fläche, Radius als Anteil der Breite. */
 const SPOTS = [
@@ -49,14 +50,21 @@ function Background({ size }: { size: SharedValue<{ width: number; height: numbe
   );
 }
 
-/** Knospe in Einheitsgröße (Radius 1), die Gruppe skaliert auf den Kreisradius. */
-export function Bud() {
+/** Knospe in Einheitsgröße (Radius 1), die Gruppe skaliert auf den Kreisradius. `golden`: Bonus-Knospe. */
+export function Bud({ golden = false }: { golden?: boolean }) {
   return (
     <>
+      {golden && <Circle cx={0} cy={0} r={1.25} color={funColors.goldLight} opacity={0.6} />}
       {PETALS.map((deg) => (
         <Group key={deg} transform={[{ rotate: (deg * Math.PI) / 180 }]}>
-          <Oval x={-0.36} y={-1.02} width={0.72} height={0.8} color={colors.lavender} />
-          <Oval x={-0.22} y={-0.92} width={0.44} height={0.5} color={gameColors.lavenderLight} />
+          <Oval x={-0.36} y={-1.02} width={0.72} height={0.8} color={golden ? funColors.gold : colors.lavender} />
+          <Oval
+            x={-0.22}
+            y={-0.92}
+            width={0.44}
+            height={0.5}
+            color={golden ? funColors.goldLight : gameColors.lavenderLight}
+          />
         </Group>
       ))}
       <Circle cx={0} cy={0} r={0.5} color={colors.lamp} />
@@ -80,7 +88,7 @@ export function TapScene({ circle, clock, size }: TapSceneProps) {
     const c = circle.get();
     const b = Skia.PathBuilder.Make();
     if (c.r <= 0) return b.detach();
-    const life = lifetimeAt(c.spawnedAtMs);
+    const life = circleLifetime(c);
     const left = Math.max(0, 1 - (clock.get().elapsedMs - c.spawnedAtMs) / life);
     const rr = c.r + 7;
     b.addArc(Skia.XYWHRect(c.x - rr, c.y - rr, rr * 2, rr * 2), -90, 360 * left);
@@ -88,16 +96,25 @@ export function TapScene({ circle, clock, size }: TapSceneProps) {
   });
   const ringColor = useDerivedValue(() => {
     const c = circle.get();
-    const left = 1 - (clock.get().elapsedMs - c.spawnedAtMs) / lifetimeAt(c.spawnedAtMs);
-    return left < 0.3 ? colors.coral : colors.plantLight;
+    const left = 1 - (clock.get().elapsedMs - c.spawnedAtMs) / circleLifetime(c);
+    if (left < 0.3) return colors.coral;
+    return c.golden ? funColors.gold : colors.plantLight;
   });
+
+  const golden = useDerivedValue(() => (circle.get().golden ? 1 : 0));
+  const normal = useDerivedValue(() => (circle.get().golden ? 0 : 1));
 
   return (
     <>
       <Background size={size} />
       <Path path={ring} color={ringColor} style="stroke" strokeWidth={5} strokeCap="round" />
       <Group transform={budTransform}>
-        <Bud />
+        <Group opacity={normal}>
+          <Bud />
+        </Group>
+        <Group opacity={golden}>
+          <Bud golden />
+        </Group>
       </Group>
     </>
   );

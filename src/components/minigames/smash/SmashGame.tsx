@@ -10,10 +10,12 @@ import { GestureDetector } from 'react-native-gesture-handler';
 import { useFrameCallback, useSharedValue } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
+import { minigameFun } from '../../../content/strings';
 import { MINIGAME_FEEL, PEST_SMASH } from '../../../game/config';
 import { cue, useMinigameAudio } from '../../../lib/audio';
-import { colors, gameColors } from '../../../lib/theme';
+import { colors, funColors, gameColors } from '../../../lib/theme';
 import { ComboBadge } from '../framework/fx/ComboBadge';
+import { EventBanner, useBanner } from '../framework/fx/EventBanner';
 import { FxLayer } from '../framework/fx/FxLayer';
 import { PopupLayer } from '../framework/fx/PopupLayer';
 import { useFx } from '../framework/fx/useFx';
@@ -36,8 +38,15 @@ import { SmashLeaf } from './SmashLeaf';
 import { grantSmashReward } from './smashReward';
 
 const HOLES = Array.from({ length: holeCount(PEST_SMASH) }, (_, i) => i);
-/** Partikel: 0 Milbe, 1 Mücke, 2 Blattstücke, 3 Marienkäfer, 4 Fehltipp. */
-const PALETTE = [colors.terracotta, colors.night, colors.plantLight, colors.coral, gameColors.leafLight] as const;
+/** Partikel: 0 Milbe, 1 Mücke, 2 Blattstücke, 3 Marienkäfer, 4 Fehltipp, 5 Panzer. */
+const PALETTE = [
+  colors.terracotta,
+  colors.night,
+  colors.plantLight,
+  colors.coral,
+  gameColors.leafLight,
+  funColors.shell,
+] as const;
 
 export function SmashGame({ session }: { session: MinigameSession }) {
   const { clock, addScore, hitStop, result, phase } = session;
@@ -45,6 +54,7 @@ export function SmashGame({ session }: { session: MinigameSession }) {
   const state = useSharedValue(createSmashState());
   const score = useSharedValue(0);
   const [combo, setCombo] = useState(0);
+  const { banner, show: showBanner, clear: clearBanner } = useBanner();
   const fx = useFx();
   const shakeTransform = useShakeTransform(fx.state, fx.now);
   useMinigameAudio(phase, result?.coins ?? null);
@@ -58,14 +68,19 @@ export function SmashGame({ session }: { session: MinigameSession }) {
     if (next === before) return;
     state.set(next);
     if (next.combo !== before.combo) scheduleOnRN(setCombo, next.combo);
+    if ((next.swarms ?? 0) > (before.swarms ?? 0)) {
+      fx.shakeHit();
+      scheduleOnRN(showBanner, minigameFun.smashSwarm, colors.night);
+    }
   });
 
   const onPoints = useCallback(
-    (points: number, nextCombo: number, friendlyHit: boolean, x: number, y: number) => {
+    (points: number, nextCombo: number, friendlyHit: boolean, x: number, y: number, cracked: boolean) => {
       cue(friendlyHit ? 'ouch' : 'hit');
       addScore(points);
       setCombo(nextCombo);
-      if (friendlyHit) fx.popup(x, y - 20, points < 0 ? `${points}` : '!', colors.coral, true);
+      if (cracked) fx.popup(x, y - 20, minigameFun.smashCrack, funColors.shell, true);
+      else if (friendlyHit) fx.popup(x, y - 20, points < 0 ? `${points}` : '!', colors.coral, true);
       else fx.popup(x, y - 20, `+${points}`, points > 1 ? colors.coral : colors.plantDark, points > 1);
     },
     [addScore, fx],
@@ -88,13 +103,28 @@ export function SmashGame({ session }: { session: MinigameSession }) {
     if (outcome.kind === 'ladybug') {
       fx.burstAt(at.x, at.y, { count: 10, color: 3, speed: 0.7 });
       fx.shakeFail();
+    } else if (outcome.cracked) {
+      fx.burstAt(at.x, at.y, { count: 10, color: 5, speed: 0.6, size: 1.3 });
+      fx.shakeHit();
     } else {
-      fx.burstAt(at.x, at.y, { count: 12, color: outcome.kind === 'mite' ? 0 : 1, size: 1.2 });
+      fx.burstAt(at.x, at.y, {
+        count: 12,
+        color: outcome.kind === 'gnat' ? 1 : 0,
+        size: 1.2,
+      });
       fx.burstAt(at.x, at.y, { count: 6, color: 2, speed: 0.5, size: 1.4 });
       fx.shakeHit();
       hitStop(MINIGAME_FEEL.hitStopMs);
     }
-    scheduleOnRN(onPoints, outcome.points, outcome.state.combo, outcome.kind === 'ladybug', at.x, at.y);
+    scheduleOnRN(
+      onPoints,
+      outcome.points,
+      outcome.state.combo,
+      outcome.kind === 'ladybug',
+      at.x,
+      at.y,
+      outcome.cracked === true,
+    );
   };
 
   const gesture = usePointerInput({ onDown: tapAt });
@@ -128,6 +158,7 @@ export function SmashGame({ session }: { session: MinigameSession }) {
           </Canvas>
           <PopupLayer popups={fx.popups} onDone={fx.removePopup} />
           <ComboBadge combo={combo} multiplier={comboMultiplier(combo, PEST_SMASH)} />
+          <EventBanner banner={banner} onDone={clearBanner} />
         </View>
       </GestureDetector>
     </View>

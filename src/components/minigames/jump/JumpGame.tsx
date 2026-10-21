@@ -9,10 +9,11 @@ import { GestureDetector } from 'react-native-gesture-handler';
 import { useFrameCallback, useSharedValue } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
-import { jumpGame, minigameFeel } from '../../../content/strings';
+import { jumpGame, minigameFeel, minigameFun } from '../../../content/strings';
 import { BUDI_JUMP, MINIGAME_FRAMEWORK } from '../../../game/config';
 import { cue, useMinigameAudio } from '../../../lib/audio';
-import { colors } from '../../../lib/theme';
+import { colors, funColors } from '../../../lib/theme';
+import { EventBanner, useBanner } from '../framework/fx/EventBanner';
 import { FxLayer } from '../framework/fx/FxLayer';
 import { PopupLayer } from '../framework/fx/PopupLayer';
 import { useFx } from '../framework/fx/useFx';
@@ -29,8 +30,8 @@ import { createWorld, type JumpWorld } from './jumpWorld';
 import { RecordMark } from './RecordMark';
 import { useJumpInput } from './useJumpInput';
 
-/** Partikel: 0 Blattstücke, 1 Feder, 2 Licht. */
-const PALETTE = [colors.plantLight, colors.lavender, colors.lamp] as const;
+/** Partikel: 0 Blattstücke, 1 Feder, 2 Licht, 3 Sonnenstrahl. */
+const PALETTE = [colors.plantLight, colors.lavender, colors.lamp, funColors.gold] as const;
 
 export function JumpGame({ session }: { session: MinigameSession }) {
   const { clock, addScore, endGame, setExtraLifeHandler, phase, result } = session;
@@ -41,6 +42,8 @@ export function JumpGame({ session }: { session: MinigameSession }) {
   const size = useSharedValue({ width: 0, height: 0 });
   const reported = useSharedValue(0);
   const reportedLights = useSharedValue(0);
+  const reportedBoosts = useSharedValue(0);
+  const { banner, show: showBanner, clear: clearBanner } = useBanner();
   const lastLandingMs = useSharedValue(-1e9);
   const [lights, setLights] = useState(0);
   const lightsRef = useRef(0);
@@ -100,6 +103,16 @@ export function JumpGame({ session }: { session: MinigameSession }) {
       fx.burstAt(sx, sy, { count: 12, color: 2, speed: 0.7 });
       scheduleOnRN(onLights, next.lightsCollected, sx, sy - 20);
     }
+    if ((next.boostsCollected ?? 0) > reportedBoosts.get()) {
+      reportedBoosts.set(next.boostsCollected ?? 0);
+      fx.burstAt(sx, sy, { count: 18, color: 3, speed: 1 });
+      fx.shakeHit();
+      scheduleOnRN(cue, 'collect');
+      scheduleOnRN(showBanner, minigameFun.jumpBoost, funColors.goldDeep);
+    } else if ((next.boostMs ?? 0) > 0) {
+      // Funkenspur unter Budi, solange der Sonnenstrahl trägt.
+      fx.burstAt(sx, sy + BUDI_JUMP.budiRadius * k, { count: 1, color: 3, speed: 0.3, size: 0.7 });
+    }
     if (next.fallen && !before.fallen) {
       fx.shakeFail();
       scheduleOnRN(cue, 'fail');
@@ -137,6 +150,7 @@ export function JumpGame({ session }: { session: MinigameSession }) {
         </Canvas>
         {recordY !== null && <RecordMark height={recordY} world={world} size={size} />}
         <PopupLayer popups={fx.popups} onDone={fx.removePopup} />
+        <EventBanner banner={banner} onDone={clearBanner} />
         <View className="absolute left-3 top-2 rounded-full bg-white px-3 py-1" pointerEvents="none">
           <Text className="font-body-bold text-sm text-ink">
             {jumpGame.lights}: {lights}

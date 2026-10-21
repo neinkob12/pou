@@ -9,10 +9,12 @@ import { GestureDetector } from 'react-native-gesture-handler';
 import { useFrameCallback, useSharedValue } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
-import { MINIGAME_FEEL, TAP_CIRCLE } from '../../../../game/config';
+import { minigameFun } from '../../../../content/strings';
+import { MINIGAME_FEEL } from '../../../../game/config';
 import { cue, useMinigameAudio } from '../../../../lib/audio';
-import { colors, gameColors } from '../../../../lib/theme';
+import { colors, funColors, gameColors } from '../../../../lib/theme';
 import { ComboBadge } from '../fx/ComboBadge';
+import { EventBanner, useBanner } from '../fx/EventBanner';
 import { comboAfterHit } from '../fx/fxLogic';
 import { FxLayer } from '../fx/FxLayer';
 import { PopupLayer } from '../fx/PopupLayer';
@@ -20,22 +22,23 @@ import { useFx } from '../fx/useFx';
 import { useShakeTransform } from '../fx/useShake';
 import { usePointerInput } from '../input/usePointerInput';
 import type { MinigameSession } from '../useMinigameSession';
-import { NO_CIRCLE, isHit, lifetimeAt, needsRespawn, placeCircle, radiusForHits, type TapCircle } from './tapCircle';
+import { NO_CIRCLE, isHit, needsRespawn, placeCircle, radiusForHits, type TapCircle } from './tapCircle';
+import { circleLifetime, inFinale, pointsForCircle, rollGolden } from './tapGolden';
 import { TapScene } from './TapScene';
 
 /** Platz für den Zeit-Ring um die Knospe, damit er nicht am Rand abgeschnitten wird. */
 const RING_ROOM = 12;
 
-/** Neue Knospe irgendwo im Feld, mit Abstand für den Ring. */
+/** Neue Knospe irgendwo im Feld, mit Abstand für den Ring. Manchmal golden (Auftrag 45). */
 function spawn(width: number, height: number, hits: number, elapsedMs: number): TapCircle {
   'worklet';
   const r = radiusForHits(hits);
   const placed = placeCircle(Math.random(), Math.random(), width, height, r + RING_ROOM, elapsedMs);
-  return { ...placed, r };
+  return { ...placed, r, golden: rollGolden(Math.random(), elapsedMs) };
 }
 
-/** Farben der Partikel: 0 Blütenblatt, 1 Licht, 2 Fehltipp. */
-const PALETTE = [colors.lavender, colors.lamp, gameColors.creamDeep] as const;
+/** Farben der Partikel: 0 Blütenblatt, 1 Licht, 2 Fehltipp, 3 Gold. */
+const PALETTE = [colors.lavender, colors.lamp, gameColors.creamDeep, funColors.gold] as const;
 
 export function TapCircleGame({ session }: { session: MinigameSession }) {
   const { clock, addScore, hitStop, phase, result } = session;
@@ -45,6 +48,8 @@ export function TapCircleGame({ session }: { session: MinigameSession }) {
   const combo = useSharedValue(0);
   const lastHitMs = useSharedValue<number | null>(null);
   const [comboShown, setComboShown] = useState(0);
+  const finaleShown = useSharedValue(false);
+  const { banner, show: showBanner, clear: clearBanner } = useBanner();
   const fx = useFx();
   const shakeTransform = useShakeTransform(fx.state, fx.now);
   useMinigameAudio(phase, result?.coins ?? null);
@@ -55,8 +60,12 @@ export function TapCircleGame({ session }: { session: MinigameSession }) {
     const { phase: p, elapsedMs } = clock.get();
     const { width, height } = size.get();
     if (p !== 'playing' || width === 0) return;
+    if (!finaleShown.get() && inFinale(elapsedMs)) {
+      finaleShown.set(true);
+      scheduleOnRN(showBanner, minigameFun.tapFinale, colors.coral);
+    }
     const c = circle.get();
-    if (needsRespawn(c, elapsedMs, lifetimeAt(c.spawnedAtMs))) {
+    if (needsRespawn(c, elapsedMs, circleLifetime(c))) {
       if (c.r > 0) {
         fx.burstAt(c.x, c.y, { count: 6, color: 2, speed: 0.35 });
         if (combo.get() > 0) {
@@ -69,10 +78,11 @@ export function TapCircleGame({ session }: { session: MinigameSession }) {
   });
 
   const onHit = useCallback(
-    (x: number, y: number, nextCombo: number) => {
-      cue('catch');
-      addScore(TAP_CIRCLE.pointsPerHit);
-      fx.popup(x, y - 10, `+${TAP_CIRCLE.pointsPerHit}`, colors.plantDark, nextCombo >= MINIGAME_FEEL.comboShowFrom);
+    (x: number, y: number, nextCombo: number, points: number, golden: boolean) => {
+      cue(golden ? 'collect' : 'catch');
+      addScore(points);
+      if (golden) fx.popup(x, y - 10, `+${points} ${minigameFun.tapGolden}`, funColors.goldDeep, true);
+      else fx.popup(x, y - 10, `+${points}`, colors.plantDark, nextCombo >= MINIGAME_FEEL.comboShowFrom);
       setComboShown(nextCombo);
     },
     [addScore, fx],
@@ -91,13 +101,13 @@ export function TapCircleGame({ session }: { session: MinigameSession }) {
     const nextCombo = comboAfterHit(combo.get(), lastHitMs.get(), elapsedMs);
     combo.set(nextCombo);
     lastHitMs.set(elapsedMs);
-    fx.burstAt(c.x, c.y, { count: 14, color: 0, size: 1.3 });
-    fx.burstAt(c.x, c.y, { count: 8, color: 1, speed: 0.6 });
+    fx.burstAt(c.x, c.y, { count: 14, color: c.golden ? 3 : 0, size: 1.3 });
+    fx.burstAt(c.x, c.y, { count: c.golden ? 16 : 8, color: 1, speed: c.golden ? 1 : 0.6 });
     fx.shakeHit();
     hitStop(MINIGAME_FEEL.hitStopMs);
     const { width, height } = size.get();
     circle.set(spawn(width, height, hits.get(), elapsedMs));
-    scheduleOnRN(onHit, c.x, c.y, nextCombo);
+    scheduleOnRN(onHit, c.x, c.y, nextCombo, pointsForCircle(c), c.golden === true);
   };
 
   const gesture = usePointerInput({ onDown: tapAt });
@@ -118,6 +128,7 @@ export function TapCircleGame({ session }: { session: MinigameSession }) {
         </Canvas>
         <PopupLayer popups={fx.popups} onDone={fx.removePopup} />
         <ComboBadge combo={comboShown} />
+        <EventBanner banner={banner} onDone={clearBanner} />
       </View>
     </GestureDetector>
   );
