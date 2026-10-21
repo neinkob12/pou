@@ -71,9 +71,12 @@ export const budi: Record<BudiPlantId | BudiFaceId | BudiPotId, ImageSourcePropT
 export type RoomAssetId = 'h1_day' | 'h2_night' | 'u1_pot' | 'u2_lamp_on' | 'u2_lamp_off';
 export const room: Partial<Record<RoomAssetId, ImageSourcePropType>> = {};
 
-// --- UI: Icons, Münzen, Buttons (P03 und folgende) ---
+// --- UI: Icons, Münzen, Pflege-Werkzeuge (P03, P10, ART-2) ---
+// ART-2: gezeichnet in src/components/ui/icons/ (Skia), mit `node assets/render-art.cjs` als PNG
+// gerendert (256 px, scharf bis 85 pt bei 3x). Nach Änderungen an den Zeichnungen neu rendern.
 export type UiAssetId =
   | 'u9_coin'
+  | 'u10_seed_fragment'
   | 'u11_water'
   | 'u11_nutrients'
   | 'u11_light'
@@ -81,19 +84,74 @@ export type UiAssetId =
   | 'u12_minigames'
   | 'u12_shop'
   | 'u12_album'
-  | 'u12_settings';
-export const ui: Partial<Record<UiAssetId, ImageSourcePropType>> = {};
+  | 'u12_settings'
+  | 'u13_chest'
+  | 'u13_chest_open'
+  | 'ui_star'
+  | 'ui_lock'
+  | 'ui_seed'
+  | 'ui_gem';
+export const ui: Record<UiAssetId, ImageSourcePropType> = {
+  u9_coin: require('../../assets/images/u9_coin.png'),
+  u10_seed_fragment: require('../../assets/images/u10_seed_fragment.png'),
+  u11_water: require('../../assets/images/u11_water.png'),
+  u11_nutrients: require('../../assets/images/u11_nutrients.png'),
+  u11_light: require('../../assets/images/u11_light.png'),
+  u11_mood: require('../../assets/images/u11_mood.png'),
+  u12_minigames: require('../../assets/images/u12_minigames.png'),
+  u12_shop: require('../../assets/images/u12_shop.png'),
+  u12_album: require('../../assets/images/u12_album.png'),
+  u12_settings: require('../../assets/images/u12_settings.png'),
+  u13_chest: require('../../assets/images/u13_chest.png'),
+  u13_chest_open: require('../../assets/images/u13_chest_open.png'),
+  ui_star: require('../../assets/images/ui_star.png'),
+  ui_lock: require('../../assets/images/ui_lock.png'),
+  ui_seed: require('../../assets/images/ui_seed.png'),
+  ui_gem: require('../../assets/images/ui_gem.png'),
+};
 
-// --- Pflege: Gießkanne, Dünger (P10) ---
-// Schlüssel = ID aus docs/ASSETS.md. Fehlt die Datei, zeigt das Werkzeug einen Platzhalter.
+// --- Pflege: Gießkanne, Dünger (P10, Bilder ART-2) ---
+// Schlüssel = ID aus docs/ASSETS.md.
 export type CareAssetId = 'u3_watering_can' | 'u4_fertilizer_grow' | 'u4_fertilizer_bloom';
-export const care: Partial<Record<CareAssetId, ImageSourcePropType>> = {};
+export const care: Record<CareAssetId, ImageSourcePropType> = {
+  u3_watering_can: require('../../assets/images/u3_watering_can.png'),
+  u4_fertilizer_grow: require('../../assets/images/u4_fertilizer_grow.png'),
+  u4_fertilizer_bloom: require('../../assets/images/u4_fertilizer_bloom.png'),
+};
+
+// --- Sorten: Porträt (Samentüte, U15) und Abzeichen je Sorte (ART-2) ---
+// Porträt für Sortenkarten im Album und in der Samenauswahl, Abzeichen für Erfolge und Ernte.
+export const strainArt: Record<StrainId, { portrait: ImageSourcePropType; badge: ImageSourcePropType }> = {
+  gustav: {
+    portrait: require('../../assets/images/u15_gustav.png'),
+    badge: require('../../assets/images/strain_badge_gustav.png'),
+  },
+  lotte: {
+    portrait: require('../../assets/images/u15_lotte.png'),
+    badge: require('../../assets/images/strain_badge_lotte.png'),
+  },
+  sascha: {
+    portrait: require('../../assets/images/u15_sascha.png'),
+    badge: require('../../assets/images/strain_badge_sascha.png'),
+  },
+  anton: {
+    portrait: require('../../assets/images/u15_anton.png'),
+    badge: require('../../assets/images/strain_badge_anton.png'),
+  },
+  koelsch: {
+    portrait: require('../../assets/images/u15_koelsch.png'),
+    badge: require('../../assets/images/strain_badge_koelsch.png'),
+  },
+};
 
 // --- Gesundheit: Schädlinge und Schimmel auf Budi (P21) ---
-// Schlüssel = ID aus docs/ASSETS.md (U17). Fehlt die Datei, zeigt Budi einen Platzhalter.
-// Datei einhängen: z. B. `u17_spider_mite: require('../../assets/images/u17_spider_mite.png'),`
+// Schlüssel = ID aus docs/ASSETS.md (U17). Bilder gezeichnet von ART-2 (src/components/ui/icons/).
 export type HealthAssetId = 'u17_spider_mite' | 'u17_fungus_gnat' | 'u17_mold';
-export const health: Partial<Record<HealthAssetId, ImageSourcePropType>> = {};
+export const health: Record<HealthAssetId, ImageSourcePropType> = {
+  u17_spider_mite: require('../../assets/images/u17_spider_mite.png'),
+  u17_fungus_gnat: require('../../assets/images/u17_fungus_gnat.png'),
+  u17_mold: require('../../assets/images/u17_mold.png'),
+};
 
 // --- Ernte: Lupe, Schere, Trocknen, Erntekiste (P24) ---
 // Schlüssel = ID aus docs/ASSETS.md. Fehlt die Datei, zeigt der Ernte-Screen einen Platzhalter.
@@ -188,10 +246,10 @@ export const sounds: Record<SoundId, number> & SoundMap = {
   s12_ouch: require('../../assets/sounds/s12_ouch.m4a'),
 };
 
-// --- App-Icon und Splash ---
+// --- App-Icon und Splash (ART-2, src/components/ui/icons/appIconArt.tsx) ---
 export const icon = {
   app: require('../../assets/icon/icon.png'),
   splash: require('../../assets/icon/splash-icon.png'),
 } satisfies AssetMap;
 
-export const assets = { budi, room, ui, upgrades, minigames, sounds, icon };
+export const assets = { budi, room, ui, upgrades, minigames, sounds, icon, strainArt };
