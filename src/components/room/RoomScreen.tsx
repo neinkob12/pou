@@ -19,7 +19,7 @@ import { Lamp } from './Lamp';
 import { NeedBars } from './NeedBars';
 import { PhaseHeader } from './PhaseHeader';
 import { PhaseChangePopup } from './phase/PhaseChangePopup';
-import { RoomBackground } from './RoomBackground';
+import { RoomBackground, RoomForeground } from './RoomBackground';
 import { RoomUpgrades } from './RoomUpgrades';
 
 // Hauptraum: nur Komposition der Slots. Besitzer je Welle siehe docs/AUFTRAEGE.md
@@ -47,6 +47,7 @@ export function RoomScreen() {
         <Lamp />
         <RoomUpgrades />
         <BudiStage />
+        <RoomForeground />
         <HealthWatch />
         <ActionTray />
         <View className="h-3" />

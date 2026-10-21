@@ -41,3 +41,29 @@ describe('roomLayout', () => {
     expect(roomLayout(0, 0).height).toBe(0);
   });
 });
+
+describe('roomLayout (ART-4)', () => {
+  const sizes = [
+    [390, 844],
+    [320, 568],
+    [430, 932],
+  ];
+
+  it('Kommode steht auf dem Boden, Poster hängt darüber ohne Überlappung', () => {
+    for (const [w, h] of sizes) {
+      const l = roomLayout(w, h);
+      expect(l.dresser.y + l.dresser.h).toBeGreaterThanOrEqual(l.floorY);
+      expect(l.dresser.y).toBeLessThan(l.floorY);
+      // Bücher und Nachtlicht (bis 10 Einheiten) passen zwischen Poster und Kommode.
+      expect(l.poster.y + l.poster.h).toBeLessThanOrEqual(l.dresser.y - 10);
+    }
+  });
+
+  it('Holzverkleidung liegt unter dem Fensterbrett', () => {
+    for (const [w, h] of sizes) {
+      const l = roomLayout(w, h);
+      expect(l.wainscotY).toBeGreaterThan(l.window.y + l.window.h);
+      expect(l.wainscotY).toBeLessThan(l.floorY);
+    }
+  });
+});
