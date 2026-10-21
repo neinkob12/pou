@@ -1,6 +1,5 @@
-import { Text } from 'react-native';
-
 import { minigameFramework as t } from '../../../content/strings';
+import { GameText } from '../../ui/GameText';
 import { GameButton } from './GameButton';
 import { Overlay } from './Overlay';
 
@@ -13,7 +12,9 @@ interface ExtraLifeOverlayProps {
 export function ExtraLifeOverlay({ onAccept, onDecline }: ExtraLifeOverlayProps) {
   return (
     <Overlay>
-      <Text className="text-center font-heading text-3xl text-ink">{t.extraLifeQuestion}</Text>
+      <GameText variant="title" align="center">
+        {t.extraLifeQuestion}
+      </GameText>
       <GameButton label={t.extraLifeAccept} onPress={onAccept} />
       <GameButton label={t.extraLifeDecline} onPress={onDecline} variant="secondary" />
     </Overlay>

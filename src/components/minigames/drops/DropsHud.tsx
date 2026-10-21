@@ -1,8 +1,11 @@
-import { Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { dropsGame as t } from '../../../content/strings';
 import { DROPS_GAME } from '../../../game/config';
-import { colors } from '../../../lib/theme';
+import { gameRadii, outline, tones, type Tone } from '../../../lib/theme';
+import { GlossFill } from '../../ui/game/GlossFill';
+import { GameText } from '../../ui/GameText';
+import { StrokeText } from '../framework/StrokeText';
 import type { DropsReward } from './dropsLogic';
 
 interface DropsHudProps {
@@ -16,25 +19,17 @@ interface DropsHudProps {
 const HEART = '♥';
 
 /** Kleiner Balken unter der Zahl, damit man den Zuwachs auf einen Blick sieht (Auftrag 40). */
-function GainBar({
-  label,
-  value,
-  color,
-  textClass,
-}: {
-  label: string;
-  value: number;
-  color: string;
-  textClass: string;
-}) {
+function GainBar({ label, value, tone }: { label: string; value: number; tone: Tone }) {
   const max = DROPS_GAME.maxBarGainPerRound;
   return (
     <View className="min-w-24 gap-1">
-      <Text className={`font-body-bold text-sm ${textClass}`}>
-        {label} +{value}/{max}
-      </Text>
-      <View className="h-2 overflow-hidden rounded-full bg-white">
-        <View className="h-2 rounded-full" style={{ width: `${(100 * value) / max}%`, backgroundColor: color }} />
+      <GameText variant="small" color={tone.edge}>
+        {`${label} +${value}/${max}`}
+      </GameText>
+      <View style={styles.track}>
+        <View style={[styles.fill, { width: `${(100 * value) / max}%` }]}>
+          <GlossFill tone={tone} radius={5} shine={false} />
+        </View>
       </View>
     </View>
   );
@@ -48,15 +43,29 @@ export function DropsHud({ lives, gain, reward }: DropsHudProps) {
       <View className="flex-row items-center justify-between gap-3">
         <View accessibilityLabel={`${t.lives}: ${lives}`} className="flex-row">
           {Array.from({ length: Math.max(DROPS_GAME.lives, lives) }, (_, i) => (
-            <Text key={i} style={{ fontSize: 24, color: colors.coral, opacity: i < lives ? 1 : 0.2 }}>
-              {HEART}
-            </Text>
+            <View key={i} style={{ opacity: i < lives ? 1 : 0.3 }}>
+              <StrokeText size={24} color={i < lives ? tones.coral.base : tones.stone.base} stroke={2}>
+                {HEART}
+              </StrokeText>
+            </View>
           ))}
         </View>
-        <GainBar label={t.water} value={shown.water} color={colors.night} textClass="text-night" />
-        <GainBar label={t.nutrients} value={shown.nutrients} color={colors.plantDark} textClass="text-plantDark" />
+        <GainBar label={t.water} value={shown.water} tone={tones.sky} />
+        <GainBar label={t.nutrients} value={shown.nutrients} tone={tones.leaf} />
       </View>
       {reward === null && <Text className="font-body text-sm text-inkMuted">{t.noReward}</Text>}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  track: {
+    height: 14,
+    overflow: 'hidden',
+    borderRadius: gameRadii.pill,
+    borderWidth: outline.thin,
+    borderColor: outline.color,
+    backgroundColor: tones.cream.light,
+  },
+  fill: { height: 10, borderRadius: 5, overflow: 'hidden' },
+});

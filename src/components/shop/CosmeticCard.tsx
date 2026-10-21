@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Text, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 import { cosmetics as text, screenUi } from '../../content/strings';
 import { COSMETIC_ITEMS, type CosmeticId } from '../../game/config';
@@ -7,11 +9,13 @@ import { cosmetics as cosmeticAssets } from '../../lib/assets';
 import { cue } from '../../lib/audio';
 import { clock } from '../../lib/clock';
 import { useGameStore } from '../../store/gameStore';
+import { usePop } from '../feedback/usePop';
 import { AssetImage } from '../ui/AssetImage';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { PriceCoin } from './PriceCoin';
+import { PurchaseBurst } from './PurchaseBurst';
 
 const IMAGE_SIZE = 64;
 
@@ -34,57 +38,67 @@ export function CosmeticCard({ id, tryingOn, onTryOn, onDone }: CosmeticCardProp
   const equipCosmetic = useGameStore((s) => s.equipCosmetic);
   const spendCoins = useGameStore((s) => s.spendCoins);
 
+  const [boughtKey, setBoughtKey] = useState(0);
+  const { style: popStyle, pop } = usePop();
+
   const name = text.items[id];
   const isOwned = ownsCosmetic(owned, id);
   const isEquipped = equippedCosmetic(owned, equippedId) === id;
   const affordable = canBuyCosmetic(owned, id, coins);
 
   return (
-    <Card
-      onPress={onTryOn}
-      selected={tryingOn}
-      tone={isEquipped ? 'rare' : 'plain'}
-      accessibilityLabel={`${name}: ${text.tryOn}`}
-    >
-      <View className="flex-row items-center gap-3">
-        <AssetImage source={cosmeticAssets[id]} label={name} size={IMAGE_SIZE} />
-        <View className="flex-1 gap-1">
-          <View className="flex-row flex-wrap items-center gap-2">
-            <Text className="font-heading text-lg text-ink">{name}</Text>
-            {isEquipped ? (
-              <Badge label={screenUi.equippedBadge} color="lavender" />
-            ) : isOwned ? (
-              <Badge label={screenUi.ownedBadge} color="plantLight" />
-            ) : null}
+    <Animated.View style={popStyle}>
+      <Card
+        onPress={onTryOn}
+        selected={tryingOn}
+        tone={isEquipped ? 'rare' : 'plain'}
+        accessibilityLabel={`${name}: ${text.tryOn}`}
+      >
+        <View className="flex-row items-center gap-3">
+          <View>
+            <AssetImage source={cosmeticAssets[id]} label={name} size={IMAGE_SIZE} />
+            <PurchaseBurst playKey={boughtKey} />
           </View>
-          <Text className={`font-body text-sm ${tryingOn ? 'text-coral' : 'text-inkMuted'}`}>
-            {isEquipped ? text.equipped : tryingOn ? text.tryingOn : text.tryOn}
-          </Text>
+          <View className="flex-1 gap-1">
+            <View className="flex-row flex-wrap items-center gap-2">
+              <Text className="font-heading text-lg text-ink">{name}</Text>
+              {isEquipped ? (
+                <Badge label={screenUi.equippedBadge} color="lavender" />
+              ) : isOwned ? (
+                <Badge label={screenUi.ownedBadge} color="plantLight" />
+              ) : null}
+            </View>
+            <Text className={`font-body text-sm ${tryingOn ? 'text-coral' : 'text-inkMuted'}`}>
+              {isEquipped ? text.equipped : tryingOn ? text.tryingOn : text.tryOn}
+            </Text>
+          </View>
+          {isOwned ? (
+            <Button
+              label={isEquipped ? text.unequip : text.equip}
+              variant="secondary"
+              size="sm"
+              onPress={() => equipCosmetic(isEquipped ? null : id) && onDone()}
+            />
+          ) : (
+            <Button
+              label={text.buy(COSMETIC_ITEMS[id].priceCoins)}
+              size="sm"
+              disabled={!affordable}
+              leading={<PriceCoin />}
+              onPress={() => {
+                if (!buyCosmetic(id, spendCoins, clock.now())) return;
+                cue('coins');
+                pop();
+                setBoughtKey((k) => k + 1);
+                onDone();
+              }}
+            />
+          )}
         </View>
-        {isOwned ? (
-          <Button
-            label={isEquipped ? text.unequip : text.equip}
-            variant="secondary"
-            size="sm"
-            onPress={() => equipCosmetic(isEquipped ? null : id) && onDone()}
-          />
-        ) : (
-          <Button
-            label={text.buy(COSMETIC_ITEMS[id].priceCoins)}
-            size="sm"
-            disabled={!affordable}
-            leading={<PriceCoin />}
-            onPress={() => {
-              if (!buyCosmetic(id, spendCoins, clock.now())) return;
-              cue('coins');
-              onDone();
-            }}
-          />
-        )}
-      </View>
-      {!isOwned && !affordable ? (
-        <Text className="text-right font-body text-xs text-inkMuted">{text.notEnoughCoins}</Text>
-      ) : null}
-    </Card>
+        {!isOwned && !affordable ? (
+          <Text className="text-right font-body text-xs text-inkMuted">{text.notEnoughCoins}</Text>
+        ) : null}
+      </Card>
+    </Animated.View>
   );
 }

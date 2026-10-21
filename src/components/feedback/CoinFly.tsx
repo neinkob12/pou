@@ -9,10 +9,10 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { colors } from '../../lib/theme';
 import type { Point } from './coinTarget';
+import { GoldCoin } from './GoldCoin';
 
-const COIN_SIZE = 22;
+const COIN_SIZE = 26;
 const COIN_COUNT = 8;
 const FLY_MS = 650;
 const STAGGER_MS = 60;
@@ -39,22 +39,9 @@ function Coin({ from, to, index, onDone }: { from: Point; to: Point; index: numb
     ],
   }));
   return (
-    <Animated.View
-      style={[
-        {
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          width: COIN_SIZE,
-          height: COIN_SIZE,
-          borderRadius: COIN_SIZE / 2,
-          backgroundColor: colors.lamp,
-          borderWidth: 2,
-          borderColor: colors.terracotta,
-        },
-        style,
-      ]}
-    />
+    <Animated.View style={[{ position: 'absolute', left: 0, top: 0 }, style]}>
+      <GoldCoin size={COIN_SIZE} />
+    </Animated.View>
   );
 }
 

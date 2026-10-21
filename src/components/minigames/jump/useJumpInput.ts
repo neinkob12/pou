@@ -3,7 +3,7 @@
 // über `readVx` liest; eine gedrückte Taste gewinnt vor Finger und Neigung.
 
 import { Accelerometer } from 'expo-sensors';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Platform, type LayoutChangeEvent } from 'react-native';
 import { useSharedValue, type SharedValue } from 'react-native-reanimated';
 
@@ -58,7 +58,7 @@ export function useJumpInput(wanted: JumpControl): JumpInput {
     };
   }, [control, tapControl, targetVx]);
 
-  const onLayout = (e: LayoutChangeEvent) => width.set(e.nativeEvent.layout.width);
+  const onLayout = useCallback((e: LayoutChangeEvent) => width.set(e.nativeEvent.layout.width), [width]);
 
   // Aufsetzen, Bewegen und Loslassen melden die noch liegenden Finger; daraus die Richtung.
   const gesture = usePointerInput({

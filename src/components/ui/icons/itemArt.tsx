@@ -2,7 +2,8 @@ import { Circle, Group, Oval, Path, RoundedRect } from '@shopify/react-native-sk
 import type { ReactNode } from 'react';
 
 import { artColors, colors } from '../../../lib/theme';
-import { Dot, Shape, shine, starPath } from './shapes';
+import { iconColors } from './iconPalette';
+import { Dot, Shape, shine, Sparkle, starPath } from './shapes';
 
 // Gegenstände im Budi-Stil (WEB-4): Tageskiste, Ernte-Werkzeuge, Shop-Upgrades. Einheiten 100 × 100.
 // Dieselben Zeichnungen landen als PNG in assets/images/ (assets/render-art.cjs), damit Shop und
@@ -10,6 +11,7 @@ import { Dot, Shape, shine, starPath } from './shapes';
 
 export type ItemIconId =
   | 'chest'
+  | 'chestOpen'
   | 'lupe'
   | 'scissors'
   | 'potTier1'
@@ -55,6 +57,24 @@ export const ITEMS: Record<ItemIconId, () => ReactNode> = {
       <Shape d="M40 40 L60 40 L60 62 C60 66 57 68 54 68 L46 68 C43 68 40 66 40 62 Z" fill={artColors.gold} line={5} />
       <Path path={starPath(50, 53, 7)} color={artColors.outline} />
       {shine('M30 30 C36 26 44 24 50 24', 4)}
+    </Group>
+  ),
+  // U13 offen: Deckel hinten hoch, Münzen und Schein
+  chestOpen: () => (
+    <Group>
+      <Circle cx={50} cy={40} r={36} color={artColors.glowSoft} />
+      <Shape d="M16 50 L22 14 C40 8 60 8 78 14 L84 50 Z" fill={artColors.woodShade} gloss={false} />
+      <Path path="M28 12 L24 50 M72 12 L76 50" color={artColors.gold} style="stroke" strokeWidth={4} />
+      <Dot cx={36} cy={46} r={10} fill={iconColors.coin} line={5} />
+      <Dot cx={62} cy={44} r={10} fill={iconColors.coin} line={5} />
+      <Dot cx={49} cy={38} r={10} fill={iconColors.coin} line={5} />
+      <Shape d="M12 50 L88 50 L88 84 C88 89 85 92 80 92 L20 92 C15 92 12 89 12 84 Z" fill={artColors.wood} />
+      <Path path="M12 66 L88 66 M12 80 L88 80" color={artColors.woodShade} style="stroke" strokeWidth={4} />
+      <Path path="M24 50 L24 92 M76 50 L76 92" color={artColors.outline} style="stroke" strokeWidth={10} />
+      <Path path="M24 50 L24 92 M76 50 L76 92" color={artColors.gold} style="stroke" strokeWidth={5} />
+      <Sparkle cx={22} cy={22} r={8} />
+      <Sparkle cx={82} cy={28} r={6} color={iconColors.star} />
+      <Sparkle cx={50} cy={12} r={6} />
     </Group>
   ),
   lupe: () => (

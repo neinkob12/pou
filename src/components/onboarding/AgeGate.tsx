@@ -1,19 +1,20 @@
 import { useState } from 'react';
 import { Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { onboarding } from '../../content/strings';
 import { useGameStore } from '../../store/gameStore';
+import { Bouncy } from '../feedback/Bouncy';
 import { BudiAvatar } from '../feedback/BudiAvatar';
 import { GlowRays } from '../feedback/GlowRays';
+import { GameScreen } from '../frame/GameScreen';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 
 const GLOW_SIZE = 220;
 
 /**
- * Altersfrage beim Erststart. Ja: bestätigt, die Weiche (OnboardingGate) bringt den Spieler ins
+ * Altersfrage beim Erststart, auf warmem Spiel-Hintergrund mit hüpfendem Budi (ART-5). Ja: bestätigt, die Weiche (OnboardingGate) bringt den Spieler ins
  * Zimmer. Nein: freundlicher Abschied ohne Weg ins Spiel; beim nächsten Start fragt die App neu.
  */
 export function AgeGate() {
@@ -21,12 +22,14 @@ export function AgeGate() {
   const [declined, setDeclined] = useState(false);
 
   return (
-    <SafeAreaView className="flex-1 bg-cream">
-      <View className="flex-1 justify-center gap-6 p-6">
+    <GameScreen backdrop="age" fixed>
+      <View className="flex-1 justify-center gap-6 p-2">
         <View style={{ height: GLOW_SIZE * 0.7, alignItems: 'center', justifyContent: 'center' }}>
           <GlowRays size={GLOW_SIZE} />
           <Animated.View entering={FadeInDown.springify().damping(12)}>
-            <BudiAvatar size={104} />
+            <Bouncy>
+              <BudiAvatar size={104} />
+            </Bouncy>
           </Animated.View>
         </View>
         <Animated.View entering={FadeInDown.delay(120).springify().damping(16)}>
@@ -50,6 +53,6 @@ export function AgeGate() {
           </Card>
         </Animated.View>
       </View>
-    </SafeAreaView>
+    </GameScreen>
   );
 }

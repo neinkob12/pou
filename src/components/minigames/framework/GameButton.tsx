@@ -1,6 +1,4 @@
-import { Pressable, Text } from 'react-native';
-
-import { cue } from '../../../lib/audio';
+import { Button } from '../../ui/Button';
 
 interface GameButtonProps {
   label: string;
@@ -8,17 +6,7 @@ interface GameButtonProps {
   variant?: 'primary' | 'secondary';
 }
 
-/** Großer Knopf für Overlays im Minigame. */
+/** Großer Knopf für Overlays im Minigame: der 3D-Spielknopf aus dem Design-System (ART-1). */
 export function GameButton({ label, onPress, variant = 'primary' }: GameButtonProps) {
-  const primary = variant === 'primary';
-  return (
-    <Pressable
-      accessibilityRole="button"
-      onPressIn={() => cue('tap')}
-      onPress={onPress}
-      className={`items-center rounded-full px-6 py-3 active:opacity-70 ${primary ? 'bg-coral' : 'bg-white'}`}
-    >
-      <Text className={`font-body-bold text-lg ${primary ? 'text-white' : 'text-ink'}`}>{label}</Text>
-    </Pressable>
-  );
+  return <Button label={label} onPress={onPress} variant={variant} size={variant === 'primary' ? 'lg' : 'md'} />;
 }

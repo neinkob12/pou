@@ -2,7 +2,8 @@ import { Text, View } from 'react-native';
 import Animated, { FadeInLeft } from 'react-native-reanimated';
 
 import { screenUi } from '../../content/strings';
-import { colors, radii, surface } from '../../lib/theme';
+import { colors, fonts, radii, surface } from '../../lib/theme';
+import { Bouncy } from '../feedback/Bouncy';
 import { BudiAvatar } from '../feedback/BudiAvatar';
 import { BRAND_WIDTH } from './frameLayout';
 
@@ -20,9 +21,22 @@ export function FrameBrand({ compact }: { compact: boolean }) {
   }
   return (
     <Animated.View entering={FadeInLeft.springify().damping(16)} style={{ width: BRAND_WIDTH, gap: 18 }}>
-      <BudiAvatar size={88} />
+      <Bouncy>
+        <BudiAvatar size={96} />
+      </Bouncy>
       <View style={{ gap: 6 }}>
-        <Text className="font-heading text-cream" style={{ fontSize: 56, lineHeight: 60 }}>
+        {/* Spielschrift (ART-5): gelber Titel mit dunkler, dicker Kante nach unten. */}
+        <Text
+          style={{
+            fontFamily: fonts.headingBold,
+            fontSize: 64,
+            lineHeight: 72,
+            color: colors.lamp,
+            textShadowColor: colors.ink,
+            textShadowOffset: { width: 0, height: 6 },
+            textShadowRadius: 0.1,
+          }}
+        >
           {text.title}
         </Text>
         <Text className="font-body text-xl text-cream/80">{text.tagline}</Text>
@@ -34,8 +48,9 @@ export function FrameBrand({ compact }: { compact: boolean }) {
           borderRadius: radii.pill,
           borderWidth: surface.line,
           borderColor: colors.ink,
-          paddingHorizontal: 12,
-          paddingVertical: 3,
+          borderBottomWidth: surface.edge + 1,
+          paddingHorizontal: 14,
+          paddingVertical: 4,
         }}
       >
         <Text className="font-body-bold text-sm text-ink">{text.badge}</Text>
