@@ -1,26 +1,32 @@
 // Fakten-Quiz im Minigame-Gerüst mit den neuen Elementen (Auftrag 45): Bedenkzeit je Frage, die von
 // Frage zu Frage knapper wird, und ein 50:50-Joker pro Runde. Fragen und Punkte kommen aus
-// facts/quiz.ts, Kopf und Antwort-Knöpfe aus facts/ (Auftrag 40). Ersetzt FactQuizGame in der Route.
+// facts/quiz.ts. Auftrag 51: eigener Spiel-Look (lila Bühne mit Lichtkugeln, Fragekarte, 3D-Knöpfe).
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { useFrameCallback, useSharedValue } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
 import { factQuiz as t, minigameFun } from '../../../content/strings';
 import { MINIGAME_FUN } from '../../../game/config';
 import { cue, useMinigameAudio } from '../../../lib/audio';
-import { colors } from '../../../lib/theme';
+import { colors, gameRadii, outline, shadows, spacing, tones } from '../../../lib/theme';
 import { useGameStore } from '../../../store/gameStore';
 import { pickQuizQuestions, pointsForAnswer } from '../../facts/quiz';
-import { QuizHeader } from '../../facts/QuizHeader';
-import { QuizOption, type OptionState } from '../../facts/QuizOption';
+import { Button } from '../../ui/Button';
+import { gradientStyle } from '../../ui/game/gradient';
+import { GameText } from '../../ui/GameText';
+import { Drift } from '../framework/art/Drift';
+import { backdrops } from '../framework/art/palette';
+import { drawTapBokeh } from '../framework/example/tapArt';
 import { PopupLayer } from '../framework/fx/PopupLayer';
 import { useFx } from '../framework/fx/useFx';
 import { digitIndex } from '../framework/input/keys';
 import { useKeyDown } from '../framework/input/useKeyboard';
 import type { MinigameSession } from '../framework/useMinigameSession';
 import { QuestionTimer } from './QuestionTimer';
+import { QuizAnswer, type AnswerState } from './QuizAnswer';
+import { QuizTop } from './QuizTop';
 import { jokerHides, questionSecondsLeft, questionTimedOut, questionTimeMs } from './quizFun';
 
 /** Gewählte Antwort: Index, oder TIMED_OUT, wenn die Bedenkzeit abgelaufen ist. */
@@ -28,7 +34,7 @@ const TIMED_OUT = -1;
 /** Höhe des Punkte-Popups (über den Antworten), waagerecht mittig. */
 const POPUP_Y = 220;
 
-function optionState(index: number, chosen: number | null, correctIndex: number, hidden: number): OptionState {
+function optionState(index: number, chosen: number | null, correctIndex: number, hidden: number): AnswerState {
   if (chosen === null) return index === hidden ? 'dimmed' : 'open';
   if (index === correctIndex) return 'correct';
   if (index === chosen) return 'wrong';
@@ -51,7 +57,8 @@ export function QuizGame({ session }: { session: MinigameSession }) {
   const open = useSharedValue(true);
   const shownLeft = useSharedValue(-1);
   const fx = useFx();
-  const [width, setWidth] = useState(0);
+  const [box, setBox] = useState({ width: 0, height: 0 });
+  const width = box.width;
   useMinigameAudio(session.phase, session.result?.coins ?? null);
 
   const question = questions[index];
@@ -67,7 +74,7 @@ export function QuizGame({ session }: { session: MinigameSession }) {
     cue(ok ? 'hit' : 'ouch');
     if (ok) {
       setCorrectCount((c) => c + 1);
-      fx.popup(width / 2, POPUP_Y, `+${points}`, colors.plantDark, points > 10);
+      fx.popup(width / 2, POPUP_Y, `+${points}`, tones.leaf.light, points > 10);
     } else if (choice === TIMED_OUT) {
       fx.popup(width / 2, POPUP_Y, minigameFun.quizTimeUp, colors.coral, true);
     }
@@ -135,14 +142,22 @@ export function QuizGame({ session }: { session: MinigameSession }) {
   if (!question) return null;
   const right = question.options[question.correctIndex];
   return (
-    <View className="flex-1" onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
-      <ScrollView contentContainerClassName="gap-4 p-4">
-        <QuizHeader index={index} results={results} secondsLeft={session.secondsLeft} />
+    <View
+      style={[styles.stage, gradientStyle(`linear-gradient(180deg, ${backdrops.quiz.join(', ')})`, backdrops.quiz[1])]}
+      onLayout={(e) => setBox({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}
+    >
+      {box.width > 0 && (
+        <Drift width={box.width} height={box.height} draw={drawTapBokeh} durationMs={18000} direction="up" />
+      )}
+      <ScrollView contentContainerStyle={styles.content}>
+        <QuizTop index={index} results={results} />
         <QuestionTimer secondsLeft={chosen === null ? qLeft : 0} totalSeconds={questionTimeMs(index) / 1000} />
-        <Text className="font-heading text-2xl text-ink">{question.question}</Text>
-        <View className="gap-3">
+        <View style={styles.card}>
+          <GameText variant="heading">{question.question}</GameText>
+        </View>
+        <View style={styles.answers}>
           {question.options.map((option, i) => (
-            <QuizOption
+            <QuizAnswer
               key={option}
               index={i}
               label={option}
@@ -153,41 +168,53 @@ export function QuizGame({ session }: { session: MinigameSession }) {
           ))}
         </View>
         {chosen !== null ? (
-          <View className="gap-3">
-            <Text className="font-body text-base text-ink">
+          <View style={styles.answers}>
+            <GameText variant="bodyBold" color={tones.cream.light} shadow>
               {chosen === question.correctIndex
                 ? t.correct
                 : chosen === TIMED_OUT
                   ? minigameFun.quizTimeUpText(right)
                   : t.wrong(right)}
-            </Text>
-            <Pressable
-              accessibilityRole="button"
-              disabled={!playing}
-              onPress={next}
-              className="items-center rounded-full bg-coral px-5 py-3 active:opacity-70"
-            >
-              <Text className="font-body-bold text-base text-white">{isLast ? t.finish : t.next}</Text>
-            </Pressable>
+            </GameText>
+            <Button label={isLast ? t.finish : t.next} onPress={next} disabled={!playing} size="lg" />
           </View>
         ) : (
-          <View className="flex-row items-center justify-between gap-3">
-            <Text className="flex-1 font-body text-sm text-plantDark">{t.perfectHint}</Text>
-            <Pressable
-              accessibilityRole="button"
-              disabled={!playing || jokersLeft <= 0}
+          <View style={styles.jokerRow}>
+            <GameText variant="bodyBold" color={tones.gold.light} shadow style={styles.flex}>
+              {t.perfectHint}
+            </GameText>
+            <Button
+              label={jokersLeft > 0 ? minigameFun.quizJoker : minigameFun.quizJokerUsed}
               onPress={playJoker}
-              className={`rounded-full bg-lavender px-4 py-2 active:opacity-70 ${jokersLeft > 0 ? '' : 'opacity-40'}`}
-            >
-              <Text className="font-body-bold text-base text-white">
-                {jokersLeft > 0 ? minigameFun.quizJoker : minigameFun.quizJokerUsed}
-              </Text>
-            </Pressable>
+              disabled={!playing || jokersLeft <= 0}
+              variant="gold"
+              size="sm"
+            />
           </View>
         )}
-        {Platform.OS === 'web' && <Text className="font-body text-sm text-inkMuted">{minigameFun.quizKeysHint}</Text>}
+        {Platform.OS === 'web' && (
+          <GameText variant="small" color={tones.cream.light}>
+            {minigameFun.quizKeysHint}
+          </GameText>
+        )}
       </ScrollView>
       <PopupLayer popups={fx.popups} onDone={fx.removePopup} />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  stage: { flex: 1, overflow: 'hidden' },
+  content: { gap: spacing.md, padding: spacing.md },
+  card: {
+    borderRadius: gameRadii.card,
+    borderWidth: outline.regular,
+    borderColor: outline.color,
+    backgroundColor: tones.cream.light,
+    padding: spacing.md,
+    boxShadow: shadows.card,
+  },
+  answers: { gap: spacing.md - 4 },
+  jokerRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md - 4 },
+  flex: { flex: 1 },
+});

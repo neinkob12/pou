@@ -101,7 +101,7 @@ export function DropsGame({ session }: { session: MinigameSession }) {
       if (points > 0) {
         addScore(points);
         setCaught({ water, fertilizer });
-        fx.popup(x, y, `+${points}`, colors.plantDark, run >= 5);
+        fx.popup(x, y, `+${points}`, tones.leaf.light, run >= 5);
       }
       if (livesLost > 0) fx.popup(x, y, minigameFeel.dropsSalt, colors.coral, true);
       setCombo(run);
@@ -252,7 +252,7 @@ export function DropsGame({ session }: { session: MinigameSession }) {
           <ComboBadge combo={combo} />
           <EventBanner banner={banner} onDone={clearBanner} />
           {phase === 'countdown' && (
-            <View className="absolute inset-x-0 bottom-24 items-center gap-1 px-6" pointerEvents="none">
+            <View className="absolute inset-x-6 bottom-24 items-center gap-1 rounded-2xl border-2 border-plantDark bg-cream px-4 py-2" pointerEvents="none">
               <Text className="text-center font-body-bold text-base text-ink">{t.hint}</Text>
               {Platform.OS === 'web' && (
                 <Text className="text-center font-body text-sm text-inkMuted">{minigameFeel.keyboardHint}</Text>

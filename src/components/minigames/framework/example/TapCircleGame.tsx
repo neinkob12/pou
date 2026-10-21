@@ -11,7 +11,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 import { minigameFun } from '../../../../content/strings';
 import { MINIGAME_FEEL } from '../../../../game/config';
 import { cue, useMinigameAudio } from '../../../../lib/audio';
-import { colors, funColors } from '../../../../lib/theme';
+import { colors } from '../../../../lib/theme';
 import { Drift } from '../art/Drift';
 import { sparks, tones } from '../art/palette';
 import { Stage } from '../art/Stage';
@@ -105,8 +105,8 @@ export function TapCircleGame({ session }: { session: MinigameSession }) {
     (x: number, y: number, nextCombo: number, points: number, golden: boolean) => {
       cue(golden ? 'collect' : 'catch');
       addScore(points);
-      if (golden) fx.popup(x, y - 10, `+${points} ${minigameFun.tapGolden}`, funColors.goldDeep, true);
-      else fx.popup(x, y - 10, `+${points}`, colors.plantDark, nextCombo >= MINIGAME_FEEL.comboShowFrom);
+      if (golden) fx.popup(x, y - 10, `+${points} ${minigameFun.tapGolden}`, tones.gold.base, true);
+      else fx.popup(x, y - 10, `+${points}`, tones.leaf.light, nextCombo >= MINIGAME_FEEL.comboShowFrom);
       setComboShown(nextCombo);
     },
     [addScore, fx],

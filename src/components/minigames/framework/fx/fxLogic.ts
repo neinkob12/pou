@@ -218,6 +218,12 @@ export function crossesSlowMo(before: number, after: number, every: number = MIN
   return after > before && Math.floor(after / every) > Math.floor(before / every);
 }
 
+/** Stufe der Kombo für die Farbe des Abzeichens: 0 bis 2, alle slowMoEveryCombo Treffer eine mehr. */
+export function comboLevel(combo: number, every: number = MINIGAME_ART.slowMoEveryCombo): number {
+  'worklet';
+  return Math.min(2, Math.floor(Math.max(0, combo) / every));
+}
+
 /** Kombo nach einem Treffer: schnell nach dem letzten heißt +1, sonst beginnt sie bei 1. */
 export function comboAfterHit(
   combo: number,

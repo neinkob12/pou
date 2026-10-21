@@ -98,7 +98,7 @@ export function SmashGame({ session }: { session: MinigameSession }) {
       setCombo(nextCombo);
       if (cracked) fx.popup(x, y - 20, minigameFun.smashCrack, funColors.shell, true);
       else if (friendlyHit) fx.popup(x, y - 20, points < 0 ? `${points}` : '!', colors.coral, true);
-      else fx.popup(x, y - 20, `+${points}`, points > 1 ? colors.coral : colors.plantDark, points > 1);
+      else fx.popup(x, y - 20, `+${points}`, points > 1 ? colors.coral : tones.leaf.light, points > 1);
     },
     [addScore, fx],
   );

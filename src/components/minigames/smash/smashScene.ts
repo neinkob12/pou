@@ -8,26 +8,13 @@ import type { SkCanvas } from '@shopify/react-native-skia';
 import { PEST_SMASH } from '../../../game/config';
 import { drawFlash, drawFx } from '../framework/art/drawFx';
 import { stamp } from '../framework/art/kit';
-import { popIn } from '../framework/art/motion';
 import type { FxState } from '../framework/fx/fxLogic';
 import { holeLayout, type Critter, type SmashState } from './pestSmash';
+import { emergeAt } from './smashMotion';
 import { smashSprites } from './smashArt';
 
 /** Tiergröße relativ zur halben Zellbreite (wie das Loch im Hintergrund). */
 const CRITTER_SCALE = 0.6;
-const POP_IN_MS = 220;
-const SINK_MS = 140;
-
-/** Wie weit ein Tier gerade aus dem Loch schaut (0 drin, 1 ganz draußen). */
-export function emergeAt(c: Critter, elapsedMs: number): number {
-  'worklet';
-  const age = elapsedMs - c.spawnedAtMs;
-  if (c.hitAtMs !== null) return 1;
-  const left = c.lifetimeMs - age;
-  if (left < SINK_MS) return Math.max(0, left / SINK_MS);
-  return popIn(Math.min(1, age / POP_IN_MS));
-}
-
 function drawCritter(canvas: SkCanvas, c: Critter, elapsed: number, width: number, height: number) {
   'worklet';
   const sprites = smashSprites();

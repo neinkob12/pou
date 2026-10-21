@@ -3,7 +3,7 @@
 // Feedback (Auftrag 40): Blattstücke beim Landen, Funken an Federn und Lichtpunkten, Budi staucht sich.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform, Text, View, type LayoutChangeEvent } from 'react-native';
+import { Platform, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import { useFrameCallback, useSharedValue } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
@@ -11,7 +11,8 @@ import { scheduleOnRN } from 'react-native-worklets';
 import { jumpGame, minigameFeel, minigameFun } from '../../../content/strings';
 import { BUDI_JUMP, MINIGAME_FRAMEWORK } from '../../../game/config';
 import { cue, useMinigameAudio } from '../../../lib/audio';
-import { colors, funColors } from '../../../lib/theme';
+import { colors, funColors, gameRadii, outline, shadows, tones as uiTones } from '../../../lib/theme';
+import { GameText } from '../../ui/GameText';
 import { sparks, tones } from '../framework/art/palette';
 import { Stage } from '../framework/art/Stage';
 import { useScene } from '../framework/art/useScene';
@@ -176,13 +177,13 @@ export function JumpGame({ session }: { session: MinigameSession }) {
         {recordY !== null && <RecordMark height={recordY} world={world} size={size} />}
         <PopupLayer popups={fx.popups} onDone={fx.removePopup} />
         <EventBanner banner={banner} onDone={clearBanner} />
-        <View className="absolute left-3 top-2 rounded-full bg-white px-3 py-1" pointerEvents="none">
-          <Text className="font-body-bold text-sm text-ink">
-            {jumpGame.lights}: {lights}
-          </Text>
+        <View style={styles.lights} pointerEvents="none">
+          <GameText variant="number" color={uiTones.gold.text}>
+            {`${jumpGame.lights}: ${lights}`}
+          </GameText>
         </View>
         {phase === 'countdown' && (
-          <View className="absolute inset-x-0 bottom-24 items-center gap-1 px-6" pointerEvents="none">
+          <View className="absolute inset-x-6 bottom-24 items-center gap-1 rounded-2xl border-2 border-plantDark bg-cream px-4 py-2" pointerEvents="none">
             <Text className="text-center font-body-bold text-base text-ink">
               {input.control === 'tilt' ? jumpGame.hintTilt : jumpGame.hintTap}
             </Text>
@@ -198,3 +199,18 @@ export function JumpGame({ session }: { session: MinigameSession }) {
     </GestureDetector>
   );
 }
+
+const styles = StyleSheet.create({
+  lights: {
+    position: 'absolute',
+    left: 12,
+    top: 8,
+    borderRadius: gameRadii.pill,
+    borderWidth: outline.thin,
+    borderColor: outline.color,
+    backgroundColor: uiTones.gold.base,
+    paddingHorizontal: 12,
+    paddingVertical: 2,
+    boxShadow: shadows.button,
+  },
+});

@@ -9,18 +9,12 @@ import { BUDI_JUMP } from '../../../game/config';
 import { Tiles } from '../framework/art/Drift';
 import { StillPicture } from '../framework/art/Stage';
 import { drawJumpClouds, drawJumpDusk, drawJumpGround, drawJumpNight } from './jumpArt';
+import { skyBlend } from './jumpFeel';
 import type { JumpWorld } from './jumpWorld';
 
 /** Anteil der Kamerafahrt, mit dem Wolken und Wiese wandern (kleiner = weiter weg). */
 const CLOUD_FACTOR = 0.35;
 const GROUND_FACTOR = 0.6;
-
-/** Deckkraft von Abend (0 bis 1 bis zur halben Schwierigkeitshöhe) und Nacht (danach). */
-export function skyBlend(cameraY: number): { dusk: number; night: number } {
-  'worklet';
-  const h = Math.max(0, cameraY) / BUDI_JUMP.difficultyHeight;
-  return { dusk: Math.min(1, h / 0.5), night: Math.min(1, Math.max(0, (h - 0.5) / 0.5)) };
-}
 
 interface JumpLayersProps {
   width: number;
@@ -36,7 +30,7 @@ export function JumpLayers({ width, height, world }: JumpLayersProps) {
   const night = useAnimatedStyle(() => ({ opacity: blend.get().night }));
   const cloudOpacity = useDerivedValue(() => 1 - blend.get().night * 0.7);
   const ground = useAnimatedStyle(() => {
-    const y = camera.get() * GROUND_FACTOR;
+    const y = Math.max(0, camera.get() * GROUND_FACTOR);
     return { opacity: y > height ? 0 : 1, transform: [{ translateY: y }] };
   });
   const box = { width, height };

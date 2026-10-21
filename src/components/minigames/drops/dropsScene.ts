@@ -70,7 +70,7 @@ export function drawDropsScene(canvas: SkCanvas, f: DropsFrame) {
   }
   for (const d of f.field.drops) {
     const sway = Math.sin(f.now / 210 + d.id) * 0.12;
-    if (d.kind === 'salt') stamp(canvas, sprites.salt, d.x, d.y, R * 0.95, R * 0.95, sway * 1.5);
+    if (d.kind === 'salt') stamp(canvas, sprites.salt, d.x, d.y, R * 1.2, R * 1.2, sway * 1.5);
     else if (d.kind === 'fertilizer') stamp(canvas, sprites.fertilizer, d.x, d.y, R, R, f.now / 400 + d.id);
     else if (d.kind === 'leaf') stamp(canvas, sprites.leaf, d.x, d.y, R, R, sway * 2.5);
     else {

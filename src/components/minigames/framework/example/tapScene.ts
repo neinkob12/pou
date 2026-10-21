@@ -13,6 +13,7 @@ import type { FxState } from '../fx/fxLogic';
 import type { TapCircle } from './tapCircle';
 import { circleLifetime } from './tapGolden';
 import { tapSprites } from './tapArt';
+import { ringColor } from './tapRing';
 
 /** Aufblühen der Knospe in ms. */
 const GROW_MS = 260;
@@ -40,14 +41,6 @@ function ringPaints(): RingPaints {
     back.setAlphaf(0.45);
     return { back, outline: make(ink.outline), arc: make(tones.leaf.base) };
   });
-}
-
-/** Ringfarbe je Restzeit: grün, dann gelb, unter 30 % rot. Gold bleibt gold, bis es knapp wird. */
-export function ringColor(left: number, golden: boolean): string {
-  'worklet';
-  if (left < 0.3) return tones.coral.base;
-  if (golden) return tones.gold.base;
-  return left < 0.6 ? tones.sun.base : tones.leaf.light;
 }
 
 export interface TapFrame {
