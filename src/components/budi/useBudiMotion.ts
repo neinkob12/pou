@@ -1,178 +1,136 @@
-import { useEffect } from 'react';
-import {
-  cancelAnimation,
-  useAnimatedStyle,
-  useDerivedValue,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withSpring,
-  withTiming,
-  type SharedValue,
-} from 'react-native-reanimated';
+import { useEffect, useMemo, useRef } from 'react';
+import { useAnimatedStyle, useDerivedValue, useSharedValue, withSpring, type SharedValue } from 'react-native-reanimated';
 
-import type { CareReaction } from '../room/care/CareStage';
+import type { Condition } from '../../game/needs';
+import type { BudiFace } from './budiLook';
+import type { BudiLookState } from './useBudiLook';
+import * as M from './motion/constants';
+import { playReaction, playSleepTransition, popFace, type BudiBody } from './motion/moves';
+import { useBreathAndSway, useIdleLife } from './motion/useIdleLife';
 
-// Bewegungswerte sind UI-Konstanten, keine Balancing-Werte.
-const BREATH_MS = 1800;
-const BREATH_SCALE = 0.025;
-/** Im Schlaf atmet Budi langsamer und tiefer. */
-const SLEEP_BREATH_MS = 2600;
-const SLEEP_BREATH_SCALE = 0.04;
-const SWAY_MS = 2600;
-const SWAY_DEG = 2.5;
-/** Pausen zwischen zwei Blinzlern, im Wechsel, damit es nicht mechanisch wirkt. */
-const BLINK_PAUSES_MS = [3200, 4700, 2100, 5200] as const;
-const BLINK_HALF_MS = 70;
-/** Ab und zu schaut Budi kurz zur Seite (Leinwand-Einheiten). */
-const GAZE_PAUSES_MS = [5200, 7800, 6100] as const;
-const GAZE_OFFSETS = [-1.4, 1.4, 0] as const;
-const GAZE_MS = 260;
-/** Budi wird größer, wenn ein Werkzeug über ihm schwebt ("Mund auf"). */
-const HOVER_SCALE = 0.08;
-const SQUASH = { x: 1.18, y: 0.82 };
-const STRETCH = { x: 0.9, y: 1.14 };
-const SQUASH_MS = 90;
-const SHAKE_PX = 8;
-const SHAKE_MS = 60;
-/** Streicheln: Budi wackelt vor Freude hin und her. */
-const WIGGLE_DEG = 6;
-const WIGGLE_MS = 110;
+type Style = ReturnType<typeof useAnimatedStyle>;
 
 interface BudiMotion {
-  bodyStyle: ReturnType<typeof useAnimatedStyle>;
-  plantStyle: ReturnType<typeof useAnimatedStyle>;
-  /** Augen-Ebene: Blinzeln (scaleY) und Blick zur Seite. */
-  eyeStyle: ReturnType<typeof useAnimatedStyle>;
+  /** Schatten am Boden: wird kleiner und blasser, wenn Budi abhebt. */
+  shadowStyle: Style;
+  /** Ganzer Budi: Hüpfen, Squash & Stretch, Neigen, Zittern, Atmen, Wachsen beim Schweben. */
+  bodyStyle: Style;
+  /** Pflanze: Wippen im Wind und Nachfedern (Follow-through). */
+  plantStyle: Style;
+  /** Augen: Blinzeln und Herzklopfen. */
+  eyeStyle: Style;
+  /** Iris: Umschauen. */
+  pupilStyle: Style;
+  /** Mund: Kauen, Schlucken, Gähnen, Ploppen. */
+  mouthStyle: Style;
 }
 
-/**
- * Blinzeln und Blick per Timer statt Dauer-Animation: Es läuft nur etwas, wenn sich die Augen
- * wirklich bewegen. Das hält den Browser bei 60 fps.
- */
-function useEyeLife(active: boolean): { lid: SharedValue<number>; gaze: SharedValue<number> } {
+function useBody(): BudiBody {
+  const hop = useSharedValue(0);
+  const sqX = useSharedValue(1);
+  const sqY = useSharedValue(1);
+  const tilt = useSharedValue(0);
+  const shift = useSharedValue(0);
+  const plant = useSharedValue(0);
+  const mouthX = useSharedValue(1);
+  const mouthY = useSharedValue(1);
+  const pulse = useSharedValue(1);
   const lid = useSharedValue(1);
-  const gaze = useSharedValue(0);
+  const gazeX = useSharedValue(0);
+  const gazeY = useSharedValue(0);
+  return useMemo(
+    () => ({ hop, sqX, sqY, tilt, shift, plant, mouthX, mouthY, pulse, lid, gazeX, gazeY }),
+    [hop, sqX, sqY, tilt, shift, plant, mouthX, mouthY, pulse, lid, gazeX, gazeY],
+  );
+}
+
+/** Spielt `play`, sobald sich die `id` ändert (nicht beim ersten Rendern). */
+function useOnNewId(id: number | null, play: () => void) {
+  const last = useRef(id);
   useEffect(() => {
-    if (!active) {
-      lid.value = 1;
-      gaze.value = withTiming(0, { duration: GAZE_MS });
-      return;
-    }
-    let blinkIndex = 0;
-    let gazeIndex = 0;
-    let blinkTimer: ReturnType<typeof setTimeout>;
-    let gazeTimer: ReturnType<typeof setTimeout>;
-    const blink = () => {
-      lid.value = withSequence(
-        withTiming(0, { duration: BLINK_HALF_MS }),
-        withTiming(1, { duration: BLINK_HALF_MS }),
-      );
-      blinkIndex = (blinkIndex + 1) % BLINK_PAUSES_MS.length;
-      blinkTimer = setTimeout(blink, BLINK_PAUSES_MS[blinkIndex]);
-    };
-    const look = () => {
-      gaze.value = withTiming(GAZE_OFFSETS[gazeIndex], { duration: GAZE_MS });
-      gazeIndex = (gazeIndex + 1) % GAZE_OFFSETS.length;
-      gazeTimer = setTimeout(look, GAZE_PAUSES_MS[gazeIndex]);
-    };
-    blinkTimer = setTimeout(blink, BLINK_PAUSES_MS[0]);
-    gazeTimer = setTimeout(look, GAZE_PAUSES_MS[0]);
-    return () => {
-      clearTimeout(blinkTimer);
-      clearTimeout(gazeTimer);
-    };
-  }, [active, lid, gaze]);
-  return { lid, gaze };
+    if (id === null || id === last.current) return;
+    last.current = id;
+    play();
+    // play hängt nur an der id; neue Funktion bei jedem Rendern soll nichts auslösen.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+}
+
+export interface BudiMotionInput {
+  look: Pick<BudiLookState, 'motion' | 'sleep'>;
+  face: BudiFace | null;
+  /** false hält Budi still (Koma, geerntet). */
+  idle: boolean;
+  eyesOpen: boolean;
+  asleep: boolean;
+  condition: Condition | null;
+  hovering: SharedValue<number>;
+  size: number;
 }
 
 /**
- * Idle (Atmen, Wippen der Pflanze, Blinzeln, Blick) und Reaktionen (Squash-and-Stretch bei Erfolg,
- * Wackeln beim Streicheln, Kopfschütteln bei Warnung). `idle = false` hält Budi still (Koma, geerntet).
+ * Budis Leben (ART-3): Idle (Atmen, Wippen, Blinzeln, Umschauen, Kopf neigen, Hüpfer), Reaktionen
+ * auf Pflege (Streicheln, Kitzeln, Verliebt, Gießen, Düngen, Schmollen), Einschlafen und Aufwachen.
+ * Alles als Transform im UI-Thread, mit Squash & Stretch und Nachfedern.
  */
-export function useBudiMotion(
-  idle: boolean,
-  eyesOpen: boolean,
-  asleep: boolean,
-  reaction: CareReaction | null,
-  hovering: SharedValue<number>,
-  size: number,
-): BudiMotion {
-  const breath = useSharedValue(0);
-  const sway = useSharedValue(0);
-  const squashX = useSharedValue(1);
-  const squashY = useSharedValue(1);
-  const shake = useSharedValue(0);
-  const wiggle = useSharedValue(0);
+export function useBudiMotion({ look, face, idle, eyesOpen, asleep, condition, hovering, size }: BudiMotionInput): BudiMotion {
+  const body = useBody();
+  const { breath, sway } = useBreathAndSway(idle, asleep);
+  useIdleLife(body, idle && eyesOpen, idle && !asleep, condition, size, look.motion?.id ?? 0);
 
+  useOnNewId(look.motion?.id ?? null, () => {
+    if (look.motion && idle) playReaction(body, look.motion.kind, size);
+  });
+  useOnNewId(look.sleep?.id ?? null, () => {
+    if (look.sleep && idle) playSleepTransition(body, look.sleep.kind, size);
+  });
+  // Mimikwechsel: weicher Übergang statt hartem Sprung.
+  const faceKey = face ?? '';
+  const lastFace = useRef(faceKey);
   useEffect(() => {
-    if (!idle) {
-      cancelAnimation(breath);
-      cancelAnimation(sway);
-      breath.value = withTiming(0);
-      sway.value = withTiming(0);
-      return;
-    }
-    breath.value = 0;
-    breath.value = withRepeat(withTiming(1, { duration: asleep ? SLEEP_BREATH_MS : BREATH_MS }), -1, true);
-    sway.value = withSequence(
-      withTiming(-1, { duration: SWAY_MS / 2 }),
-      withRepeat(withTiming(1, { duration: SWAY_MS }), -1, true),
-    );
-  }, [idle, asleep, breath, sway]);
+    if (lastFace.current === faceKey) return;
+    lastFace.current = faceKey;
+    if (idle) popFace(body, eyesOpen);
+  }, [faceKey, idle, eyesOpen, body]);
 
-  const { lid, gaze } = useEyeLife(idle && eyesOpen);
+  const hover = useDerivedValue(() => withSpring(hovering.get(), M.BOUNCY));
+  const breathScale = asleep ? M.SLEEP_BREATH_SCALE : M.BREATH_SCALE;
+  const lift = size * M.HOP_HEIGHT;
 
-  useEffect(() => {
-    if (!reaction || reaction.feedback === 'error') return;
-    if (reaction.feedback === 'success') {
-      squashX.value = withSequence(
-        withTiming(SQUASH.x, { duration: SQUASH_MS }),
-        withTiming(STRETCH.x, { duration: SQUASH_MS }),
-        withSpring(1),
-      );
-      squashY.value = withSequence(
-        withTiming(SQUASH.y, { duration: SQUASH_MS }),
-        withTiming(STRETCH.y, { duration: SQUASH_MS }),
-        withSpring(1),
-      );
-      if (reaction.type === 'pet') {
-        wiggle.value = withSequence(
-          withTiming(-1, { duration: WIGGLE_MS }),
-          withTiming(1, { duration: WIGGLE_MS * 2 }),
-          withTiming(-1, { duration: WIGGLE_MS * 2 }),
-          withSpring(0),
-        );
-      }
-    } else {
-      shake.value = withSequence(
-        withTiming(SHAKE_PX, { duration: SHAKE_MS }),
-        withTiming(-SHAKE_PX, { duration: SHAKE_MS }),
-        withTiming(SHAKE_PX, { duration: SHAKE_MS }),
-        withTiming(0, { duration: SHAKE_MS }),
-      );
-    }
-  }, [reaction, squashX, squashY, shake, wiggle]);
-
-  const hover = useDerivedValue(() => withSpring(hovering.get()));
-  const breathScale = asleep ? SLEEP_BREATH_SCALE : BREATH_SCALE;
-
+  const shadowStyle = useAnimatedStyle(() => {
+    const air = Math.min(1, -body.hop.value / lift);
+    return { opacity: 1 - air * 0.55, transform: [{ scaleX: (1 - air * 0.35) * body.sqX.value }, { scaleY: 1 - air * 0.35 }] };
+  });
   const bodyStyle = useAnimatedStyle(() => {
-    const grow = 1 + hover.value * HOVER_SCALE;
+    const grow = 1 + hover.value * M.HOVER_SCALE;
+    const b = breath.value * breathScale;
     return {
       transform: [
-        { translateX: shake.value },
-        { rotate: `${wiggle.value * WIGGLE_DEG}deg` },
-        { scaleX: squashX.value * grow * (1 + breath.value * breathScale * 0.4) },
-        { scaleY: squashY.value * grow * (1 + breath.value * breathScale) },
+        { translateY: body.hop.value },
+        { translateX: body.shift.value },
+        { rotate: `${body.tilt.value * M.TILT_DEG}deg` },
+        { scaleX: body.sqX.value * grow * (1 - b * 0.4) },
+        { scaleY: body.sqY.value * grow * (1 + b) },
       ],
     };
   });
-  const plantStyle = useAnimatedStyle(() => ({ transform: [{ rotate: `${sway.value * SWAY_DEG}deg` }] }));
-
+  const plantStyle = useAnimatedStyle(() => {
+    const kick = body.plant.value;
+    return {
+      transform: [
+        { rotate: `${sway.value * M.SWAY_DEG + kick * M.PLANT_KICK_DEG}deg` },
+        { scaleY: 1 - Math.abs(kick) * M.PLANT_KICK_SCALE },
+        { scaleX: 1 + Math.abs(kick) * M.PLANT_KICK_SCALE * 0.5 },
+      ],
+    };
+  });
   const eyeStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: (gaze.value * size) / 100 }, { scaleY: Math.max(0.08, lid.value) }],
+    transform: [{ scaleX: body.pulse.value }, { scaleY: Math.max(0.08, body.lid.value) * body.pulse.value }],
   }));
+  const pupilStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: (body.gazeX.value * size) / 100 }, { translateY: (body.gazeY.value * size) / 100 }],
+  }));
+  const mouthStyle = useAnimatedStyle(() => ({ transform: [{ scaleX: body.mouthX.value }, { scaleY: body.mouthY.value }] }));
 
-  return { bodyStyle, plantStyle, eyeStyle };
+  return { shadowStyle, bodyStyle, plantStyle, eyeStyle, pupilStyle, mouthStyle };
 }
