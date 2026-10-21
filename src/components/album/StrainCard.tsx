@@ -3,13 +3,15 @@ import { Text, View } from 'react-native';
 import type { Rarity, Strain } from '../../game/config';
 import { unlockProgress, type ProgressStats } from '../../game/progression';
 import { strainsAlbum } from '../../content/strings';
-import type { ColorName } from '../../lib/theme';
+import { colors, radii, surface, type ColorName } from '../../lib/theme';
+import { Badge } from '../ui/Badge';
 import { Bar } from '../ui/Bar';
 import { Button } from '../ui/Button';
-import { Placeholder } from '../ui/Placeholder';
+import { Card } from '../ui/Card';
+import { IconTile } from '../ui/IconTile';
 
 const DAYS_PER_WEEK = 7;
-const PORTRAIT_HEIGHT = 120;
+const PORTRAIT_SIZE = 84;
 
 const RARITY_COLOR: Record<Rarity, ColorName> = {
   common: 'plantLight',
@@ -19,13 +21,6 @@ const RARITY_COLOR: Record<Rarity, ColorName> = {
   legendary: 'terracotta',
 };
 
-const RARITY_BG: Record<Rarity, string> = {
-  common: 'bg-plantLight',
-  rare: 'bg-lavender',
-  epic: 'bg-coral',
-  speed: 'bg-lamp',
-  legendary: 'bg-terracotta',
-};
 
 interface StrainCardProps {
   strain: Strain;
@@ -52,63 +47,71 @@ function unlockHint(strain: Strain, stats: ProgressStats): string {
   }
 }
 
-/** Rätsel-Porträt einer gesperrten Sorte: dunkle Fläche mit Fragezeichen (WEB-3). */
+/** Rätsel-Porträt einer gesperrten Sorte: dunkle Kachel mit Fragezeichen (WEB-3, WEB-5 kompakt). */
 function LockedPortrait() {
   return (
     <View
       accessibilityLabel={strainsAlbum.lockedPortrait}
-      className="items-center justify-center rounded-xl border-2 border-dashed border-inkMuted bg-night"
-      style={{ height: PORTRAIT_HEIGHT }}
+      style={{
+        width: PORTRAIT_SIZE,
+        height: PORTRAIT_SIZE,
+        borderRadius: radii.md,
+        backgroundColor: colors.night,
+        borderWidth: surface.line,
+        borderStyle: 'dashed',
+        borderColor: colors.inkMuted,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
     >
-      <Text className="font-heading text-5xl text-white/70">{strainsAlbum.lockSymbol}</Text>
-      <Text className="font-body-bold text-sm text-white/70">{strainsAlbum.lockedPortrait}</Text>
+      <Text className="font-heading text-4xl text-white/70">{strainsAlbum.lockSymbol}</Text>
     </View>
   );
 }
 
 /**
- * Sammelkarte einer Sorte (WEB-3 überarbeitet): Seltenheit als farbige Plakette. Freigeschaltet mit
- * farbigem Porträt, gesperrt als dunkle Rätselkarte mit Fortschrittsbalken bis zur Freischaltung.
+ * Sammelkarte einer Sorte (WEB-3, WEB-5 überarbeitet): Porträt links, rechts Name, Seltenheit und
+ * Blütezeit. Gesperrt als stumpfe Rätselkarte mit Fortschrittsbalken bis zur Freischaltung.
  */
 export function StrainCard({ strain, unlocked, stats, action }: StrainCardProps) {
   const weeks = Math.round(strain.floweringDays / DAYS_PER_WEEK);
   const progress = unlocked ? null : unlockProgress(strain, stats);
   return (
-    <View
+    <Card
+      tone={unlocked ? 'plain' : 'muted'}
       accessibilityLabel={`${strain.name}, ${unlocked ? strainsAlbum.unlocked : strainsAlbum.locked}`}
-      className={`gap-2 rounded-2xl p-4 ${unlocked ? 'bg-white' : 'bg-white/60'}`}
     >
-      {unlocked ? (
-        <Placeholder
-          label={strainsAlbum.portrait(strain.name)}
-          color={RARITY_COLOR[strain.rarity]}
-          height={PORTRAIT_HEIGHT}
-        />
-      ) : (
-        <LockedPortrait />
-      )}
-      <View className="flex-row items-center justify-between gap-2">
-        <Text className={`flex-1 font-heading text-xl ${unlocked ? 'text-ink' : 'text-inkMuted'}`}>{strain.name}</Text>
-        <View className={`rounded-full px-3 py-0.5 ${unlocked ? RARITY_BG[strain.rarity] : 'bg-inkMuted/30'}`}>
-          <Text className="font-body-bold text-xs text-ink">{strainsAlbum.rarity[strain.rarity]}</Text>
+      <View className="flex-row gap-3">
+        {unlocked ? (
+          <IconTile label={strainsAlbum.portrait(strain.name)} color={RARITY_COLOR[strain.rarity]} size={PORTRAIT_SIZE} />
+        ) : (
+          <LockedPortrait />
+        )}
+        <View className="flex-1 gap-1">
+          <Text className={`font-heading text-xl leading-6 ${unlocked ? 'text-ink' : 'text-inkMuted'}`}>
+            {strain.name}
+          </Text>
+          <Badge label={strainsAlbum.rarity[strain.rarity]} color={unlocked ? RARITY_COLOR[strain.rarity] : 'cream'} />
+          <Text className="font-body text-sm text-inkMuted">
+            {strainsAlbum.floweringWeeks(weeks)}
+            {strain.autoflower ? ` · ${strainsAlbum.autoflower}` : ''}
+          </Text>
         </View>
       </View>
-      <Text className="font-body text-sm text-ink">
-        {strainsAlbum.floweringWeeks(weeks)}
-        {strain.autoflower ? ` · ${strainsAlbum.autoflower}` : ''}
-      </Text>
-      <Text className="font-body text-base text-ink">{strainsAlbum.special[strain.id]}</Text>
-      <Text className={`font-body-bold text-sm ${unlocked ? 'text-plantDark' : 'text-inkMuted'}`}>
-        {unlocked ? strainsAlbum.unlocked : unlockHint(strain, stats)}
-      </Text>
-      {progress ? (
-        <Bar
-          value={progress.target > 0 ? progress.current / progress.target : 0}
-          color="lavender"
-          accessibilityLabel={unlockHint(strain, stats)}
-        />
-      ) : null}
+      <Text className={`font-body text-base ${unlocked ? 'text-ink' : 'text-inkMuted'}`}>{strainsAlbum.special[strain.id]}</Text>
+      {unlocked ? null : (
+        <View className="gap-1">
+          <Text className="font-body-bold text-sm text-inkMuted">{unlockHint(strain, stats)}</Text>
+          {progress ? (
+            <Bar
+              value={progress.target > 0 ? progress.current / progress.target : 0}
+              color="lavender"
+              accessibilityLabel={unlockHint(strain, stats)}
+            />
+          ) : null}
+        </View>
+      )}
       {action && unlocked ? <Button label={action.label} onPress={action.onPress} disabled={action.disabled} /> : null}
-    </View>
+    </Card>
   );
 }

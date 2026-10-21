@@ -459,6 +459,7 @@ export const debug = {
   resetConfirm: 'Nochmal tippen zum Bestätigen',
   setBars: 'Balken setzen',
   strainsTitle: 'Sorten',
+  knowledgeTitle: 'Fakten-Karten',
   unlockStrains: 'Alle Sorten freischalten',
   unlockEventStrain: 'Kölsche Knospe freischalten',
 };
@@ -666,6 +667,43 @@ export const dailyGoals = {
   chestTitle: 'Kiste offen!',
   chestReward: (coins: number) => `Da drin: ${coins} Münzen. Morgen hab ich wieder was für dich.`,
   claimed: 'Geschafft! Morgen gibt es ein neues Ziel.',
+};
+
+// Oberfläche der Screens, leere Zustände und Rahmen am Rechner (WEB-5).
+export const screenUi = {
+  backArrow: '‹',
+  chevron: '›',
+  frame: {
+    title: 'PotPou',
+    tagline: 'Pflege Budi vom Samen bis zur Ernte.',
+    badge: 'Browser-Testversion',
+    hints: ['Am Handy einfach diese Seite öffnen.', 'Dein Spielstand bleibt in diesem Browser.'],
+  },
+  harvestSteps: ['Lupe', 'Schere', 'Trocknen', 'Ernte'],
+  harvestStepLabel: (step: number, total: number) => `Schritt ${step} von ${total}`,
+  emptyPot: {
+    title: 'Der Topf ist leer',
+    text: 'Such dir einen Samen aus, dann geht es los.',
+  },
+  notReady: {
+    title: 'Noch nicht so weit',
+    text: 'Budi wächst noch. Wenn oben "Erntebereit" steht, kannst du hier ernten.',
+  },
+  knowledgeEmpty: {
+    title: 'Noch keine Karten',
+    text: 'Bei jedem Phasenwechsel verrät Budi dir etwas Neues über sich.',
+  },
+  shopMaxed: 'Alles ausgebaut. Budi ist rundum versorgt.',
+  newBadge: 'Neu',
+  ownedBadge: 'Im Besitz',
+  equippedBadge: 'Trägt Budi',
+  lockedBadge: 'Gesperrt',
+  cosmeticsTitle: 'Accessoires',
+  upgradesIntro: 'Upgrades helfen Budi dauerhaft. Münzen gibt es bei Ernte und Spielen.',
+  albumCollected: (n: number, total: number) => `${n} von ${total} Sorten`,
+  strainsTitle: 'Sorten',
+  knowledgeTitle: 'Fakten-Karten',
+  seedSelectSubtitle: 'Jede Sorte wächst anders. Neue gibt es durch Ernten und Samen-Fragmente.',
 };
 
 /** Web-Version zum Testen im Browser (Auftrag PWEB). */

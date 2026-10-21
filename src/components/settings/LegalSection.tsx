@@ -1,6 +1,6 @@
 import { Linking, Pressable, Text } from 'react-native';
 
-import { legal, legalUrls } from '../../content/strings';
+import { legal, legalUrls, screenUi } from '../../content/strings';
 import { SettingsSection } from './SettingsSection';
 
 function LegalLink({ label, url }: { label: string; url: string }) {
@@ -8,8 +8,13 @@ function LegalLink({ label, url }: { label: string; url: string }) {
     Linking.openURL(url).catch((error: unknown) => console.warn('[legal] Link nicht geöffnet.', error));
   };
   return (
-    <Pressable accessibilityRole="link" onPress={open} className="rounded-xl bg-cream px-4 py-3 active:opacity-70">
+    <Pressable
+      accessibilityRole="link"
+      onPress={open}
+      className="min-h-12 flex-row items-center justify-between rounded-2xl bg-cream px-4 py-3 active:opacity-70"
+    >
       <Text className="font-body-bold text-base text-ink">{label}</Text>
+      <Text className="font-heading text-xl text-plantDark">{screenUi.chevron}</Text>
     </Pressable>
   );
 }

@@ -1,8 +1,7 @@
 import { useRouter } from 'expo-router';
-import { Text, View } from 'react-native';
 
-import { harvestScreen } from '../../content/strings';
-import { Button } from '../ui/Button';
+import { harvestScreen, screenUi } from '../../content/strings';
+import { EmptyState } from '../ui/EmptyState';
 import { DryingView } from './DryingView';
 import { HarvestSummary } from './HarvestSummary';
 import { ReadyStep } from './ReadyStep';
@@ -17,14 +16,21 @@ export function HarvestFlow() {
   if (step === 'ready' && status) return <ReadyStep status={status} seed={seed} />;
   if ((step === 'drying' || step === 'done') && status) return <DryingView status={status} session={session} />;
 
-  const empty = step === 'empty';
-  return (
-    <View className="gap-3">
-      <Text className="font-body text-base text-ink">{empty ? harvestScreen.noPlant : harvestScreen.notReady}</Text>
-      <Button
-        label={empty ? harvestScreen.toSeedSelect : harvestScreen.toRoom}
-        onPress={() => (empty ? router.push('/seed-select') : router.replace('/'))}
+  // Leerer Topf oder noch nicht reif: Budi erklärt, ein Knopf führt weiter (WEB-5).
+  if (step === 'empty') {
+    return (
+      <EmptyState
+        title={screenUi.emptyPot.title}
+        text={screenUi.emptyPot.text}
+        action={{ label: harvestScreen.toSeedSelect, onPress: () => router.push('/seed-select') }}
       />
-    </View>
+    );
+  }
+  return (
+    <EmptyState
+      title={screenUi.notReady.title}
+      text={screenUi.notReady.text}
+      action={{ label: harvestScreen.toRoom, onPress: () => router.replace('/') }}
+    />
   );
 }
