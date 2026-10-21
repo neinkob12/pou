@@ -1,6 +1,6 @@
 # ART-2: Icons, App-Icon, Splash und Item-Grafiken auf Spiele-Niveau
 
-Branch: `claude/auftrag-47-art-2-icons-app-icon-splash-und-item-gra` · PR: siehe Auftrag a47 · Auftrag a47
+Branch: `claude/auftrag-47-art-2-icons-app-icon-splash-und-item-gra` · PR: #55 · Auftrag a47
 
 ## Icon-Blatt
 
