@@ -1,6 +1,7 @@
 import { Circle, Group, LinearGradient, Oval, Path, Rect, RoundedRect, vec } from '@shopify/react-native-skia';
 
-import { artColors } from '../../../lib/theme';
+import { artColors, colors } from '../../../lib/theme';
+import { Depth, Garland, HangingPlant, Moonbeam } from './RoomDecor';
 import { roomLayout, type RoomLayout } from './roomLayout';
 
 const OUTLINE = 0.9;
@@ -50,8 +51,10 @@ function Floor({ l, isDay }: { l: RoomLayout; isDay: boolean }) {
       ))}
       {/* Teppich mit Schatten unter Budi */}
       <Oval x={10} y={l.rugY - 6.5} width={80} height={13} color={artColors.outline} opacity={0.25} />
-      <Oval x={11} y={l.rugY - 6.8} width={78} height={12.6} color={isDay ? artColors.rug : artColors.rugShade} />
-      <Oval x={16} y={l.rugY - 4.8} width={68} height={8.6} color={artColors.rugShade} opacity={0.5} />
+      <Oval x={11} y={l.rugY - 6.8} width={78} height={12.6} color={isDay ? artColors.rug : artColors.rugNight} />
+      <Oval x={16} y={l.rugY - 4.8} width={68} height={8.6} color={isDay ? artColors.rugShade : artColors.rugNightShade} opacity={0.5} />
+      {/* Fransen-Muster am Rand */}
+      <Oval x={13.5} y={l.rugY - 5.9} width={73} height={10.8} color={colors.white} opacity={isDay ? 0.35 : 0.15} style="stroke" strokeWidth={0.4} />
       <Oval x={30} y={l.rugY - 2.6} width={40} height={4.6} color={artColors.outline} opacity={0.22} />
     </Group>
   );
@@ -169,7 +172,11 @@ export function RoomArt({ width, height, isDay }: { width: number; height: numbe
       <Wall l={l} isDay={isDay} />
       <Window l={l} isDay={isDay} />
       <Shelf l={l} isDay={isDay} />
+      <HangingPlant l={l} isDay={isDay} />
+      <Garland l={l} isDay={isDay} />
       <Floor l={l} isDay={isDay} />
+      {isDay ? null : <Moonbeam l={l} />}
+      <Depth l={l} isDay={isDay} />
     </Group>
   );
 }

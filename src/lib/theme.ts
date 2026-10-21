@@ -130,6 +130,14 @@ export const artColors = {
   denim: '#4C6FB8',
   straw: '#E9C87A',
   strawShade: '#C9A452',
+  // Zimmer-Licht (WEB-4)
+  moonGlow: 'rgba(200,215,255,0.55)',
+  moonGlowFade: 'rgba(200,215,255,0)',
+  shadow: 'rgba(47,41,60,0.18)',
+  shadowNight: 'rgba(10,12,30,0.45)',
+  shadowFade: 'rgba(47,41,60,0)',
+  rugNight: '#5E4A8C',
+  rugNightShade: '#46376E',
 } as const;
 
 // Minigame-Farben (Auftrag 40, WEB-2): hellere und dunklere Töne der Palette für Hintergründe,
