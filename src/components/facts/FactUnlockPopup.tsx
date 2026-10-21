@@ -4,7 +4,11 @@ import { Pressable, Text, View } from 'react-native';
 import { factById } from '../../content/facts';
 import { facts as t, modal } from '../../content/strings';
 import { useGameStore } from '../../store/gameStore';
+import Animated, { ZoomIn } from 'react-native-reanimated';
+
+import { BudiAvatar } from '../feedback/BudiAvatar';
 import { Button } from '../ui/Button';
+import { POPUP_MAX_WIDTH, popupCardStyle } from '../ui/popupCard';
 import { FactCardView } from './FactCardView';
 import { useFactUnlocks } from './useFactUnlocks';
 
@@ -38,16 +42,21 @@ export function FactUnlockPopup() {
       onPress={dismiss}
       className="absolute inset-0 items-center justify-center bg-ink/50 p-6"
     >
-      <Pressable accessibilityViewIsModal className="w-full gap-4 rounded-3xl bg-cream p-6">
-        <Text className="font-heading text-2xl text-ink">{t.popupTitle}</Text>
-        <Text className="font-body text-base text-ink">{t.popupIntro}</Text>
-        <FactCardView card={card} unlocked />
-        {more > 0 ? <Text className="font-body text-sm text-inkMuted">{t.popupMore(more)}</Text> : null}
-        <View className="gap-2">
-          {more > 0 ? <Button label={t.popupNext} onPress={dismiss} /> : null}
-          <Button label={modal.close} variant="secondary" onPress={dismiss} />
-        </View>
-      </Pressable>
+      <Animated.View entering={ZoomIn.springify().damping(14)} style={{ width: '100%', maxWidth: POPUP_MAX_WIDTH }}>
+        <Pressable accessibilityViewIsModal className="w-full gap-4 rounded-3xl bg-cream p-6" style={popupCardStyle}>
+          <View className="flex-row items-center gap-3">
+            <BudiAvatar size={44} />
+            <Text className="flex-1 font-heading text-2xl text-ink">{t.popupTitle}</Text>
+          </View>
+          <Text className="font-body text-base text-ink">{t.popupIntro}</Text>
+          <FactCardView card={card} unlocked />
+          {more > 0 ? <Text className="font-body text-sm text-inkMuted">{t.popupMore(more)}</Text> : null}
+          <View className="gap-2">
+            {more > 0 ? <Button label={t.popupNext} onPress={dismiss} /> : null}
+            <Button label={modal.close} variant="secondary" onPress={dismiss} />
+          </View>
+        </Pressable>
+      </Animated.View>
     </Pressable>
   );
 }

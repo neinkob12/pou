@@ -10,11 +10,14 @@ import { clock } from '../../lib/clock';
 import { shop } from '../../content/strings';
 import { useGameStore } from '../../store/gameStore';
 import { AssetImage } from '../ui/AssetImage';
+import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
 import { LevelPips } from './LevelPips';
+import { PriceCoin } from './PriceCoin';
 import { UPGRADE_COLORS, upgradeAssetId } from './upgradeVisuals';
 
-const IMAGE_SIZE = 72;
+const IMAGE_SIZE = 64;
 
 /** Ein Upgrade im Shop: Bild, Name, Wirkung, Stufen-Punkte und Kauf-Button mit Rückmeldung (WEB-3). */
 export function UpgradeCard({ id }: { id: UpgradeId }) {
@@ -41,42 +44,44 @@ export function UpgradeCard({ id }: { id: UpgradeId }) {
   };
 
   return (
-    <View className={`flex-row items-center gap-3 rounded-2xl p-3 ${maxed ? 'bg-plantLight/25' : 'bg-white'}`}>
-      <View>
-        <AssetImage
-          source={upgradeAssets[upgradeAssetId(id, level)]}
-          label={text.name}
-          color={UPGRADE_COLORS[id]}
-          size={IMAGE_SIZE}
-          tile
-        />
-        {boughtKey > 0 ? (
-          <Animated.View
-            key={boughtKey}
-            entering={ZoomIn.springify().damping(8)}
-            style={{ position: 'absolute', right: -6, top: -6 }}
-          >
-            <View className="rounded-full bg-plantDark px-2 py-0.5">
-              <Text className="font-body-bold text-xs text-white">{shop.bought}</Text>
-            </View>
-          </Animated.View>
-        ) : null}
-      </View>
-      <View className="flex-1 gap-1">
-        <Text className="font-heading text-lg text-ink">{text.name}</Text>
-        <Text className="font-body text-sm text-inkMuted">{text.text}</Text>
-        {max > 1 ? <LevelPips level={level} max={max} label={shop.level(level, max)} /> : null}
-        <View className="items-start pt-1">
-          {maxed ? (
-            <Text className="font-body-bold text-sm text-plantDark">{max > 1 ? shop.maxed : shop.owned}</Text>
-          ) : (
-            <Button label={label} disabled={!affordable} onPress={buy} />
-          )}
+    <Card tone={maxed ? 'success' : 'plain'}>
+      <View className="flex-row items-center gap-3">
+        <View>
+          <AssetImage
+            source={upgradeAssets[upgradeAssetId(id, level)]}
+            label={text.name}
+            color={UPGRADE_COLORS[id]}
+            size={IMAGE_SIZE}
+            tile
+          />
+          {boughtKey > 0 ? (
+            <Animated.View
+              key={boughtKey}
+              entering={ZoomIn.springify().damping(8)}
+              style={{ position: 'absolute', right: -8, top: -8 }}
+            >
+              <Badge label={shop.bought} color="plantDark" light />
+            </Animated.View>
+          ) : null}
         </View>
-        {next && !affordable ? (
-          <Text className="font-body text-xs text-inkMuted">{shop.missingCoins(next.price - coins)}</Text>
-        ) : null}
+        <View className="flex-1 gap-1">
+          <Text className="font-heading text-lg leading-6 text-ink">{text.name}</Text>
+          <Text className="font-body text-sm text-inkMuted">{text.text}</Text>
+          {max > 1 ? <LevelPips level={level} max={max} label={shop.level(level, max)} /> : null}
+        </View>
       </View>
-    </View>
+      <View className="flex-row items-center justify-between gap-2 pt-1">
+        {maxed ? (
+          <Badge label={max > 1 ? shop.maxed : shop.owned} color="plantLight" />
+        ) : (
+          <>
+            <Text className="flex-1 font-body text-xs text-inkMuted">
+              {next && !affordable ? shop.missingCoins(next.price - coins) : ''}
+            </Text>
+            <Button label={label} size="sm" disabled={!affordable} onPress={buy} leading={<PriceCoin />} />
+          </>
+        )}
+      </View>
+    </Card>
   );
 }
