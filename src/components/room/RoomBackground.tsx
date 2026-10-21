@@ -3,6 +3,7 @@ import { ImageBackground, StyleSheet, View, type LayoutChangeEvent } from 'react
 
 import { room as roomAssets } from '../../lib/assets';
 import { ArtCanvas } from '../ui/ArtCanvas';
+import { RoomAmbience } from './art/RoomAmbience';
 import { RoomArt } from './art/RoomArt';
 import { usePlantStatus } from './phase/usePlantStatus';
 
@@ -25,9 +26,12 @@ export function RoomBackground() {
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill} className={isDay ? 'bg-cream' : 'bg-night'} onLayout={onLayout}>
       {size.width > 0 ? (
-        <ArtCanvas width={size.width} height={size.height} still>
-          <RoomArt width={size.width} height={size.height} isDay={isDay} />
-        </ArtCanvas>
+        <>
+          <ArtCanvas width={size.width} height={size.height} still>
+            <RoomArt width={size.width} height={size.height} isDay={isDay} />
+          </ArtCanvas>
+          <RoomAmbience width={size.width} height={size.height} isDay={isDay} />
+        </>
       ) : null}
     </View>
   );

@@ -8,6 +8,7 @@ import {
   LATE_PHASE_PROGRESS,
   plantLayerFor,
   plantLayerWithStrain,
+  STRAIN_STYLES,
   type BudiLookInput,
 } from '../budiLook';
 
@@ -143,5 +144,17 @@ describe('Schlaf und Reife (WEB-1)', () => {
     expect(isRipe('ready')).toBe(true);
     expect(isRipe('flowering')).toBe(false);
     expect(isRipe(null)).toBe(false);
+  });
+});
+
+describe('Sorten-Form der Blätter', () => {
+  it('Sascha hat schmale, Anton breite Fiederblätter', () => {
+    expect(STRAIN_STYLES.sascha.leafWidth).toBeLessThan(STRAIN_STYLES.gustav.leafWidth);
+    expect(STRAIN_STYLES.anton.leafWidth).toBeGreaterThan(STRAIN_STYLES.gustav.leafWidth);
+  });
+
+  it('gibt die Blattbreite an die Pflanzen-Ebene weiter', () => {
+    const layer = plantLayerWithStrain('b04_vegetative_large', 'vegetative', 'sascha', () => false);
+    expect(layer.leafWidth).toBe(STRAIN_STYLES.sascha.leafWidth);
   });
 });

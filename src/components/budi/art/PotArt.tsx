@@ -3,7 +3,7 @@ import { Group, LinearGradient, Oval, Path, RoundedRect, vec } from '@shopify/re
 import { artColors } from '../../../lib/theme';
 
 /** Topfkörper (Trapez mit runden Ecken) und Rand, Budi-Leinwand 100 × 100. */
-const BODY = 'M22 66 L78 66 Q80 66 79.6 68 L74.6 93.5 Q74 97 70.5 97 L29.5 97 Q26 97 25.4 93.5 L20.4 68 Q20 66 22 66 Z';
+export const POT_BODY = 'M22 66 L78 66 Q80 66 79.6 68 L74.6 93.5 Q74 97 70.5 97 L29.5 97 Q26 97 25.4 93.5 L20.4 68 Q20 66 22 66 Z';
 const BODY_SHADE = 'M64 66 L78 66 Q80 66 79.6 68 L74.6 93.5 Q74 97 70.5 97 L62 97 Q68 82 64 66 Z';
 const RIM = { x: 16, y: 58.5, width: 68, height: 9.5, r: 4 };
 const OUTLINE = 1.7;
@@ -16,8 +16,8 @@ export function PotArt() {
       <Oval x={22} y={55.6} width={56} height={6.4} color={artColors.outline} />
       <Oval x={23} y={56.4} width={54} height={5} color={artColors.soil} />
       <Oval x={30} y={57} width={20} height={2} color={artColors.soilLight} />
-      <Path path={BODY} color={artColors.outline} style="stroke" strokeWidth={OUTLINE * 2} strokeJoin="round" />
-      <Path path={BODY}>
+      <Path path={POT_BODY} color={artColors.outline} style="stroke" strokeWidth={OUTLINE * 2} strokeJoin="round" />
+      <Path path={POT_BODY}>
         <LinearGradient start={vec(20, 66)} end={vec(80, 97)} colors={[artColors.potLight, artColors.pot]} />
       </Path>
       <Path path={BODY_SHADE} color={artColors.potShade} opacity={0.55} />
