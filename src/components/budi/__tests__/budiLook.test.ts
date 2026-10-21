@@ -158,3 +158,20 @@ describe('Sorten-Form der Blätter', () => {
     expect(layer.leafWidth).toBe(STRAIN_STYLES.sascha.leafWidth);
   });
 });
+
+describe('neue Mimiken (ART-3)', () => {
+  it('kichert beim Kitzeln und ist nach vielen Streichlern verliebt', () => {
+    expect(faceFor('ok', { type: 'pet', feedback: 'success', streak: 2 }, false)).toBe('giggle');
+    expect(faceFor('ok', { type: 'pet', feedback: 'success', streak: 4 }, false)).toBe('love');
+  });
+
+  it('mampft beim Düngen', () => {
+    expect(faceFor('hungry', { type: 'fertilize', feedback: 'success' }, false)).toBe('yum');
+  });
+
+  it('gähnt beim Einschlafen und Aufwachen, aber nicht wenn ihm etwas fehlt', () => {
+    expect(faceFor('ok', null, false, true, true)).toBe('yawn');
+    expect(faceFor('ok', null, false, false, true)).toBe('yawn');
+    expect(faceFor('thirsty', null, false, false, true)).toBe('b10_face_thirsty');
+  });
+});

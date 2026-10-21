@@ -5,14 +5,15 @@ import type { Condition } from '../../game/needs';
 import type { CareReaction } from '../room/care/CareStage';
 import { ArtCanvas } from '../ui/ArtCanvas';
 import { CareFx } from './art/CareFx';
-import { EYE_Y, FaceArt } from './art/FaceArt';
+import { EYE_Y, FaceArt, MOUTH_Y, type FacePart } from './art/FaceArt';
+import { hasMovingIris } from './art/faceSpec';
 import { PLANT_H } from './art/geometry';
 import { HarvestArt } from './art/HarvestArt';
 import { plantPalette } from './art/palette';
 import { PlantArt } from './art/PlantArt';
-import { PotArt } from './art/PotArt';
+import { PotArt, ShadowArt } from './art/PotArt';
 import { SleepZ } from './art/SleepZ';
-import { canBlink } from './budiLook';
+import { canBlink, type BudiFace } from './budiLook';
 import { BudiLayer } from './BudiLayer';
 import { useBudiLook } from './useBudiLook';
 import { useBudiMotion } from './useBudiMotion';
@@ -35,17 +36,26 @@ interface BudiProps {
   size?: number;
 }
 
+/** Eine Gesichtsebene auf eigener stiller Leinwand. */
+function FaceLayer({ face, part, size }: { face: BudiFace; part: FacePart; size: number }) {
+  return (
+    <ArtCanvas width={size} height={size} still>
+      <FaceArt face={face} part={part} />
+    </ArtCanvas>
+  );
+}
+
 /**
- * Budi als Vektorgrafik (Skia): Pflanze je Phase, Topf, Gesicht je Zustand, Accessoire.
- * Pflanze und Topf ändern sich nur mit der Phase (einmal gerendert, wippen per View-Transform).
- * Blinzeln und Blick bewegen die Augen-Ebene per View-Transform: keine Leinwand zeichnet laufend neu.
+ * Budi als Vektorgrafik (Skia): Schatten, Pflanze je Phase, Topf, Gesicht je Mimik, Accessoire.
+ * Jede Ebene zeichnet nur, wenn sich Phase oder Mimik ändern. Alle Bewegung (Hüpfen, Squash &
+ * Stretch, Blinzeln, Umschauen, Kauen) läuft als View-Transform: keine Leinwand zeichnet pro Frame.
  */
 export function Budi({ condition, reaction, hovering, accessory, size = BUDI_SIZE }: BudiProps) {
   const look = useBudiLook(condition, reaction, hovering);
   const asleep = look.face === 'b10_face_snoring';
   const idle = look.pot !== null && look.face !== 'b10_face_coma';
   const eyesOpen = look.face !== null && canBlink(look.face);
-  const motion = useBudiMotion(idle, eyesOpen, asleep, reaction, hovering, size);
+  const motion = useBudiMotion({ look, face: look.face, idle, eyesOpen, asleep, condition, hovering, size });
   const { plant } = look;
   const palette = plantPalette(plant?.tint ?? null, look.ripe);
   const harvested = plant !== null && look.pot === null;
@@ -53,6 +63,13 @@ export function Budi({ condition, reaction, hovering, accessory, size = BUDI_SIZ
 
   return (
     <View style={{ width: size, height: size }}>
+      {look.pot ? (
+        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.shadow, motion.shadowStyle]}>
+          <ArtCanvas width={size} height={size} still>
+            <ShadowArt />
+          </ArtCanvas>
+        </Animated.View>
+      ) : null}
       <Animated.View style={[StyleSheet.absoluteFill, styles.origin, motion.bodyStyle]}>
         {harvested ? (
           <ArtCanvas width={size} height={size} still>
@@ -81,16 +98,20 @@ export function Budi({ condition, reaction, hovering, accessory, size = BUDI_SIZ
           </ArtCanvas>
         ) : null}
         {look.pot && look.face ? (
-          <>
-            <ArtCanvas width={size} height={size} style={StyleSheet.absoluteFill} still>
-              <FaceArt face={look.face} part="rest" />
-            </ArtCanvas>
-            <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.eyes, motion.eyeStyle]}>
-              <ArtCanvas width={size} height={size} still>
-                <FaceArt face={look.face} part="eyes" />
-              </ArtCanvas>
+          <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+            <FaceLayer face={look.face} part="rest" size={size} />
+            <Animated.View style={[StyleSheet.absoluteFill, styles.eyes, motion.eyeStyle]}>
+              <FaceLayer face={look.face} part="eyes" size={size} />
+              {hasMovingIris(look.face) ? (
+                <Animated.View style={[StyleSheet.absoluteFill, motion.pupilStyle]}>
+                  <FaceLayer face={look.face} part="pupils" size={size} />
+                </Animated.View>
+              ) : null}
             </Animated.View>
-          </>
+            <Animated.View style={[StyleSheet.absoluteFill, styles.mouth, motion.mouthStyle]}>
+              <FaceLayer face={look.face} part="mouth" size={size} />
+            </Animated.View>
+          </View>
         ) : null}
         {accessory && look.pot ? <BudiLayer source={accessory} /> : null}
       </Animated.View>
@@ -103,7 +124,10 @@ export function Budi({ condition, reaction, hovering, accessory, size = BUDI_SIZ
 const styles = StyleSheet.create({
   // Topfboden unten mittig: Wippen und Squash drehen und stauchen um diesen Punkt.
   origin: { transformOrigin: 'bottom' },
-  // Lider klappen um die Augenlinie.
+  // Lider klappen um die Augenlinie, der Mund kaut um seine Mitte.
   eyes: { transformOrigin: `50% ${EYE_Y}%` },
+  mouth: { transformOrigin: `50% ${MOUTH_Y + 1.5}%` },
+  // Schatten schrumpft um seine Mitte am Boden.
+  shadow: { transformOrigin: '50% 97%' },
   plantBox: { position: 'absolute', left: 0, right: 0, top: 0, transformOrigin: 'bottom' },
 });

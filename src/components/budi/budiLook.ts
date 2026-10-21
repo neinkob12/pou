@@ -15,8 +15,19 @@ export const LATE_PHASE_PROGRESS = 0.5;
 /** Phasen, in denen Budi geerntet ist: kein Topf, kein Gesicht, nur die Ernte-Ebene. */
 const HARVESTED_PHASES: readonly PhaseId[] = ['drying', 'done'];
 
+/**
+ * Mimiken ohne eigene Bilddatei (ART-3), nur gezeichnet: verliebt (oft gestreichelt), kichern
+ * (gekitzelt), mampfen (gedüngt), gähnen (Einschlafen und Aufwachen).
+ */
+export type ExtraFaceId = 'love' | 'giggle' | 'yum' | 'yawn';
+export type BudiFace = BudiFaceId | ExtraFaceId;
+
+/** Ab so vielen Streichlern kurz hintereinander kichert Budi (gekitzelt), ab LOVE_STREAK ist er verliebt. */
+export const TICKLE_STREAK = 2;
+export const LOVE_STREAK = 4;
+
 /** Gesichter, bei denen Budi blinzeln darf (offene Augen). */
-const BLINK_FACES: readonly BudiFaceId[] = [
+const BLINK_FACES: readonly BudiFace[] = [
   'b10_face_neutral',
   'b10_face_happy',
   'b10_face_thirsty',
@@ -79,6 +90,18 @@ export function plantLayerFor(phase: PhaseId, phaseProgress: number): BudiPlantI
 export interface BudiReaction {
   type: CareActionId;
   feedback: CareFeedback;
+  /** Wievielter Streichler kurz hintereinander (budiMood.ts). Fehlt = 1. */
+  streak?: number;
+}
+
+/** Reaktionsgesicht nach erfolgreicher Pflege. */
+function successFace(reaction: BudiReaction): BudiFace {
+  if (reaction.type === 'water') return 'b10_face_happy';
+  if (reaction.type !== 'pet') return 'yum';
+  const streak = reaction.streak ?? 1;
+  if (streak >= LOVE_STREAK) return 'love';
+  if (streak >= TICKLE_STREAK) return 'giggle';
+  return 'b10_face_very_happy';
 }
 
 /**
@@ -90,20 +113,23 @@ export function faceFor(
   reaction: BudiReaction | null,
   hovering: boolean,
   asleep = false,
-): BudiFaceId {
+  /** Gerade am Einschlafen oder Aufwachen: Budi gähnt. */
+  drowsy = false,
+): BudiFace {
   if (condition === 'coma' || condition === 'sick') return CONDITION_FACES[condition];
   // 'error' = Pflege hat nicht gewirkt (z. B. keine Pflanze): kein Reaktionsgesicht.
   if (reaction && reaction.feedback !== 'error') {
     if (reaction.feedback === 'warning') return 'b10_face_offended';
-    return reaction.type === 'pet' ? 'b10_face_very_happy' : 'b10_face_happy';
+    return successFace(reaction);
   }
   if (hovering) return 'b10_face_surprised';
+  if (drowsy && condition === 'ok') return 'yawn';
   // Nachts schläft Budi, wenn ihm nichts fehlt. Durst oder Hunger wecken ihn (Zustandsgesicht).
   if (asleep && condition === 'ok') return 'b10_face_snoring';
   return CONDITION_FACES[condition];
 }
 
-export function canBlink(face: BudiFaceId): boolean {
+export function canBlink(face: BudiFace): boolean {
   return BLINK_FACES.includes(face);
 }
 
@@ -141,7 +167,7 @@ export interface BudiLook {
   /** null = noch kein Samen: nur der leere Topf. */
   plant: PlantLayer | null;
   pot: BudiPotId | null;
-  face: BudiFaceId | null;
+  face: BudiFace | null;
   blink: boolean;
 }
 
@@ -154,6 +180,8 @@ export interface BudiLookInput {
   hovering: boolean;
   /** Dunkelphase im Lichtplan: Budi schläft (nur Darstellung). */
   isNight?: boolean;
+  /** Übergang Schlafen und Wachen (budiMood.ts): Budi gähnt. */
+  drowsy?: boolean;
 }
 
 /** Erntereif: Blütenhärchen werden bernsteinfarben. */
@@ -171,6 +199,6 @@ export function computeBudiLook(
   }
   const plant = plantLayerWithStrain(plantLayerFor(phase, input.phaseProgress), phase, strainId, hasAsset);
   if (HARVESTED_PHASES.includes(phase)) return { plant, pot: null, face: null, blink: false };
-  const face = faceFor(condition ?? 'ok', input.reaction, input.hovering, input.isNight ?? false);
+  const face = faceFor(condition ?? 'ok', input.reaction, input.hovering, input.isNight ?? false, input.drowsy ?? false);
   return { plant, pot: 'u01_pot_standard', face, blink: canBlink(face) };
 }
