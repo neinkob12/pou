@@ -14,10 +14,11 @@ import { AssetImage } from '../ui/AssetImage';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
+import { ItemStage } from './ItemStage';
 import { PriceCoin } from './PriceCoin';
 import { PurchaseBurst } from './PurchaseBurst';
 
-const IMAGE_SIZE = 64;
+const IMAGE_SIZE = 58;
 
 interface CosmeticCardProps {
   id: CosmeticId;
@@ -56,7 +57,9 @@ export function CosmeticCard({ id, tryingOn, onTryOn, onDone }: CosmeticCardProp
       >
         <View className="flex-row items-center gap-3">
           <View>
-            <AssetImage source={cosmeticAssets[id]} label={name} size={IMAGE_SIZE} />
+            <ItemStage glow={isEquipped ? '#E2D6FB' : undefined}>
+              <AssetImage source={cosmeticAssets[id]} label={name} size={IMAGE_SIZE} />
+            </ItemStage>
             <PurchaseBurst playKey={boughtKey} />
           </View>
           <View className="flex-1 gap-1">
@@ -72,6 +75,10 @@ export function CosmeticCard({ id, tryingOn, onTryOn, onDone }: CosmeticCardProp
               {isEquipped ? text.equipped : tryingOn ? text.tryingOn : text.tryOn}
             </Text>
           </View>
+        </View>
+        {/* Knopf in eigener Zeile wie bei den Upgrades: der Name bekommt die ganze Breite. */}
+        <View className="flex-row items-center justify-between gap-2">
+          <Text className="flex-1 font-body text-xs text-inkMuted">{!isOwned && !affordable ? text.notEnoughCoins : ''}</Text>
           {isOwned ? (
             <Button
               label={isEquipped ? text.unequip : text.equip}
@@ -83,6 +90,7 @@ export function CosmeticCard({ id, tryingOn, onTryOn, onDone }: CosmeticCardProp
             <Button
               label={text.buy(COSMETIC_ITEMS[id].priceCoins)}
               size="sm"
+              variant="success"
               disabled={!affordable}
               leading={<PriceCoin />}
               onPress={() => {
@@ -95,9 +103,6 @@ export function CosmeticCard({ id, tryingOn, onTryOn, onDone }: CosmeticCardProp
             />
           )}
         </View>
-        {!isOwned && !affordable ? (
-          <Text className="text-right font-body text-xs text-inkMuted">{text.notEnoughCoins}</Text>
-        ) : null}
       </Card>
     </Animated.View>
   );

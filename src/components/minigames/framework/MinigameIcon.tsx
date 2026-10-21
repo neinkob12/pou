@@ -63,11 +63,25 @@ function iconDraw(game: MinigameInfo): BackdropDraw {
 
 const draws = new Map<string, BackdropDraw>();
 
-export function MinigameIcon({ game }: { game: MinigameInfo }) {
-  let draw = draws.get(game.id);
+/** Bild in beliebiger Größe: gezeichnet wird immer in SIZE-Einheiten, dann skaliert (scharf). */
+function scaledDraw(game: MinigameInfo, size: number): BackdropDraw {
+  const base = iconDraw(game);
+  const k = size / SIZE;
+  return (c, pen, w, h) => {
+    'worklet';
+    c.save();
+    c.scale(k, k);
+    base(c, pen, w, h);
+    c.restore();
+  };
+}
+
+export function MinigameIcon({ game, size = SIZE }: { game: MinigameInfo; size?: number }) {
+  const key = `${game.id}:${size}`;
+  let draw = draws.get(key);
   if (!draw) {
-    draw = iconDraw(game);
-    draws.set(game.id, draw);
+    draw = scaledDraw(game, size);
+    draws.set(key, draw);
   }
-  return <StillPicture width={SIZE} height={SIZE} draw={draw} />;
+  return <StillPicture width={size} height={size} draw={draw} />;
 }

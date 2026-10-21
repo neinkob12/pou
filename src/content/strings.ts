@@ -26,7 +26,8 @@ export const tabs = {
   minigames: 'Spiele',
   shop: 'Shop',
   album: 'Album',
-  settings: 'Einstellungen',
+  // Kurz, damit der Name unter das Icon der Tab-Kachel passt. Der Screen heißt weiter "Einstellungen".
+  settings: 'Optionen',
 };
 
 export const room = {
@@ -595,7 +596,7 @@ export const onboarding = {
       },
       bars: {
         title: 'So geht es mir',
-        text: 'Oben siehst du Wasser, Nährstoffe, Licht und Laune. Wird ein Balken leer, brauche ich dich. Ich wachse weiter, auch wenn du weg bist.',
+        text: 'Oben siehst du Wasser, Nährstoffe, Licht und Laune. Wird eine Kugel leer, brauche ich dich. Tipp sie an, dann siehst du den Stand. Ich wachse weiter, auch wenn du weg bist.',
       },
       minigames: {
         title: 'Lust auf ein Spiel?',
@@ -751,4 +752,25 @@ export const uiGallery = {
   displaySample: 'PotPou',
   titleSample: 'Titel in Spielschrift',
   bodySample: 'Fließtext in Nunito, gut lesbar auch in klein.',
+};
+
+// Zimmer-HUD und Spiele-Auswahl im Redesign "Spiel-Look 2" (Chef-Auftrag).
+export const roomHud = {
+  /** Kurzinfo beim Antippen einer Bedürfnis-Kugel. */
+  needValue: (label: string, value: number) => `${label} ${value} %`,
+  needLow: 'Braucht dich!',
+  noPlant: 'Topf ist leer',
+  phaseDetails: 'Phase ansehen',
+  phaseTitle: 'Budis Phase',
+  phaseProgress: (percent: number) => `${percent} % geschafft`,
+  phaseDay: (day: number) => `Tag ${day}`,
+  switchReady: 'Bereit für die Blüte',
+  goalOpen: 'Tagesziel ansehen',
+  goalDone: 'Erledigt',
+  goalReward: 'Belohnung: eine Kiste mit Münzen',
+};
+
+export const gamesHub = {
+  best: (score: number) => `Rekord ${score}`,
+  noBest: 'Neu',
 };

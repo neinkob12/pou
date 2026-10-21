@@ -327,3 +327,40 @@ export const insets = {
 export const overlay = {
   backdrop: 'rgba(20,24,40,0.55)',
 } as const;
+
+// --- Redesign "Spiel-Look 2" (Chef-Auftrag): ruhige Flächen, klare Hierarchie ---
+// Behälter (Karten, HUD-Pillen) treten zurück: helle Fläche, weicher Schatten, feine Kante.
+// Nur was man anfassen kann, trägt die dicke Kontur und die 3D-Kante (Button, Werkzeuge).
+
+/** Tab-Leiste und HUD-Glas über der Spielwelt. */
+export const chrome = {
+  /** Tab-Leiste: tiefes Waldgrün, rahmt jede Szene ein wie in Spielen üblich. */
+  barTop: '#2F5A3C',
+  barBottom: '#1F3D29',
+  barLine: '#14281B',
+  barGloss: 'rgba(255,255,255,0.10)',
+  /** Inaktive Tabs: Icon etwas zurückgenommen. */
+  idleOpacity: 0.78,
+  /** Helle Glas-Pille für HUD-Elemente im Zimmer. */
+  glass: 'rgba(255,250,240,0.94)',
+  glassLine: 'rgba(31,58,39,0.16)',
+  glassShadow: '0 4px 12px rgba(31,40,30,0.20)',
+  /** Feine Kante für ruhige Karten. */
+  cardLine: 'rgba(31,58,39,0.12)',
+  cardEdge: '#E9D7B8',
+  cardShadow: '0 6px 16px rgba(60,40,20,0.12)',
+  /** Weicher Lichthof hinter wichtigen Knöpfen. */
+  halo: 'rgba(255,214,90,0.55)',
+} as const;
+
+/** Bewegung für Auftritte: kurz, mit leichtem Überschwingen, gestaffelt. */
+export const motion = {
+  /** Abstand zwischen gestaffelten Elementen beim Auftritt. */
+  stagger: 55,
+  /** Feder für Auftritte von HUD und Karten. */
+  enter: { damping: 15, stiffness: 190, mass: 0.8 },
+  /** Feder für den Tab-Wechsel. */
+  tab: { damping: 16, stiffness: 260, mass: 0.7 },
+  /** Wie weit Elemente beim Auftritt gleiten. */
+  enterOffset: 18,
+} as const;

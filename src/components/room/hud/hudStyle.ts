@@ -11,9 +11,6 @@ export const hud = {
   gloss: 'rgba(255,255,255,0.7)',
   track: '#F3E6CC',
   warn: tones.danger.base,
-  /** Fach unten: Holz. */
-  tray: { light: '#F7D3A3', base: '#E9B77F', dark: '#D69D5E', edge: '#9C6638', text: '#4A2E1A' } satisfies Tone,
-  pedestal: tones.cream,
   hintBg: 'rgba(31,58,39,0.78)',
   ringHover: 'rgba(255,216,74,0.45)',
   ringHoverEdge: tones.gold.base,
@@ -26,11 +23,3 @@ export const NEED_TONES: Record<NeedBarId, Tone> = {
   light: tones.gold,
   mood: tones.coral,
 };
-
-/** Kacheln der Navigation unten, jede mit eigener Farbe. */
-export const NAV_TONES = {
-  minigames: tones.grape,
-  shop: tones.coral,
-  album: tones.leaf,
-  settings: tones.sky,
-} as const satisfies Record<string, Tone>;

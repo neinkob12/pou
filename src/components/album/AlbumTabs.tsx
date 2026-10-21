@@ -1,8 +1,8 @@
 import { useState, type ComponentType } from 'react';
-import { Pressable, Text, View } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
+import { Pressable, Text, View, type LayoutChangeEvent } from 'react-native';
+import Animated, { FadeIn, useAnimatedStyle, useDerivedValue, useReducedMotion, withSpring } from 'react-native-reanimated';
 
-import { colors, surface } from '../../lib/theme';
+import { chrome, colors, motion, radii } from '../../lib/theme';
 
 export interface AlbumTab {
   key: string;
@@ -11,19 +11,55 @@ export interface AlbumTab {
 }
 
 const FADE_MS = 180;
+const PAD = 4;
 
-/** Umschaltung zwischen zwei Tabs als Schalter mit Kontur (WEB-5); der Inhalt blendet über. */
+/**
+ * Umschaltung zwischen zwei Tabs (Redesign): helle Glas-Schiene, darauf gleitet eine weiße Pille
+ * mit Federung zum gewählten Tab. Der Inhalt blendet über.
+ */
 export function AlbumTabs({ tabs }: { tabs: AlbumTab[] }) {
+  const reduced = useReducedMotion();
   const [activeKey, setActiveKey] = useState(tabs[0]?.key);
+  const [width, setWidth] = useState(0);
   const active = tabs.find((t) => t.key === activeKey) ?? tabs[0];
+  const index = Math.max(0, tabs.findIndex((t) => t.key === active?.key));
+  const slot = tabs.length > 0 ? (width - PAD * 2) / tabs.length : 0;
+
+  const x = useDerivedValue(() => (reduced ? index * slot : withSpring(index * slot, motion.tab)), [index, slot, reduced]);
+  const pill = useAnimatedStyle(() => ({ transform: [{ translateX: x.value }] }));
 
   return (
     <View className="gap-4">
       <View
         accessibilityRole="tablist"
-        className="flex-row gap-1 rounded-full bg-white p-1"
-        style={{ borderWidth: surface.line, borderColor: colors.plantDark }}
+        onLayout={(e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width)}
+        style={{
+          flexDirection: 'row',
+          padding: PAD,
+          borderRadius: radii.pill,
+          backgroundColor: 'rgba(255,255,255,0.55)',
+          borderWidth: 1,
+          borderColor: chrome.glassLine,
+        }}
       >
+        {slot > 0 ? (
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              {
+                position: 'absolute',
+                top: PAD,
+                bottom: PAD,
+                left: PAD,
+                width: slot,
+                borderRadius: radii.pill,
+                backgroundColor: colors.white,
+                boxShadow: chrome.glassShadow,
+              },
+              pill,
+            ]}
+          />
+        ) : null}
         {tabs.map((tab) => {
           const selected = tab.key === active?.key;
           return (
@@ -32,9 +68,9 @@ export function AlbumTabs({ tabs }: { tabs: AlbumTab[] }) {
               accessibilityRole="tab"
               accessibilityState={{ selected }}
               onPress={() => setActiveKey(tab.key)}
-              className={`min-h-10 flex-1 items-center justify-center rounded-full ${selected ? 'bg-plantDark' : 'active:bg-cream'}`}
+              style={{ minHeight: 40, flex: 1, alignItems: 'center', justifyContent: 'center' }}
             >
-              <Text className={`font-body-bold text-base ${selected ? 'text-white' : 'text-inkMuted'}`}>{tab.label}</Text>
+              <Text className={`font-heading text-base ${selected ? 'text-plantDark' : 'text-inkMuted'}`}>{tab.label}</Text>
             </Pressable>
           );
         })}

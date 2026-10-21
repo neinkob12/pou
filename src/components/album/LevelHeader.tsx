@@ -2,7 +2,8 @@ import { Text, View } from 'react-native';
 
 import { levelProgress, type ProgressStats } from '../../game/progression';
 import { strainsAlbum } from '../../content/strings';
-import { colors, radii, surface } from '../../lib/theme';
+import { chrome, colors, radii, tones } from '../../lib/theme';
+import { gradientStyle, toneGradient } from '../ui/game/gradient';
 import { Bar } from '../ui/Bar';
 import { Card } from '../ui/Card';
 
@@ -10,10 +11,7 @@ const LEVEL_BADGE = 56;
 
 function Stat({ label }: { label: string }) {
   return (
-    <View
-      className="flex-1 items-center rounded-2xl bg-white px-2 py-2"
-      style={{ borderWidth: surface.line, borderColor: colors.plantDark }}
-    >
+    <View className="flex-1 items-center rounded-2xl bg-white px-2 py-2" style={{ boxShadow: chrome.glassShadow }}>
       <Text className="text-center font-body-bold text-sm text-ink">{label}</Text>
     </View>
   );
@@ -30,9 +28,10 @@ export function LevelHeader({ stats }: { stats: ProgressStats }) {
             width: LEVEL_BADGE,
             height: LEVEL_BADGE,
             borderRadius: radii.pill,
-            backgroundColor: colors.lavender,
-            borderWidth: surface.line,
-            borderColor: colors.plantDark,
+            ...gradientStyle(toneGradient(tones.grape), tones.grape.base),
+            borderWidth: 3,
+            borderColor: colors.white,
+            boxShadow: chrome.glassShadow,
             alignItems: 'center',
             justifyContent: 'center',
           }}
