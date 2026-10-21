@@ -234,6 +234,7 @@ export const minigameFun = {
   tapFinale: 'Endspurt!',
   tapGolden: 'Gold!',
   smashSwarm: 'Schwarm!',
+  smashArmored: 'Panzermilbe: 2 Treffer',
   smashCrack: 'Knack!',
   dropsShower: 'Regenschauer!',
   dropsShield: 'Schutzblatt!',

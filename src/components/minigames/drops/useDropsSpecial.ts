@@ -10,6 +10,8 @@ import { colors, funColors, gameColors } from '../../../lib/theme';
 import type { Fx } from '../framework/fx/useFx';
 import { potTop } from './dropsLogic';
 
+const POPUP_HALF = 64;
+
 export type DropsSpecial = 'golden' | 'shield' | 'shieldUsed' | 'shower';
 
 export function useDropsSpecial(
@@ -18,8 +20,11 @@ export function useDropsSpecial(
   size: SharedValue<{ width: number; height: number }>,
 ) {
   return useCallback(
-    (kind: DropsSpecial, x: number) => {
-      const y = potTop(size.get().height) - 40;
+    (kind: DropsSpecial, atX: number) => {
+      const { width, height } = size.get();
+      // Popups sind 120 breit: am Rand nach innen ziehen, sonst ist der Text abgeschnitten.
+      const x = Math.min(Math.max(atX, POPUP_HALF), Math.max(POPUP_HALF, width - POPUP_HALF));
+      const y = potTop(height) - 40;
       if (kind === 'shower') {
         showBanner(minigameFun.dropsShower, gameColors.waterDark);
       } else if (kind === 'shield') {

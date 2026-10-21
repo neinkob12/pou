@@ -3,13 +3,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, type DimensionValue } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSequence,
-  withSpring,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
 import { MINIGAME_FUN } from '../../../../game/config';
@@ -38,26 +32,34 @@ export function useBanner(): {
   return { banner, show, clear };
 }
 
+/** Einblenden und Ausblenden in ms, dazwischen steht das Banner MINIGAME_FUN.bannerMs. */
+const IN_MS = 180;
+const OUT_MS = 220;
+
 function BannerText({ banner, onDone }: { banner: Banner; onDone: () => void }) {
-  const t = useSharedValue(0);
+  const ms = useSharedValue(0);
+  const total = IN_MS + MINIGAME_FUN.bannerMs + OUT_MS;
   useEffect(() => {
-    t.set(0);
-    t.set(
-      withSequence(
-        withSpring(1, { damping: 9, stiffness: 240 }),
-        withTiming(1, { duration: MINIGAME_FUN.bannerMs }),
-        withTiming(2, { duration: 220 }, (finished) => {
-          if (finished) scheduleOnRN(onDone);
-        }),
-      ),
+    // Eine Animation über die ganze Dauer, damit der Abschluss-Callback sicher kommt (auch im Web).
+    ms.set(0);
+    ms.set(
+      withTiming(total, { duration: total, easing: Easing.linear }, (finished) => {
+        if (finished) scheduleOnRN(onDone);
+      }),
     );
-  }, [banner.id, onDone, t]);
+  }, [banner.id, ms, onDone, total]);
   const style = useAnimatedStyle(() => {
-    const v = t.get();
-    return {
-      opacity: v <= 1 ? Math.min(1, v * 2) : 2 - v,
-      transform: [{ scale: v <= 1 ? 0.5 + v * 0.5 : 1 - (v - 1) * 0.1 }],
-    };
+    const v = ms.get();
+    if (v < IN_MS) {
+      const k = v / IN_MS;
+      return { opacity: k, transform: [{ scale: 0.5 + k * 0.65 }] };
+    }
+    const hold = v - IN_MS;
+    if (hold < 120) return { opacity: 1, transform: [{ scale: 1.15 - (hold / 120) * 0.15 }] };
+    const out = v - IN_MS - MINIGAME_FUN.bannerMs;
+    if (out <= 0) return { opacity: 1, transform: [{ scale: 1 }] };
+    const k = Math.min(1, out / OUT_MS);
+    return { opacity: 1 - k, transform: [{ scale: 1 - k * 0.1 }] };
   });
   return (
     <Animated.View style={[styles.pill, { backgroundColor: banner.color }, style]}>

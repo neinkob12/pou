@@ -40,7 +40,7 @@ function addLeaf(b: SkPathBuilder, x: number, y: number, w: number, h: number) {
   b.close();
 }
 
-type Part = 'leaf' | 'rib' | 'crack' | 'coil';
+type Part = 'leaf' | 'rib' | 'crack' | 'coil' | 'arrows';
 
 /** Alle Blätter, die `pick` auswählt, als ein Pfad in Pixeln: Fläche, Mittelrippe, Riss oder Feder. */
 function leafPath(w: JumpWorld, width: number, height: number, pick: (p: Platform) => boolean, part: Part) {
@@ -58,6 +58,16 @@ function leafPath(w: JumpWorld, width: number, height: number, pick: (p: Platfor
     else if (part === 'rib') {
       b.moveTo(x - lw * 0.42, y + lh / 2);
       b.lineTo(x + lw * 0.42, y + lh / 2);
+    } else if (part === 'arrows') {
+      // Wander-Blatt (Auftrag 45): kleine Pfeile links und rechts zeigen, dass es gleitet.
+      const cy = y + lh / 2;
+      const a = lh * 0.55;
+      for (const side of [-1, 1]) {
+        const tip = x + side * lw * 0.68;
+        b.moveTo(tip - side * a, cy - a);
+        b.lineTo(tip, cy);
+        b.lineTo(tip - side * a, cy + a);
+      }
     } else if (part === 'crack') {
       b.moveTo(x - lw * 0.05, y - lh * 0.2);
       b.lineTo(x + lw * 0.04, y + lh * 0.4);
@@ -143,6 +153,7 @@ export function JumpScene({ world, size, now, lastLandingMs, children }: JumpSce
   const coil = useLeaves(world, size, isSpring, 'coil');
   const moving = useLeaves(world, size, isMoving, 'leaf');
   const movingRib = useLeaves(world, size, isMoving, 'rib');
+  const movingArrows = useLeaves(world, size, isMoving, 'arrows');
 
   const lights = useDerivedValue(() => {
     const { width, height } = size.get();
@@ -195,6 +206,7 @@ export function JumpScene({ world, size, now, lastLandingMs, children }: JumpSce
       <Path path={moving} color={gameColors.leafLight} />
       <Path path={moving} color={colors.plantDark} style="stroke" strokeWidth={1.5} />
       <Path path={movingRib} color={colors.plantDark} style="stroke" strokeWidth={1.2} strokeCap="round" />
+      <Path path={movingArrows} color={colors.plantDark} style="stroke" strokeWidth={2} strokeCap="round" />
       <Path path={breaking} color={colors.terracotta} />
       <Path path={breaking} color={gameColors.soil} style="stroke" strokeWidth={1.5} />
       <Path path={crack} color={gameColors.soil} style="stroke" strokeWidth={1.5} />

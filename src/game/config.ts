@@ -757,7 +757,7 @@ export const MINIGAME_FUN = {
     /** Regenschauer: alle so viele ms für eine kurze Zeit doppelt so viele Tropfen. */
     showerEveryMs: 30000,
     showerMs: 3000,
-    showerSpawnFactor: 0.5,
+    showerSpawnFactor: 0.4,
   },
   jump: {
     /** Wander-Blätter gleiten hin und her: Anteil ab movingFromHeight, steigt bis difficultyHeight. */
