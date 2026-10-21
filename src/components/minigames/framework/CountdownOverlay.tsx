@@ -1,8 +1,13 @@
+// Start-Countdown (Auftrag 40, Auftrag 51): jede Zahl knallt mit Überschwingen und leichter Drehung
+// auf, dahinter läuft ein Ring nach außen; "Los!" springt größer auf und fliegt weg.
+
 import { useEffect, useRef, useState } from 'react';
-import { Text } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
+  Easing,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withSequence,
   withSpring,
   withTiming,
@@ -10,22 +15,38 @@ import Animated, {
 
 import { minigameFeel } from '../../../content/strings';
 import { MINIGAME_FEEL } from '../../../game/config';
+import { springs } from '../../../lib/theme';
+import { sparks, tones } from './art/palette';
 import { Overlay } from './Overlay';
 import type { MinigamePhase } from './session';
+import { StrokeText } from './StrokeText';
 
-/** Zahl oder "Los!" springt beim Wechsel auf und setzt sich weich (Auftrag 40). */
-function PopText({ text, colorClass }: { text: string; colorClass: string }) {
-  const scale = useSharedValue(0.4);
-  const opacity = useSharedValue(0);
+/** Farbe je Zahl: 3 Koralle, 2 Gold, 1 Grün. */
+const COLORS: Record<number, string> = { 3: tones.coral.base, 2: tones.gold.base, 1: tones.leaf.base };
+
+function Burst({ text, color, size }: { text: string; color: string; size: number }) {
+  const scale = useSharedValue(0.2);
+  const spin = useSharedValue(-14);
+  const ring = useSharedValue(0);
   useEffect(() => {
-    scale.set(withSequence(withTiming(1.25, { duration: 120 }), withSpring(1, { damping: 9, stiffness: 220 })));
-    opacity.set(withTiming(1, { duration: 90 }));
-  }, [text, opacity, scale]);
-  const style = useAnimatedStyle(() => ({ opacity: opacity.get(), transform: [{ scale: scale.get() }] }));
+    scale.set(withSequence(withTiming(1.3, { duration: 130, easing: Easing.out(Easing.quad) }), withSpring(1, springs.pop)));
+    spin.set(withSpring(0, springs.release));
+    ring.set(withTiming(1, { duration: 650, easing: Easing.out(Easing.cubic) }));
+  }, [ring, scale, spin, text]);
+  const textStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }, { rotate: `${spin.get()}deg` }] }));
+  const ringStyle = useAnimatedStyle(() => ({
+    opacity: 0.8 * (1 - ring.get()),
+    transform: [{ scale: 0.4 + ring.get() * 1.6 }],
+  }));
   return (
-    <Animated.View style={style}>
-      <Text className={`font-heading text-8xl ${colorClass}`}>{text}</Text>
-    </Animated.View>
+    <View style={styles.center}>
+      <Animated.View style={[styles.ring, { borderColor: color }, ringStyle]} />
+      <Animated.View style={textStyle}>
+        <StrokeText size={size} color={color}>
+          {text}
+        </StrokeText>
+      </Animated.View>
+    </View>
   );
 }
 
@@ -33,26 +54,39 @@ function PopText({ text, colorClass }: { text: string; colorClass: string }) {
 export function CountdownOverlay({ value }: { value: number }) {
   return (
     <Overlay card={false}>
-      <PopText key={value} text={String(value)} colorClass="text-coral" />
+      <Burst key={value} text={String(value)} color={COLORS[value] ?? sparks.white} size={112} />
     </Overlay>
   );
 }
 
-/** "Los!" kurz nach dem Countdown. Zeigt sich einmal je Runde. */
+/** "Los!" kurz nach dem Countdown: springt auf und fliegt nach oben weg. Einmal je Runde. */
 export function GoFlash({ phase }: { phase: MinigamePhase }) {
   const [visible, setVisible] = useState(false);
   const shown = useRef(false);
+  const lift = useSharedValue(0);
   useEffect(() => {
     if (phase !== 'playing' || shown.current) return;
     shown.current = true;
     setVisible(true);
+    lift.set(withDelay(MINIGAME_FEEL.goFlashMs * 0.6, withTiming(1, { duration: MINIGAME_FEEL.goFlashMs * 0.4 })));
     const timer = setTimeout(() => setVisible(false), MINIGAME_FEEL.goFlashMs);
     return () => clearTimeout(timer);
-  }, [phase]);
+  }, [lift, phase]);
+  const style = useAnimatedStyle(() => ({
+    opacity: 1 - lift.get(),
+    transform: [{ translateY: -60 * lift.get() }, { scale: 1 + lift.get() * 0.3 }],
+  }));
   if (!visible) return null;
   return (
     <Overlay card={false} passThrough>
-      <PopText text={minigameFeel.go} colorClass="text-plantDark" />
+      <Animated.View style={style}>
+        <Burst text={minigameFeel.go} color={tones.gold.light} size={96} />
+      </Animated.View>
     </Overlay>
   );
 }
+
+const styles = StyleSheet.create({
+  center: { alignItems: 'center', justifyContent: 'center' },
+  ring: { position: 'absolute', width: 160, height: 160, borderRadius: 80, borderWidth: 10 },
+});

@@ -1,7 +1,20 @@
-import { Pressable, Text, View } from 'react-native';
+// Kopfzeile im Spiel (Auftrag 45, Auftrag 51 im Spiel-Look): Spielname, Punkte- und Zeit-Pillen mit
+// Kontur, die Punkte springen bei jedem Zuwachs auf, die Zeit pulsiert rot in den letzten Sekunden.
+// Darunter Sterne-Ziel und Rekord als kleine Pillen.
+
+import { useEffect } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from 'react-native-reanimated';
 
 import { minigameFramework as t, minigameFun } from '../../../content/strings';
+import { MINIGAME_ART } from '../../../game/config';
+import { fonts, gameRadii, outline, spacing, springs, tones } from '../../../lib/theme';
+import { GameText } from '../../ui/GameText';
+import { IconButton } from '../../ui/IconButton';
 import type { RoundGoal } from './roundGoal';
+
+/** Ab so vielen Sekunden Rest pulsiert die Zeit rot. */
+const HURRY_SECONDS = 5;
 
 interface ScoreHudProps {
   title: string;
@@ -20,38 +33,97 @@ function goalText(goal: RoundGoal): string {
     : minigameFun.goalNextStar(goal.nextStars, goal.points);
 }
 
-/** Kopfzeile: Spielname, Punkte, Restzeit, Pause-Knopf; darunter Sterne-Ziel und Rekord. */
-export function ScoreHud({ title, score, secondsLeft, canPause, onPause, goal, record = 0 }: ScoreHudProps) {
+/** Pille mit Beschriftung und Zahl; `bumpKey` lässt sie bei jeder Änderung aufspringen. */
+function Pill({ label, value, tone, bumpKey }: { label: string; value: string; tone: keyof typeof tones; bumpKey: unknown }) {
+  const scale = useSharedValue(1);
+  useEffect(() => {
+    scale.set(withSequence(withTiming(MINIGAME_ART.scoreBump, { duration: 80 }), withSpring(1, springs.release)));
+  }, [bumpKey, scale]);
+  const style = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }] }));
+  const c = tones[tone];
   return (
-    <View className="px-4 py-2">
-      <View className="flex-row items-center gap-3">
-        <Text className="flex-1 font-heading text-xl text-ink" numberOfLines={1}>
+    <Animated.View style={[styles.pill, { backgroundColor: c.base }, style]}>
+      <GameText variant="small" color={c.text} shadow={c.text === tones.coral.text}>
+        {label}
+      </GameText>
+      <GameText variant="number" color={c.text} shadow={c.text === tones.coral.text}>
+        {value}
+      </GameText>
+    </Animated.View>
+  );
+}
+
+/** Pause-Symbol: zwei Balken. */
+function PauseGlyph() {
+  return (
+    <View style={styles.glyph}>
+      <View style={styles.bar} />
+      <View style={styles.bar} />
+    </View>
+  );
+}
+
+export function ScoreHud({ title, score, secondsLeft, canPause, onPause, goal, record = 0 }: ScoreHudProps) {
+  const hurry = secondsLeft !== null && secondsLeft <= HURRY_SECONDS && secondsLeft > 0;
+  return (
+    <View style={styles.wrap}>
+      <View style={styles.row}>
+        <GameText variant="heading" numberOfLines={1} style={styles.title}>
           {title}
-        </Text>
-        <Text className="font-body-bold text-base text-ink">
-          {t.score}: {score}
-        </Text>
+        </GameText>
+        <Pill label={t.score} value={String(score)} tone="sky" bumpKey={score} />
         {secondsLeft !== null && (
-          <Text className="font-body-bold text-base text-ink">
-            {t.timeLeft}: {secondsLeft}
-          </Text>
+          <Pill
+            label={t.timeLeft}
+            value={String(secondsLeft)}
+            tone={hurry ? 'danger' : 'cream'}
+            bumpKey={hurry ? secondsLeft : 0}
+          />
         )}
-        <Pressable
-          accessibilityRole="button"
+        <IconButton
+          icon={<PauseGlyph />}
           accessibilityLabel={t.pause}
-          disabled={!canPause}
           onPress={onPause}
-          className={`rounded-full bg-white px-3 py-1 active:opacity-70 ${canPause ? '' : 'opacity-40'}`}
-        >
-          <Text className="font-body-bold text-base text-ink">{t.pause}</Text>
-        </Pressable>
+          disabled={!canPause}
+          size="sm"
+          quiet
+        />
       </View>
       {(goal || record > 0) && (
-        <View className="flex-row justify-end gap-3">
-          {goal && <Text className="font-body-bold text-sm text-lavender">{goalText(goal)}</Text>}
-          {record > 0 && <Text className="font-body text-sm text-inkMuted">{minigameFun.record(record)}</Text>}
+        <View style={styles.sub}>
+          {goal && <Text style={[styles.chip, styles.goal]}>{goalText(goal)}</Text>}
+          {record > 0 && <Text style={[styles.chip, styles.record]}>{minigameFun.record(record)}</Text>}
         </View>
       )}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  wrap: { paddingHorizontal: spacing.md, paddingTop: spacing.xs, paddingBottom: spacing.sm, gap: spacing.xs },
+  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  title: { flex: 1 },
+  pill: {
+    minWidth: 54,
+    alignItems: 'center',
+    borderRadius: gameRadii.chip,
+    borderWidth: outline.thin,
+    borderColor: outline.color,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 1,
+  },
+  glyph: { flexDirection: 'row', gap: 4 },
+  bar: { width: 5, height: 14, borderRadius: 2, backgroundColor: outline.color },
+  sub: { flexDirection: 'row', justifyContent: 'flex-end', gap: spacing.sm },
+  chip: {
+    overflow: 'hidden',
+    borderRadius: gameRadii.pill,
+    borderWidth: outline.thin,
+    borderColor: outline.color,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 1,
+    fontSize: 13,
+  },
+  goal: { backgroundColor: tones.grape.base, color: tones.grape.text, fontFamily: fonts.headingBold },
+  record: { backgroundColor: tones.cream.light, color: tones.cream.text, fontFamily: fonts.headingBold },
+});

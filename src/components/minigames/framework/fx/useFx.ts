@@ -5,7 +5,7 @@ import { useCallback, useRef, useState } from 'react';
 import { useFrameCallback, useSharedValue, type SharedValue } from 'react-native-reanimated';
 
 import { MINIGAME_FEEL } from '../../../../game/config';
-import { burst, createFx, pruneFx, shake, type BurstOptions, type FxState } from './fxLogic';
+import { burst, createFx, flash, fxBusy, pruneFx, ring, shake, type BurstOptions, type FxState } from './fxLogic';
 
 export interface Popup {
   id: number;
@@ -27,12 +27,19 @@ export interface Fx {
   /** Kamera-Wackeln; auch aus Worklets aufrufbar. */
   shakeHit: () => void;
   shakeFail: () => void;
+  /** Schockwellen-Ring (Auftrag 51); `color` zeigt in die Palette der Szene. Auch aus Worklets. */
+  ringAt: (x: number, y: number, color: number, scale?: number) => void;
+  /** Weißer Blitz über dem Feld (Auftrag 51). Auch aus Worklets. */
+  flash: () => void;
   /** Punkte-Popup (nur JS-Thread, aus Worklets per scheduleOnRN). */
   popup: (x: number, y: number, text: string, color: string, big?: boolean) => void;
   removePopup: (id: number) => void;
 }
 
-export function useFx(): Fx {
+/**
+ * `timeScale`: Tempo der Effekt-Uhr (Zeitlupe der Runde, Auftrag 51). Ohne läuft sie in echter Zeit.
+ */
+export function useFx(timeScale?: SharedValue<number>): Fx {
   const state = useSharedValue<FxState>(createFx());
   const now = useSharedValue(0);
   const [popups, setPopups] = useState<Popup[]>([]);
@@ -40,10 +47,12 @@ export function useFx(): Fx {
 
   useFrameCallback((frame) => {
     'worklet';
-    now.set(frame.timestamp);
+    const dt = Math.min(frame.timeSincePreviousFrame ?? 0, 100);
+    const t = now.get() + dt * (timeScale ? timeScale.get() : 1);
+    now.set(t);
     const before = state.get();
-    if (before.particles.length === 0) return;
-    const next = pruneFx(before, frame.timestamp);
+    if (!fxBusy(before)) return;
+    const next = pruneFx(before, t);
     if (next !== before) state.set(next);
   });
 
@@ -65,6 +74,19 @@ export function useFx(): Fx {
     state.set(shake(state.get(), now.get(), MINIGAME_FEEL.shakeFailMs, MINIGAME_FEEL.shakeFailPx));
   }, [now, state]);
 
+  const ringAt = useCallback(
+    (x: number, y: number, color: number, scale = 1) => {
+      'worklet';
+      state.set(ring(state.get(), x, y, now.get(), color, scale));
+    },
+    [now, state],
+  );
+
+  const flashNow = useCallback(() => {
+    'worklet';
+    state.set(flash(state.get(), now.get()));
+  }, [now, state]);
+
   const popup = useCallback((x: number, y: number, text: string, color: string, big = false) => {
     const id = nextId.current;
     nextId.current += 1;
@@ -73,5 +95,5 @@ export function useFx(): Fx {
 
   const removePopup = useCallback((id: number) => setPopups((list) => list.filter((p) => p.id !== id)), []);
 
-  return { state, now, popups, burstAt, shakeHit, shakeFail, popup, removePopup };
+  return { state, now, popups, burstAt, shakeHit, shakeFail, ringAt, flash: flashNow, popup, removePopup };
 }

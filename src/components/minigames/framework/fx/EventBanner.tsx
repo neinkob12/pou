@@ -2,12 +2,13 @@
 // und verblassen. Ein Banner zur Zeit, ein neues ersetzt das alte.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, View, type DimensionValue } from 'react-native';
+import { StyleSheet, View, type DimensionValue } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
 import { MINIGAME_FUN } from '../../../../game/config';
-import { colors, fonts, radii, spacing } from '../../../../lib/theme';
+import { colors, gameRadii, outline, shadows, spacing } from '../../../../lib/theme';
+import { StrokeText } from '../StrokeText';
 
 export interface Banner {
   id: number;
@@ -52,7 +53,7 @@ function BannerText({ banner, onDone }: { banner: Banner; onDone: () => void }) 
     const v = ms.get();
     if (v < IN_MS) {
       const k = v / IN_MS;
-      return { opacity: k, transform: [{ scale: 0.5 + k * 0.65 }] };
+      return { opacity: k, transform: [{ scale: 0.5 + k * 0.65 }, { rotate: `${(1 - k) * -12}deg` }] };
     }
     const hold = v - IN_MS;
     if (hold < 120) return { opacity: 1, transform: [{ scale: 1.15 - (hold / 120) * 0.15 }] };
@@ -63,7 +64,10 @@ function BannerText({ banner, onDone }: { banner: Banner; onDone: () => void }) 
   });
   return (
     <Animated.View style={[styles.pill, { backgroundColor: banner.color }, style]}>
-      <Text style={styles.text}>{banner.text}</Text>
+      <View style={styles.shine} />
+      <StrokeText size={28} color={colors.white}>
+        {banner.text}
+      </StrokeText>
     </Animated.View>
   );
 }
@@ -78,13 +82,29 @@ interface EventBannerProps {
 export function EventBanner({ banner, onDone, top = '18%' }: EventBannerProps) {
   return (
     <View style={[styles.wrap, { top }]} pointerEvents="none">
-      {banner && <BannerText key={banner.id} banner={banner} onDone={onDone} />}
+      <View style={styles.tilt}>{banner && <BannerText key={banner.id} banner={banner} onDone={onDone} />}</View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   wrap: { position: 'absolute', left: 0, right: 0, alignItems: 'center' },
-  pill: { borderRadius: radii.md, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm },
-  text: { fontFamily: fonts.headingBold, fontSize: 26, color: colors.white },
+  pill: {
+    overflow: 'hidden',
+    borderRadius: gameRadii.card,
+    borderWidth: outline.thick,
+    borderColor: outline.color,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    boxShadow: shadows.pop,
+  },
+  tilt: { transform: [{ rotate: '-3deg' }] },
+  shine: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    height: '45%',
+    backgroundColor: 'rgba(255,255,255,0.28)',
+  },
 });

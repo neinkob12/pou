@@ -8,7 +8,8 @@ import { useFrameCallback, useSharedValue, type SharedValue } from 'react-native
 import { scheduleOnRN } from 'react-native-worklets';
 
 import { canOfferExtraLife, requestExtraLife } from './extraLife';
-import { consumeHitStop } from './fx/fxLogic';
+import { MINIGAME_ART } from '../../../game/config';
+import { consumeHitStop, consumeSlowMo } from './fx/fxLogic';
 import { finishRound, type RoundResult } from './finishRound';
 import {
   countdownDisplay,
@@ -51,6 +52,10 @@ export interface MinigameSession {
   setExtraLifeHandler: (handler: (() => void) | null) => void;
   /** Hält die Spielzeit kurz an (Treffer-Gefühl). Auch aus Worklets aufrufbar. */
   hitStop: (ms: number) => void;
+  /** Zeitlupe für MINIGAME_ART.slowMoMs (Kombo-Stufe, Auftrag 51). Auch aus Worklets aufrufbar. */
+  slowMo: () => void;
+  /** Aktuelles Tempo der Spielzeit (1, in der Zeitlupe kleiner). Effekte laufen damit mit. */
+  timeScale: SharedValue<number>;
 }
 
 export function useMinigameSession({
@@ -62,6 +67,8 @@ export function useMinigameSession({
   const [initial] = useState(createClock);
   const clock = useSharedValue<MinigameClock>(initial);
   const hitStopLeft = useSharedValue(0);
+  const slowMoLeft = useSharedValue(0);
+  const timeScale = useSharedValue(1);
 
   const [phase, setPhase] = useState<MinigamePhase>(initial.phase);
   const [countdown, setCountdown] = useState(countdownDisplay(initial));
@@ -101,7 +108,12 @@ export function useMinigameSession({
     if (before.phase !== 'countdown' && before.phase !== 'playing') return;
     const held = consumeHitStop(hitStopLeft.get(), frame.timeSincePreviousFrame ?? 0);
     if (held.leftMs !== hitStopLeft.get()) hitStopLeft.set(held.leftMs);
-    const next = stepClock(before, held.dtMs, durationMs);
+    const slow = consumeSlowMo(slowMoLeft.get(), held.dtMs, MINIGAME_ART.slowMoFactor);
+    if (slow.leftMs !== slowMoLeft.get()) {
+      slowMoLeft.set(slow.leftMs);
+      timeScale.set(slow.leftMs > 0 ? MINIGAME_ART.slowMoFactor : 1);
+    }
+    const next = stepClock(before, slow.dtMs, durationMs);
     clock.set(next);
     const cd = countdownDisplay(next);
     if (cd !== countdownDisplay(before)) scheduleOnRN(setCountdown, cd);
@@ -127,6 +139,12 @@ export function useMinigameSession({
     },
     [hitStopLeft],
   );
+
+  const slowMo = useCallback(() => {
+    'worklet';
+    slowMoLeft.set(MINIGAME_ART.slowMoMs);
+    timeScale.set(MINIGAME_ART.slowMoFactor);
+  }, [slowMoLeft, timeScale]);
 
   const pause = useCallback(() => {
     const next = pauseClock(clock.get());
@@ -183,5 +201,7 @@ export function useMinigameSession({
     declineExtraLife: finalize,
     setExtraLifeHandler,
     hitStop,
+    slowMo,
+    timeScale,
   };
 }

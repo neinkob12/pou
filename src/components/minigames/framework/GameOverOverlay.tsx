@@ -1,12 +1,22 @@
-import { useState } from 'react';
-import { Text, View } from 'react-native';
+// Spielende (Auftrag 40, Auftrag 51 im Spiel-Look): Titel mit Kontur, Sterne knallen nacheinander auf,
+// Punkte und Münzen zählen hoch, Rekord-Abzeichen wackelt, Tipp fürs Nochmal, 3D-Knöpfe.
+
+import { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 
 import { minigameFeel, minigameFramework as t, minigameFun } from '../../../content/strings';
-import { GameButton } from './GameButton';
+import { MINIGAME_ART } from '../../../game/config';
+import { gameRadii, outline, spacing, tones as ui } from '../../../lib/theme';
+import { GameText } from '../../ui/GameText';
+import { tones } from './art/palette';
+import { countUpValue } from './countUp';
 import type { RoundResult } from './finishRound';
+import { GameButton } from './GameButton';
 import { Overlay } from './Overlay';
 import { ResultStars } from './ResultStars';
 import { pointsToNextStar, starsFor } from './stars';
+import { StrokeText } from './StrokeText';
 
 interface GameOverOverlayProps {
   result: RoundResult;
@@ -14,12 +24,48 @@ interface GameOverOverlayProps {
   onExit: () => void;
 }
 
-function Row({ label, value }: { label: string; value: string | number }) {
+/** Zahl, die nach dem Aufploppen der Karte hochzählt. */
+function useCountUp(target: number): number {
+  const [shown, setShown] = useState(0);
+  useEffect(() => {
+    let frame = 0;
+    const start = Date.now();
+    const tick = () => {
+      const value = countUpValue(target, Date.now() - start, MINIGAME_ART.countUpMs);
+      setShown(value);
+      if (value !== target) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [target]);
+  return shown;
+}
+
+function Stat({ label, value, tone }: { label: string; value: string; tone: { base: string; dark: string } }) {
   return (
-    <View className="flex-row justify-between">
-      <Text className="font-body text-lg text-ink">{label}</Text>
-      <Text className="font-body-bold text-lg text-ink">{value}</Text>
+    <View style={[styles.stat, { backgroundColor: tone.base, borderColor: outline.color }]}>
+      <GameText variant="small" color={ui.cream.light} shadow align="center">
+        {label}
+      </GameText>
+      <GameText variant="heading" color={ui.cream.light} shadow align="center">
+        {value}
+      </GameText>
     </View>
+  );
+}
+
+function RecordBadge() {
+  const wiggle = useSharedValue(0);
+  useEffect(() => {
+    wiggle.set(withDelay(900, withRepeat(withSequence(withTiming(1, { duration: 120 }), withTiming(-1, { duration: 120 }), withTiming(0, { duration: 120 })), 3, false)));
+  }, [wiggle]);
+  const style = useAnimatedStyle(() => ({ transform: [{ rotate: `${-4 + wiggle.get() * 6}deg` }] }));
+  return (
+    <Animated.View style={[styles.record, style]}>
+      <StrokeText size={22} color={tones.gold.light}>
+        {t.newHighscore}
+      </StrokeText>
+    </Animated.View>
   );
 }
 
@@ -37,22 +83,32 @@ export function GameOverOverlay({ result, onPlayAgain, onExit }: GameOverOverlay
   const stars = starsFor(result.gameId, result.score);
   const toNext = pointsToNextStar(result.gameId, result.score);
   const tip = useTip(result.gameId);
+  const score = useCountUp(result.score);
+  const coins = useCountUp(result.coins);
   return (
     <Overlay>
-      <Text className="text-center font-heading text-3xl text-ink">{t.gameOver}</Text>
+      <View style={styles.title}>
+        <StrokeText size={34} color={ui.cream.light}>
+          {t.gameOver}
+        </StrokeText>
+      </View>
       <ResultStars stars={stars} />
-      <Text className="text-center font-body text-sm text-inkMuted">
+      <GameText variant="bodyBold" color={tones.petal.dark} align="center">
         {toNext === null ? minigameFeel.allStars : minigameFeel.nextStar(toNext)}
-      </Text>
-      {result.isNewHighscore && <Text className="text-center font-heading text-xl text-coral">{t.newHighscore}</Text>}
-      <Row label={t.score} value={result.score} />
-      <Row label={t.coinsEarned} value={`+${result.coins}`} />
-      <Row label={t.highscore} value={result.highscore} />
-      <Text className="text-center font-body text-base text-plantDark">{t.moodBonus}</Text>
+      </GameText>
+      {result.isNewHighscore && <RecordBadge />}
+      <View style={styles.stats}>
+        <Stat label={t.score} value={String(score)} tone={ui.sky} />
+        <Stat label={t.coinsEarned} value={`+${coins}`} tone={ui.gold} />
+        <Stat label={t.highscore} value={String(result.highscore)} tone={ui.grape} />
+      </View>
+      <GameText variant="bodyBold" color={tones.leafDeep.dark} align="center">
+        {t.moodBonus}
+      </GameText>
       {tip && (
-        <View className="rounded-2xl bg-white px-4 py-2">
-          <Text className="font-body-bold text-sm text-ink">{minigameFeel.tipTitle}</Text>
-          <Text className="font-body text-sm text-ink">{tip}</Text>
+        <View style={styles.tip}>
+          <GameText variant="bodyBold">{minigameFeel.tipTitle}</GameText>
+          <GameText variant="body">{tip}</GameText>
         </View>
       )}
       <GameButton label={t.playAgain} onPress={onPlayAgain} />
@@ -60,3 +116,25 @@ export function GameOverOverlay({ result, onPlayAgain, onExit }: GameOverOverlay
     </Overlay>
   );
 }
+
+const styles = StyleSheet.create({
+  title: { alignItems: 'center', marginTop: -spacing.sm },
+  stats: { flexDirection: 'row', gap: spacing.sm },
+  stat: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: spacing.xs + 2,
+    borderRadius: gameRadii.chip,
+    borderWidth: outline.thin,
+  },
+  record: { alignSelf: 'center' },
+  tip: {
+    gap: 2,
+    borderRadius: gameRadii.chip,
+    borderWidth: outline.thin,
+    borderColor: outline.color,
+    backgroundColor: ui.cream.light,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+});

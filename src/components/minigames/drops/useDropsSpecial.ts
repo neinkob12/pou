@@ -6,7 +6,8 @@ import type { SharedValue } from 'react-native-reanimated';
 
 import { minigameFun } from '../../../content/strings';
 import { cue } from '../../../lib/audio';
-import { colors, funColors, gameColors } from '../../../lib/theme';
+import { colors, gameColors } from '../../../lib/theme';
+import { tones } from '../framework/art/palette';
 import type { Fx } from '../framework/fx/useFx';
 import { potTop } from './dropsLogic';
 
@@ -32,10 +33,10 @@ export function useDropsSpecial(
         showBanner(minigameFun.dropsShield, colors.plantDark);
       } else if (kind === 'shieldUsed') {
         cue('hit');
-        fx.popup(x, y, minigameFun.dropsShieldUsed, colors.plantDark, true);
+        fx.popup(x, y, minigameFun.dropsShieldUsed, tones.leaf.light, true);
       } else {
         cue('collect');
-        fx.popup(x, y, minigameFun.dropsGolden, funColors.goldDeep, true);
+        fx.popup(x, y, minigameFun.dropsGolden, tones.gold.base, true);
       }
     },
     [fx, showBanner, size],
