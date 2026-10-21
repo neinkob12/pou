@@ -112,3 +112,17 @@ describe('plantPalette', () => {
     expect(plain.pistil).not.toBe(plantPalette(null, false).pistil);
   });
 });
+
+describe('fanLeaf Blattbreite je Sorte', () => {
+  const xs = (d: string) => (d.match(/-?\d+(\.\d+)?/g) ?? []).map(Number).filter((_, i) => i % 2 === 0);
+  const spread = (factor: number) => {
+    const [leaflet] = fanLeaf({ x: 50, y: 50 }, 0, 20, 1, factor);
+    const x = xs(leaflet.shape);
+    return Math.max(...x) - Math.min(...x);
+  };
+
+  it('macht Fiederblätter schmaler oder breiter', () => {
+    expect(spread(0.6)).toBeLessThan(spread(1));
+    expect(spread(1.4)).toBeGreaterThan(spread(1));
+  });
+});

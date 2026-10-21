@@ -98,11 +98,18 @@ export const health: Partial<Record<HealthAssetId, ImageSourcePropType>> = {};
 // --- Ernte: Lupe, Schere, Trocknen, Erntekiste (P24) ---
 // Schlüssel = ID aus docs/ASSETS.md. Fehlt die Datei, zeigt der Ernte-Screen einen Platzhalter.
 export type HarvestAssetId = 'u7_lupe' | 'u8_scissors' | 'b7_drying' | 'b8_crate' | 'h3_drying_room';
-export const harvest: Partial<Record<HarvestAssetId, ImageSourcePropType>> = {};
+// WEB-4: gezeichnet (Skia) und mit `node assets/render-art.cjs` als PNG gerendert.
+export const harvest: Partial<Record<HarvestAssetId, ImageSourcePropType>> = {
+  u7_lupe: require('../../assets/images/u7_lupe.png'),
+  u8_scissors: require('../../assets/images/u8_scissors.png'),
+  b7_drying: require('../../assets/images/b7_drying.png'),
+  b8_crate: require('../../assets/images/b8_crate.png'),
+  h3_drying_room: require('../../assets/images/h3_drying_room.png'),
+};
 
 // --- Shop-Upgrades: Bilder im Shop und im Raum (P15) ---
 // Topf-Stufen U1, LED U2, Ventilator U5, Entfeuchter U6, Spezialdünger U4. Das Nützlings-Kit hat
-// noch keine ID in docs/ASSETS.md und bleibt Platzhalter.
+// noch keine ID in docs/ASSETS.md und heißt hier `beneficials` (Marienkäfer).
 export type UpgradeAssetId =
   | 'u1_pot_1'
   | 'u1_pot_2'
@@ -112,11 +119,20 @@ export type UpgradeAssetId =
   | 'u5_fan'
   | 'u6_dehumidifier'
   | 'beneficials';
-export const upgrades: Partial<Record<UpgradeAssetId, ImageSourcePropType>> = {};
+// WEB-4: gezeichnet (Skia) und mit `node assets/render-art.cjs` als PNG gerendert.
+export const upgrades: Partial<Record<UpgradeAssetId, ImageSourcePropType>> = {
+  u1_pot_1: require('../../assets/images/u1_pot_1.png'),
+  u1_pot_2: require('../../assets/images/u1_pot_2.png'),
+  u1_pot_3: require('../../assets/images/u1_pot_3.png'),
+  u2_led_on: require('../../assets/images/u2_led_on.png'),
+  u4_special: require('../../assets/images/u4_special.png'),
+  u6_dehumidifier: require('../../assets/images/u6_dehumidifier.png'),
+  beneficials: require('../../assets/images/beneficials.png'),
+};
 
 // --- Kosmetik: Accessoires für den Accessoire-Slot von Budi (P25) ---
-// U16 aus docs/ASSETS.md, Ebenen auf der Budi-Leinwand 1024 × 1024. Die Dateien in assets/budi/
-// sind Platzhalter (farbige Form + Text) unter den endgültigen Namen: echte Grafik drüberkopieren.
+// U16 aus docs/ASSETS.md, Ebenen auf der Budi-Leinwand 1024 × 1024. Seit WEB-4 gezeichnet
+// (src/components/budi/art/AccessoryArt.tsx, gerendert mit `node assets/render-art.cjs`).
 export const cosmetics: Record<CosmeticId, ImageSourcePropType> = {
   u16_sunglasses: require('../../assets/budi/u16_sunglasses.png'),
   u16_hat_cap: require('../../assets/budi/u16_hat_cap.png'),
