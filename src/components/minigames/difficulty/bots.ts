@@ -4,14 +4,8 @@
 
 import { BUDI_JUMP, DROPS_GAME, PEST_SMASH, TAP_CIRCLE } from '../../../game/config';
 import { clampPot, createField, potTop, stepField, type DropsField } from '../drops/dropsLogic';
-import {
-  NO_CIRCLE,
-  lifetimeAt,
-  needsRespawn,
-  placeCircle,
-  radiusForHits,
-  type TapCircle,
-} from '../framework/example/tapCircle';
+import { NO_CIRCLE, needsRespawn, placeCircle, radiusForHits, type TapCircle } from '../framework/example/tapCircle';
+import { circleLifetime, pointsForCircle, rollGolden } from '../framework/example/tapGolden';
 import { fillPlatforms } from '../jump/jumpLevel';
 import { advanceWorld, jumpHeight, scoreForHeight } from '../jump/jumpPhysics';
 import { createWorld, type JumpWorld } from '../jump/jumpWorld';
@@ -36,25 +30,27 @@ function reaction(ms: number, rand: () => number): number {
   return ms * (0.8 + 0.4 * rand());
 }
 
-/** Tipp den Kreis: Bot tippt jede Knospe nach `reactionMs`, wenn sie dann noch steht. */
+/** Tipp den Kreis: Bot tippt jede Knospe nach `reactionMs`, wenn sie dann noch steht. Mit goldenen Knospen. */
 export function simulateTap(reactionMs: number, seed: number): number {
   const rand = seededRandom(seed);
   const end = TAP_CIRCLE.durationSeconds * 1000;
   let circle: TapCircle = NO_CIRCLE;
   let hits = 0;
+  let score = 0;
   let tapAt = Infinity;
   const spawn = (t: number) => {
-    circle = placeCircle(rand(), rand(), 390, 700, radiusForHits(hits), t);
+    circle = { ...placeCircle(rand(), rand(), 390, 700, radiusForHits(hits), t), golden: rollGolden(rand(), t) };
     tapAt = t + reaction(reactionMs, rand);
   };
   for (let t = 0; t < end; t += SIM_STEP_MS) {
-    if (needsRespawn(circle, t, lifetimeAt(circle.spawnedAtMs))) spawn(t);
+    if (needsRespawn(circle, t, circleLifetime(circle))) spawn(t);
     if (t >= tapAt) {
       hits += 1;
+      score += pointsForCircle(circle);
       spawn(t);
     }
   }
-  return hits * TAP_CIRCLE.pointsPerHit;
+  return score;
 }
 
 /** Mittel über mehrere Startwerte, gerundet. */
@@ -67,7 +63,7 @@ export function averageScore(run: (seed: number) => number, runs = 20): number {
 /**
  * Schädlings-Smash: Bot sieht jedes Tier nach `reactionMs` und klatscht Schädlinge, solange sie
  * noch da sind. Mit `ladybugSlip` erwischt er aus Versehen einen Marienkäfer. Ein Finger: zwischen
- * zwei Tipps vergehen mindestens `tapGapMs`.
+ * zwei Tipps vergehen mindestens `tapGapMs`. Panzermilben klatscht er zweimal.
  */
 export function simulateSmash(reactionMs: number, seed: number, ladybugSlip = 0.1, tapGapMs = 300): number {
   const rand = seededRandom(seed);
@@ -91,6 +87,8 @@ export function simulateSmash(reactionMs: number, seed: number, ladybugSlip = 0.
       const outcome = tapHole(state, c.hole, t, score, PEST_SMASH);
       state = outcome.state;
       score += outcome.points;
+      // Panzermilbe: gleich noch einmal draufklatschen, sobald der Finger wieder frei ist.
+      if (outcome.cracked) planned.set(c.id, fingerFreeAt);
     }
   }
   return score;

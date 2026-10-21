@@ -225,8 +225,43 @@ export const minigameFeel = {
   } as Record<string, readonly string[]>,
 };
 
+// Neue Elemente der Minigames (Auftrag 45, WEB-7)
+export const minigameFun = {
+  newRecord: 'Neuer Rekord!',
+  goalNextStar: (stars: number, points: number) => `${'★'.repeat(stars)} bei ${points}`,
+  goalAllStars: '★★★ geschafft',
+  record: (points: number) => `Rekord ${points}`,
+  tapFinale: 'Endspurt!',
+  tapGolden: 'Gold!',
+  smashSwarm: 'Schwarm!',
+  smashArmored: 'Panzermilbe: 2 Treffer',
+  smashCrack: 'Knack!',
+  dropsShower: 'Regenschauer!',
+  dropsShield: 'Schutzblatt!',
+  dropsShieldUsed: 'Geschützt!',
+  dropsGolden: 'Gold!',
+  jumpBoost: 'Sonnenstrahl!',
+  quizJoker: '50:50',
+  quizJokerUsed: 'Joker weg',
+  quizTimeUp: 'Zeit um!',
+  quizQuestionTime: (s: number) => `${s} s`,
+  quizKeysHint: 'Am Rechner: Tasten 1 bis 3, J für den Joker, Enter für weiter',
+  quizTimeUpText: (answer: string) => `Die Zeit ist um. Richtig wäre: ${answer}`,
+  tips: {
+    tap: ['Goldene Knospen bringen 3 Punkte, verschwinden aber schneller.', 'Im Endspurt tauchen mehr goldene Knospen auf.'],
+    smash: ['Panzermilben brauchen zwei Treffer und bringen Extrapunkte.', 'Bei 15 und 30 Sekunden kommt ein Schwarm. Halt dich bereit.'],
+    drops: [
+      'Goldene Tropfen bringen 3 Punkte.',
+      'Ein Schutzblatt im Topf hält das nächste Salz ab.',
+      'Im Regenschauer fällt kein Salz. Sammel, so viel du kannst.',
+    ],
+    jump: ['Ein Sonnenstrahl trägt Budi ein Stück nach oben.', 'Wander-Blätter gleiten hin und her. Pass den Moment ab.'],
+    quiz: ['Die Bedenkzeit wird mit jeder Frage knapper.', 'Einmal pro Runde nimmt der Joker eine falsche Antwort weg.'],
+  } as Record<string, readonly string[]>,
+};
+
 export const minigameCards = {
-  tap: 'Tippe die Kreise, bevor sie verschwinden.',
+  tap: 'Tipp die Knospen, bevor ihr Ring abläuft. Gold zählt dreifach.',
   smash: 'Klatsch die Schädlinge vom Blatt, aber verschone die Marienkäfer.',
   drops: 'Fang Wasser- und Düngertropfen mit dem Topf.',
   jump: 'Hüpf mit Budi von Blatt zu Blatt nach oben.',

@@ -1,13 +1,14 @@
 import { Text, View } from 'react-native';
 
-import { smashGame as t } from '../../../content/strings';
+import { minigameFun, smashGame as t } from '../../../content/strings';
 import { PEST_SMASH } from '../../../game/config';
-import { colors, type ColorName } from '../../../lib/theme';
+import { colors, funColors } from '../../../lib/theme';
 
-const LEGEND: { label: string; color: ColorName }[] = [
-  { label: t.mite, color: 'terracotta' },
-  { label: t.gnat, color: 'night' },
-  { label: t.ladybug, color: 'coral' },
+const LEGEND: { label: string; color: string }[] = [
+  { label: t.mite, color: colors.terracotta },
+  { label: minigameFun.smashArmored, color: funColors.shell },
+  { label: t.gnat, color: colors.night },
+  { label: t.ladybug, color: colors.coral },
 ];
 
 interface SmashInfoProps {
@@ -21,7 +22,7 @@ export function SmashInfo({ protectionEarned }: SmashInfoProps) {
       <View className="flex-row flex-wrap gap-3">
         {LEGEND.map((l) => (
           <View key={l.label} className="flex-row items-center gap-1">
-            <View className="h-3 w-3 rounded-full" style={{ backgroundColor: colors[l.color] }} />
+            <View className="h-3 w-3 rounded-full" style={{ backgroundColor: l.color }} />
             <Text className="font-body text-sm text-ink">{l.label}</Text>
           </View>
         ))}

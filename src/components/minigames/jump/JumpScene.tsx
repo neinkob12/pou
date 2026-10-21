@@ -1,7 +1,8 @@
 // Zeichnet Budi Jump mit Skia (Auftrag 40: eigene Grafik statt Platzhalter). Liest nur Shared Values,
 // rendert also ohne React mit 60 fps. Himmel wird mit der Höhe zur Nacht, Blätter als Blattformen je
 // Typ (normal grün, brechend braun mit Riss, Feder lavendel mit Spirale), Lichtpunkte leuchten,
-// Budi ist ein Spross mit Gesicht und staucht sich beim Landen.
+// Budi ist ein Spross mit Gesicht und staucht sich beim Landen. Auftrag 45: Wander-Blätter hellgrün,
+// Sonnenstrahlen als drehende Sonnen.
 
 import { Group, LinearGradient, Path, Rect, Skia, vec, type SkPathBuilder } from '@shopify/react-native-skia';
 import type { ReactNode } from 'react';
@@ -9,6 +10,7 @@ import { useDerivedValue, type SharedValue } from 'react-native-reanimated';
 
 import { BUDI_JUMP } from '../../../game/config';
 import { colors, gameColors } from '../../../lib/theme';
+import { JumpBoosts } from './JumpBoosts';
 import { JumpBudi } from './JumpBudi';
 import { budiShape, skyAt, starsVisibility } from './jumpFeel';
 import type { JumpWorld, Platform } from './jumpWorld';
@@ -38,7 +40,7 @@ function addLeaf(b: SkPathBuilder, x: number, y: number, w: number, h: number) {
   b.close();
 }
 
-type Part = 'leaf' | 'rib' | 'crack' | 'coil';
+type Part = 'leaf' | 'rib' | 'crack' | 'coil' | 'arrows';
 
 /** Alle Blätter, die `pick` auswählt, als ein Pfad in Pixeln: Fläche, Mittelrippe, Riss oder Feder. */
 function leafPath(w: JumpWorld, width: number, height: number, pick: (p: Platform) => boolean, part: Part) {
@@ -56,6 +58,16 @@ function leafPath(w: JumpWorld, width: number, height: number, pick: (p: Platfor
     else if (part === 'rib') {
       b.moveTo(x - lw * 0.42, y + lh / 2);
       b.lineTo(x + lw * 0.42, y + lh / 2);
+    } else if (part === 'arrows') {
+      // Wander-Blatt (Auftrag 45): kleine Pfeile links und rechts zeigen, dass es gleitet.
+      const cy = y + lh / 2;
+      const a = lh * 0.55;
+      for (const side of [-1, 1]) {
+        const tip = x + side * lw * 0.68;
+        b.moveTo(tip - side * a, cy - a);
+        b.lineTo(tip, cy);
+        b.lineTo(tip - side * a, cy + a);
+      }
     } else if (part === 'crack') {
       b.moveTo(x - lw * 0.05, y - lh * 0.2);
       b.lineTo(x + lw * 0.04, y + lh * 0.4);
@@ -113,7 +125,11 @@ function useLeaves(
 export function JumpScene({ world, size, now, lastLandingMs, children }: JumpSceneProps) {
   const isNormal = (p: Platform) => {
     'worklet';
-    return p.kind === 'normal';
+    return p.kind === 'normal' && !p.vx;
+  };
+  const isMoving = (p: Platform) => {
+    'worklet';
+    return p.kind === 'normal' && !!p.vx;
   };
   const isBreaking = (p: Platform) => {
     'worklet';
@@ -135,6 +151,9 @@ export function JumpScene({ world, size, now, lastLandingMs, children }: JumpSce
   const spring = useLeaves(world, size, isSpring, 'leaf');
   const springRib = useLeaves(world, size, isSpring, 'rib');
   const coil = useLeaves(world, size, isSpring, 'coil');
+  const moving = useLeaves(world, size, isMoving, 'leaf');
+  const movingRib = useLeaves(world, size, isMoving, 'rib');
+  const movingArrows = useLeaves(world, size, isMoving, 'arrows');
 
   const lights = useDerivedValue(() => {
     const { width, height } = size.get();
@@ -179,10 +198,15 @@ export function JumpScene({ world, size, now, lastLandingMs, children }: JumpSce
     <>
       <Sky world={world} size={size} />
       <Path path={halos} color={colors.lamp} opacity={0.3} />
+      <JumpBoosts world={world} size={size} now={now} />
       <Path path={lights} color={colors.lamp} />
       <Path path={normal} color={colors.plantLight} />
       <Path path={normal} color={colors.plantDark} style="stroke" strokeWidth={1.5} />
       <Path path={normalRib} color={colors.plantDark} style="stroke" strokeWidth={1.2} opacity={0.6} />
+      <Path path={moving} color={gameColors.leafLight} />
+      <Path path={moving} color={colors.plantDark} style="stroke" strokeWidth={1.5} />
+      <Path path={movingRib} color={colors.plantDark} style="stroke" strokeWidth={1.2} strokeCap="round" />
+      <Path path={movingArrows} color={colors.plantDark} style="stroke" strokeWidth={2} strokeCap="round" />
       <Path path={breaking} color={colors.terracotta} />
       <Path path={breaking} color={gameColors.soil} style="stroke" strokeWidth={1.5} />
       <Path path={crack} color={gameColors.soil} style="stroke" strokeWidth={1.5} />

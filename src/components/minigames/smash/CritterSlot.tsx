@@ -6,7 +6,7 @@ import { Circle, Group, Line, Oval, vec } from '@shopify/react-native-skia';
 import { useDerivedValue, type SharedValue } from 'react-native-reanimated';
 
 import { PEST_SMASH } from '../../../game/config';
-import { colors, gameColors } from '../../../lib/theme';
+import { colors, funColors, gameColors } from '../../../lib/theme';
 import type { MinigameClock } from '../framework/session';
 import { holeLayout, type CritterKind, type SmashState } from './pestSmash';
 
@@ -96,6 +96,19 @@ function Gnat({ legWiggle }: { legWiggle: SharedValue<number> }) {
   );
 }
 
+/** Panzer der Panzermilbe (Auftrag 45): Platten über dem Rücken, nach dem ersten Treffer weg. */
+function Shell() {
+  return (
+    <>
+      <Oval x={-0.62} y={-0.05} width={1.24} height={0.75} color={funColors.shell} />
+      <Oval x={-0.5} y={0.02} width={1} height={0.5} color={funColors.shellLight} />
+      <Line p1={vec(0, -0.02)} p2={vec(0, 0.68)} color={funColors.shell} strokeWidth={0.07} />
+      <Line p1={vec(-0.5, 0.32)} p2={vec(0.5, 0.32)} color={funColors.shell} strokeWidth={0.06} />
+      <Oval x={-0.36} y={-0.62} width={0.72} height={0.3} color={funColors.shell} />
+    </>
+  );
+}
+
 function Ladybug() {
   return (
     <>
@@ -151,6 +164,11 @@ export function CritterSlot({ hole, state, clock, size }: CritterSlotProps) {
   const mite = useKindOpacity(state, hole, 'mite');
   const gnat = useKindOpacity(state, hole, 'gnat');
   const ladybug = useKindOpacity(state, hole, 'ladybug');
+  const armored = useKindOpacity(state, hole, 'armored');
+  const shell = useDerivedValue(() => {
+    const c = state.get().critters.find((x) => x.hole === hole);
+    return c && c.kind === 'armored' && (c.hitsLeft ?? 1) > 1 ? 1 : 0;
+  });
 
   return (
     <>
@@ -168,6 +186,12 @@ export function CritterSlot({ hole, state, clock, size }: CritterSlotProps) {
         </Group>
         <Group opacity={ladybug}>
           <Ladybug />
+        </Group>
+        <Group opacity={armored} transform={[{ scale: 1.15 }]}>
+          <Mite legWiggle={legWiggle} />
+          <Group opacity={shell}>
+            <Shell />
+          </Group>
         </Group>
       </Group>
     </>

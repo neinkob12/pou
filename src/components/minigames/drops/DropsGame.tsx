@@ -13,8 +13,9 @@ import { scheduleOnRN } from 'react-native-worklets';
 import { dropsGame as t, minigameFeel } from '../../../content/strings';
 import { DROPS_GAME, MINIGAME_FRAMEWORK } from '../../../game/config';
 import { cue, useMinigameAudio } from '../../../lib/audio';
-import { colors, gameColors } from '../../../lib/theme';
+import { colors, funColors, gameColors } from '../../../lib/theme';
 import { ComboBadge } from '../framework/fx/ComboBadge';
+import { EventBanner, useBanner } from '../framework/fx/EventBanner';
 import { FxLayer } from '../framework/fx/FxLayer';
 import { PopupLayer } from '../framework/fx/PopupLayer';
 import { useFx } from '../framework/fx/useFx';
@@ -24,12 +25,22 @@ import type { MinigameSession } from '../framework/useMinigameSession';
 import { DropsCanvas } from './DropsCanvas';
 import { floorY, movePotByKeys, vanishedDrops } from './dropsFeel';
 import { DropsHud } from './DropsHud';
-import { barGain, clampPot, createField, grantExtraLife, potTop, stepField, type DropsReward } from './dropsLogic';
+import {
+  barGain,
+  clampPot,
+  createField,
+  grantExtraLife,
+  inShower,
+  potTop,
+  stepField,
+  type DropsReward,
+} from './dropsLogic';
 import { applyDropsReward } from './dropsReward';
+import { useDropsSpecial } from './useDropsSpecial';
 
-/** Partikel: 0 Wasser, 1 Dünger, 2 Salz. */
-const PALETTE = [gameColors.water, colors.plantLight, colors.inkMuted] as const;
-const KIND_COLOR = { water: 0, fertilizer: 1, salt: 2 } as const;
+/** Partikel: 0 Wasser, 1 Dünger, 2 Salz, 3 Gold, 4 Schutzblatt. */
+const PALETTE = [gameColors.water, colors.plantLight, colors.inkMuted, funColors.gold, colors.plantDark] as const;
+const KIND_COLOR = { water: 0, fertilizer: 1, salt: 2, golden: 3, leaf: 4 } as const;
 
 export function DropsGame({ session }: { session: MinigameSession }) {
   const { clock, addScore, endGame, setExtraLifeHandler, phase, result } = session;
@@ -41,6 +52,8 @@ export function DropsGame({ session }: { session: MinigameSession }) {
   const [lives, setLives] = useState<number>(DROPS_GAME.lives);
   const [caught, setCaught] = useState({ water: 0, fertilizer: 0 });
   const [combo, setCombo] = useState(0);
+  const showerOn = useSharedValue(false);
+  const { banner, show: showBanner, clear: clearBanner } = useBanner();
   const [reward, setReward] = useState<DropsReward | null | undefined>(undefined);
   const rewardedRef = useRef(false);
   const fx = useFx();
@@ -73,6 +86,8 @@ export function DropsGame({ session }: { session: MinigameSession }) {
     [addScore, endGame, fx, size],
   );
 
+  const onSpecial = useDropsSpecial(fx, showBanner, size);
+
   useFrameCallback((frame) => {
     'worklet';
     const { phase: p, elapsedMs } = clock.get();
@@ -89,10 +104,20 @@ export function DropsGame({ session }: { session: MinigameSession }) {
     for (const v of vanishedDrops(before, next, height)) {
       if (v.caught) {
         catchX = v.x;
-        fx.burstAt(v.x, potTop(height), { count: v.kind === 'salt' ? 8 : 10, color: KIND_COLOR[v.kind], upward: true });
-      } else if (v.kind !== 'salt') {
+        fx.burstAt(v.x, potTop(height), {
+          count: v.kind === 'salt' ? 8 : 10,
+          color: KIND_COLOR[v.kind],
+          upward: true,
+        });
+      } else if (v.kind !== 'salt' && v.kind !== 'leaf') {
         // Daneben: kleiner Platscher am Boden, Serie vorbei.
-        fx.burstAt(v.x, floorY(height), { count: 5, color: KIND_COLOR[v.kind], upward: true, speed: 0.45, size: 0.7 });
+        fx.burstAt(v.x, floorY(height), {
+          count: 5,
+          color: KIND_COLOR[v.kind],
+          upward: true,
+          speed: 0.45,
+          size: 0.7,
+        });
         streakBroken = streak.get() > 0;
         streak.set(0);
       }
@@ -104,6 +129,22 @@ export function DropsGame({ session }: { session: MinigameSession }) {
     if (events.livesLost > 0) {
       streak.set(0);
       fx.shakeFail();
+    }
+    const shower = inShower(elapsedMs);
+    if (shower !== showerOn.get()) {
+      showerOn.set(shower);
+      if (shower) scheduleOnRN(onSpecial, 'shower', next.potX);
+    }
+    if (events.golden) scheduleOnRN(onSpecial, 'golden', catchX);
+    if (events.shieldGained) scheduleOnRN(onSpecial, 'shield', catchX);
+    if (events.shieldUsed) {
+      fx.burstAt(catchX, potTop(height), {
+        count: 12,
+        color: 4,
+        upward: true,
+        speed: 0.8,
+      });
+      scheduleOnRN(onSpecial, 'shieldUsed', catchX);
     }
     if (events.points > 0 || events.livesLost > 0 || streakBroken) {
       scheduleOnRN(
@@ -153,7 +194,10 @@ export function DropsGame({ session }: { session: MinigameSession }) {
     field.set({ ...f, potX: clampPot(f.potX || width / 2, width) });
   };
 
-  const gain = { water: barGain(caught.water), nutrients: barGain(caught.fertilizer) };
+  const gain = {
+    water: barGain(caught.water),
+    nutrients: barGain(caught.fertilizer),
+  };
   return (
     <View className="flex-1">
       <DropsHud lives={lives} gain={gain} reward={reward} />
@@ -168,6 +212,7 @@ export function DropsGame({ session }: { session: MinigameSession }) {
           </Canvas>
           <PopupLayer popups={fx.popups} onDone={fx.removePopup} />
           <ComboBadge combo={combo} />
+          <EventBanner banner={banner} onDone={clearBanner} />
           {phase === 'countdown' && (
             <View className="absolute inset-x-0 bottom-24 items-center gap-1 px-6" pointerEvents="none">
               <Text className="text-center font-body-bold text-base text-ink">{t.hint}</Text>
