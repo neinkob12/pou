@@ -3,7 +3,6 @@ import { Circle, Group, LinearGradient, Oval, Path, RadialGradient, Rect, Rounde
 import { artColors, colors } from '../../../lib/theme';
 import { iconColors as c, iconInk } from './iconPalette';
 import { Dot, Line, Shape, Sparkle } from './shapes';
-import { FanLeaf } from './strainArt';
 import { darken, lighten } from './tint';
 
 // App-Icon, Android-Ebenen, Favicon und Ladebild (ART-2). Einheiten 100 × 100.
@@ -36,6 +35,10 @@ function Burst() {
 
 // Eigene Topfform und eigenes Gesicht, damit das Logo nicht an Budis Spielgrafik hängt.
 const POT_BODY = 'M22 66 L78 66 Q80 66 79.6 68 L74.6 93.5 Q74 97 70.5 97 L29.5 97 Q26 97 25.4 93.5 L20.4 68 Q20 66 22 66 Z';
+// Keimling (Chef-Entscheidung a52): zwei runde Keimblätter und eine kleine Knospe in der Mitte.
+const SPROUT_LEFT = 'M48 34 C40 40 22 38 16 26 C12 16 22 8 32 12 C42 16 48 24 48 34 Z';
+const SPROUT_RIGHT = 'M52 32 C60 38 80 36 86 22 C90 10 80 2 68 6 C58 10 52 20 52 32 Z';
+const SPROUT_BUD = 'M50 30 C46 26 46 20 50 14 C54 20 54 26 50 30 Z';
 const FACE = { eyeY: 78, eyeDx: 9.5, eyeRx: 4.2, eyeRy: 5 } as const;
 
 /** Fröhliches Gesicht auf dem Topf: große Augen mit Glanz, Bäckchen, offenes Lachen. */
@@ -59,17 +62,15 @@ function HappyFace() {
   );
 }
 
-/** Budi als Logo: kräftiger Topf mit fröhlichem Gesicht, drei Fächerblätter. Budi-Leinwand 100 × 100. */
+/** Budi als Logo: kräftiger Topf mit fröhlichem Gesicht, ein Keimling mit zwei runden Blättern. Budi-Leinwand 100 × 100. */
 export function BudiMark({ mono = false }: { mono?: boolean }) {
   return (
     <Group>
-      <Line d="M50 60 C50 48 50 40 50 30" color={artColors.stem} width={4} />
-      {[-1, 1].map((side) => (
-        <Group key={side} transform={[{ rotate: side * 1.1 }]} origin={vec(50, 54)}>
-          <FanLeaf cx={50} cy={54} size={34} fingers={5} color={artColors.leafShade} />
-        </Group>
-      ))}
-      <FanLeaf cx={50} cy={50} size={40} color={colors.plantLight} />
+      <Line d="M50 60 C50 50 49 42 50 32" color={artColors.stem} width={4.5} />
+      <Shape d={SPROUT_LEFT} fill={colors.plantLight} line={4} />
+      <Shape d={SPROUT_RIGHT} fill={colors.plantLight} line={4} />
+      <Path path="M47 32 C40 30 33 26 26 22 M53 30 C60 26 67 20 74 16" color={artColors.leafShade} style="stroke" strokeWidth={1.8} strokeCap="round" />
+      <Shape d={SPROUT_BUD} fill={artColors.leafLight} line={3.5} />
       <Shape d={POT_BODY} fill={artColors.pot} line={4} />
       <RoundedRect x={13} y={55} width={74} height={14} r={6} color={iconInk.outline} />
       <RoundedRect x={15.5} y={57.5} width={69} height={9} r={4}>
@@ -115,7 +116,7 @@ export function AppIconArt({ variant, font }: { variant: AppArtVariant; font?: S
       return (
         <Group>
           <Burst />
-          <Placed cx={50} cy={52} s={0.86} />
+          <Placed cx={50} cy={54} s={0.84} />
           <Sparkle cx={82} cy={20} r={6} />
           <Sparkle cx={18} cy={30} r={4} />
         </Group>
@@ -124,9 +125,9 @@ export function AppIconArt({ variant, font }: { variant: AppArtVariant; font?: S
       return <Burst />;
     case 'foreground':
       // Android schneidet auf die mittleren 66 von 108 dp zu: Budi bleibt in diesem Kreis.
-      return <Placed cx={50} cy={51} s={0.56} />;
+      return <Placed cx={50} cy={53} s={0.48} />;
     case 'monochrome':
-      return <Placed cx={50} cy={51} s={0.56} mono />;
+      return <Placed cx={50} cy={53} s={0.48} mono />;
     case 'favicon':
       return (
         <Group>
