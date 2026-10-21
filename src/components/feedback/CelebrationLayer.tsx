@@ -1,27 +1,37 @@
-import { useEffect, useRef, useState } from 'react';
-import { Pressable, Text, View, type HostInstance } from 'react-native';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Pressable, View, type HostInstance } from 'react-native';
+import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated';
 
-import { celebrations, dailyGoals, lightPhase } from '../../content/strings';
+import { celebrations } from '../../content/strings';
 import { gameEvents } from '../../game/events';
-import { cue } from '../../lib/audio';
+import { colors, surface } from '../../lib/theme';
 import { PUFF_MS } from '../room/phase/Puff';
-import { Button } from '../ui/Button';
-import { BudiAvatar } from './BudiAvatar';
+import { CelebrationCard } from './CelebrationCard';
 import { dismissCelebration, enqueueCelebration, type Celebration } from './celebrationQueue';
-import { getCoinAnchor, type Point } from './coinTarget';
 import { CoinFly } from './CoinFly';
-import { CountUpText } from './CountUpText';
+import { CoinRain } from './CoinRain';
+import { getCoinAnchor, type Point } from './coinTarget';
+import { Confetti } from './Confetti';
+import { GlowRays } from './GlowRays';
 import { Sparkles } from './Sparkles';
+import { useCameraShake } from './useCameraShake';
+import { useLevelUps } from './useLevelUps';
+
+const GLOW_SIZE = 380;
+/** Wie stark die Karte beim Erscheinen wackelt, je Feier. */
+const SHAKE: Record<Celebration['kind'], number> = { phase: 0.4, chest: 0.6, level: 0.8 };
 
 /**
- * Feiern im Zimmer (WEB-3): Phasenwechsel (nach der Puff-Wolke) und Tageskiste. Budi jubelt,
- * Funken fliegen, Münzen zählen hoch und fliegen beim Schließen in den Münzzähler.
- * Eine Zeile in RoomScreen.tsx, hört nur auf gameEvents.
+ * Feiern im Zimmer (WEB-3, ART-5 groß inszeniert): Phasenwechsel (nach der Puff-Wolke), Tageskiste
+ * und Level-Aufstieg. Abdunkeln, kreisende Strahlen, Konfetti, Karte federt herein und wackelt,
+ * Münzen zählen hoch, regnen herab und fliegen beim Schließen in den Münzzähler.
+ * Eine Zeile in RoomScreen.tsx, hört nur auf gameEvents und den Spielstand.
  */
 export function CelebrationLayer() {
   const [queue, setQueue] = useState<Celebration[]>([]);
   const [fly, setFly] = useState<{ from: Point; to: Point } | null>(null);
+  const [rainKey, setRainKey] = useState(0);
+  const { style: shakeStyle, shake } = useCameraShake();
   const layerRef = useRef<HostInstance>(null);
   const cardRef = useRef<HostInstance>(null);
   // Mitte der Karte relativ zur Ebene, gemessen beim Layout: beim Schließen ist die Karte schon weg.
@@ -53,7 +63,18 @@ export function CelebrationLayer() {
     };
   }, []);
 
+  useLevelUps(useCallback((level: number) => setQueue((q) => enqueueCelebration(q, { kind: 'level', level })), []));
+
   const current = queue[0];
+  const currentKey = current ? JSON.stringify(current) : '';
+  const currentKind = current?.kind;
+
+  // Jede neue Feier: Karte wackelt kurz nach dem Hereinfedern.
+  useEffect(() => {
+    if (!currentKind) return;
+    const timer = setTimeout(() => shake(SHAKE[currentKind]), 260);
+    return () => clearTimeout(timer);
+  }, [currentKey, currentKind, shake]);
 
   const close = () => {
     const anchor = getCoinAnchor();
@@ -63,6 +84,7 @@ export function CelebrationLayer() {
       setFly({ from, to: { x: anchor.x - origin.x, y: anchor.y - origin.y } });
     }
     cardCenter.current = null;
+    setRainKey(0);
     setQueue(dismissCelebration);
   };
 
@@ -73,38 +95,39 @@ export function CelebrationLayer() {
           accessibilityRole="button"
           accessibilityLabel={celebrations.continue}
           onPress={close}
-          className="absolute inset-0 items-center justify-center bg-ink/50 p-6"
+          className="absolute inset-0 items-center justify-center p-6"
         >
-          <Sparkles playKey={queue.length} />
           <Animated.View
-            key={JSON.stringify(current)}
-            entering={ZoomIn.springify().damping(11)}
-            style={{ width: '100%' }}
-          >
-            <View ref={cardRef} onLayout={measure} className="w-full max-w-md items-center gap-3 self-center rounded-3xl bg-cream p-6">
-              <BudiAvatar size={72} />
-              <Text className="text-center font-heading text-2xl text-ink">
-                {current.kind === 'phase' ? lightPhase.phaseChangedTitle : dailyGoals.chestTitle}
-              </Text>
-              {current.kind === 'phase' ? (
-                <Text className="text-center font-body-bold text-lg text-ink">
-                  {lightPhase.phaseChanged[current.phase]}
-                </Text>
-              ) : (
-                <>
-                  <CountUpText
-                    value={current.coins}
-                    format={celebrations.coins}
-                    onDone={() => cue('coins')}
-                    className="font-heading text-4xl text-coral"
-                  />
-                  <Text className="text-center font-body text-base text-ink">{celebrations.chestText}</Text>
-                </>
-              )}
-              <View className="w-full">
-                <Button label={celebrations.continue} onPress={close} />
+            key={`dim-${currentKey}`}
+            entering={FadeIn.duration(220)}
+            pointerEvents="none"
+            className="absolute inset-0 bg-ink/60"
+          />
+          <View pointerEvents="none" className="absolute inset-0 items-center justify-center">
+            <GlowRays size={GLOW_SIZE} />
+          </View>
+          <Confetti playKey={queue.length} count={current.kind === 'phase' ? 24 : 40} />
+          <Sparkles playKey={queue.length} />
+          {current.kind === 'chest' && rainKey > 0 ? <CoinRain coins={current.coins} playKey={rainKey} /> : null}
+          <Animated.View key={currentKey} entering={ZoomIn.springify().damping(9)} style={{ width: '100%' }}>
+            <Animated.View style={shakeStyle}>
+              <View
+                ref={cardRef}
+                onLayout={measure}
+                className="w-full max-w-md items-center gap-3 self-center rounded-3xl bg-cream p-6"
+                style={{
+                  borderWidth: surface.line + 1,
+                  borderBottomWidth: surface.edge + 3,
+                  borderColor: colors.plantDark,
+                }}
+              >
+                <CelebrationCard
+                  celebration={current}
+                  onClose={close}
+                  onCoinsCounted={() => setRainKey((k) => k + 1)}
+                />
               </View>
-            </View>
+            </Animated.View>
           </Animated.View>
         </Pressable>
       ) : null}

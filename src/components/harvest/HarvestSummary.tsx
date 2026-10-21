@@ -1,19 +1,22 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import Animated, { FadeIn, FadeInUp, ZoomIn } from 'react-native-reanimated';
 
 import { QUALITY_STARS, STRAINS } from '../../game/config';
-import { harvestScreen, screenUi } from '../../content/strings';
+import { harvestScreen } from '../../content/strings';
 import { cue } from '../../lib/audio';
 import { harvest as harvestAssets } from '../../lib/assets';
 import { useGameStore } from '../../store/gameStore';
 import { coinsStartMs, COUNT_UP_MS } from '../feedback/celebration';
+import { CoinRain } from '../feedback/CoinRain';
+import { Confetti } from '../feedback/Confetti';
 import { CountUpText } from '../feedback/CountUpText';
 import { GlowRays } from '../feedback/GlowRays';
 import { RevealBox } from '../feedback/RevealBox';
 import { Sparkles } from '../feedback/Sparkles';
 import { StarRow } from '../feedback/StarRow';
+import { useCameraShake } from '../feedback/useCameraShake';
 import { AssetImage } from '../ui/AssetImage';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
@@ -21,8 +24,11 @@ import { Card } from '../ui/Card';
 import { DoubleCoinsSlot } from './DoubleCoinsSlot';
 import type { HarvestResult } from './harvestFlow';
 import { HarvestSteps } from './HarvestSteps';
+import { NewStrainBanner } from './NewStrainBanner';
 
 const GLOW_SIZE = 280;
+/** Kurz nachdem die Kiste aufgesprungen ist, wackelt die Kamera. */
+const SHAKE_AFTER_MS = 180;
 
 /**
  * Abschluss als Höhepunkt (WEB-3): Erntekiste wackelt, Antippen deckt auf, Sterne springen
@@ -32,8 +38,16 @@ export function HarvestSummary({ result }: { result: HarvestResult }) {
   const router = useRouter();
   const clear = useGameStore((s) => s.clearHarvestResult);
   const [open, setOpen] = useState(false);
+  const [rainKey, setRainKey] = useState(0);
+  const { style: shakeStyle, shake } = useCameraShake();
   const coinsAt = coinsStartMs(QUALITY_STARS.max);
   const afterCoins = coinsAt + COUNT_UP_MS;
+
+  useEffect(() => {
+    if (!open) return;
+    const timer = setTimeout(() => shake(1), SHAKE_AFTER_MS);
+    return () => clearTimeout(timer);
+  }, [open, shake]);
 
   const next = () => {
     clear();
@@ -79,7 +93,8 @@ export function HarvestSummary({ result }: { result: HarvestResult }) {
   }
 
   return (
-    <View className="items-center gap-3">
+    <Animated.View style={[{ alignItems: 'center', gap: 12 }, shakeStyle]}>
+      <Confetti count={44} />
       <Card tone="highlight" padding={20} style={{ alignSelf: 'stretch', overflow: 'hidden' }}>
         <View className="items-center gap-2">
           <Animated.View entering={ZoomIn.springify().damping(10)}>
@@ -114,7 +129,10 @@ export function HarvestSummary({ result }: { result: HarvestResult }) {
               value={result.coins}
               format={harvestScreen.summaryCoins}
               delayMs={coinsAt}
-              onDone={() => cue('coins')}
+              onDone={() => {
+                cue('coins');
+                setRainKey(1);
+              }}
               className="font-heading text-3xl text-coral"
             />
             {result.coinsDoubled ? (
@@ -129,16 +147,7 @@ export function HarvestSummary({ result }: { result: HarvestResult }) {
         </Card>
       </Animated.View>
       {result.newStrains.map((id) => (
-        <Animated.View key={id} entering={ZoomIn.delay(afterCoins).springify().damping(9)} style={{ width: '100%' }}>
-          <Card tone="rare">
-            <View className="items-center gap-1">
-              <Badge label={screenUi.newBadge} color="lavender" light center />
-              <Text className="text-center font-heading text-lg text-ink">
-                {harvestScreen.summaryNewStrain(STRAINS[id].name)}
-              </Text>
-            </View>
-          </Card>
-        </Animated.View>
+        <NewStrainBanner key={id} id={id} delayMs={afterCoins} />
       ))}
       <Animated.View entering={FadeIn.delay(afterCoins)} style={{ width: '100%' }}>
         <View className="w-full gap-2">
@@ -146,6 +155,7 @@ export function HarvestSummary({ result }: { result: HarvestResult }) {
           <Button label={harvestScreen.summaryNext} onPress={next} />
         </View>
       </Animated.View>
-    </View>
+      {rainKey > 0 ? <CoinRain coins={result.coins} playKey={rainKey} /> : null}
+    </Animated.View>
   );
 }

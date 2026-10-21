@@ -716,4 +716,8 @@ export const celebrations = {
   continue: 'Weiter',
   coins: (coins: number) => `+${coins} Münzen`,
   chestText: 'Morgen hab ich wieder was für dich.',
+  // ART-5: Level-Aufstieg
+  levelTitle: 'Level geschafft!',
+  level: (level: number) => `Level ${level}`,
+  levelText: 'Du wirst ein richtig guter Gärtner. Schau ins Album, was neu ist.',
 };

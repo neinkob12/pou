@@ -58,7 +58,8 @@ export default function RootLayout() {
               paddingBottom: insets.bottom + 6,
             },
             tabBarLabelStyle: { fontFamily: fonts.bodyBold, fontSize: 11 },
-            animation: 'fade',
+            // Wischen zwischen den Tabs wie in Spielen (ART-5), dazu federt jeder Screen herein (GameScreen).
+            animation: 'shift',
           }}
         >
           <Tabs.Screen name="index" options={{ title: tabs.room, tabBarIcon: tabIcon('budi') }} />
