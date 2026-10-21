@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 
 import { care } from '../../content/strings';
 import { useNeeds } from '../../hooks/useNeeds';
-import { useCareStage } from './care/CareStage';
+import { useCareControls } from './care/CareStage';
 import { CARE_TOOLS, type CareTool as CareToolId } from './care/careLogic';
 import { CareTool } from './care/CareTool';
 import { HudPanel } from './hud/HudPanel';
@@ -12,7 +12,7 @@ import { hud } from './hud/hudStyle';
 /** Holzfach unter Budi (Look ART-4): Gießkanne und zwei Dünger zum Ziehen, darunter ein Hinweis. */
 export function ActionTray() {
   const { phase, condition, canCare, care: doCare } = useNeeds();
-  const { react } = useCareStage();
+  const { react } = useCareControls();
 
   const onDrop = useCallback(
     (tool: CareToolId) => {

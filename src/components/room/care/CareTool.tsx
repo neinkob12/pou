@@ -18,7 +18,7 @@ import { springs, type ColorName } from '../../../lib/theme';
 import { AssetImage } from '../../ui/AssetImage';
 import type { GameIconId } from '../../ui/icons/iconArt';
 import { hud } from '../hud/hudStyle';
-import { useCareStage } from './CareStage';
+import { useCareControls } from './CareStage';
 import { isInsideRect, type CareTool as CareToolId, type Rect } from './careLogic';
 import { playPickupHaptic } from './haptics';
 import { WaterDrops } from './WaterDrops';
@@ -64,7 +64,7 @@ interface CareToolProps {
  * zurück ins Fach.
  */
 export function CareTool({ tool, index, disabled, onDrop }: CareToolProps) {
-  const { targetRef, hovering } = useCareStage();
+  const { targetRef, hovering } = useCareControls();
   const reduced = useReducedMotion();
   const x = useSharedValue(0);
   const y = useSharedValue(0);
