@@ -68,6 +68,7 @@ export const artColors = {
   potRim: '#D9825A',
   cheek: '#FF9DA8',
   eye: '#2B2B2B',
+  iris: '#6B4A3A',
   eyeShine: colors.white,
   mouth: '#7A2F3A',
   tongue: '#FF7A8A',

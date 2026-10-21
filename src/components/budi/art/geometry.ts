@@ -73,9 +73,12 @@ export interface Leaflet {
   vein: string;
 }
 
-/** Fächerblatt: ungerade Zahl Fiederblätter, symmetrisch um die Richtung `deg`. */
-export function fanLeaf(base: Point, deg: number, size: number, count: FanLeafletCount): Leaflet[] {
-  const width = size * 0.34;
+/**
+ * Fächerblatt: ungerade Zahl Fiederblätter, symmetrisch um die Richtung `deg`.
+ * `widthFactor` macht die Fiederblätter schmaler (Sativa) oder breiter (Indica), siehe STRAIN_STYLES.
+ */
+export function fanLeaf(base: Point, deg: number, size: number, count: FanLeafletCount, widthFactor = 1): Leaflet[] {
+  const width = size * 0.34 * widthFactor;
   const out: Leaflet[] = [];
   for (const { deg: spread, len } of LEAFLET_FAN[count]) {
     const sides = spread === 0 ? [0] : [-spread, spread];
