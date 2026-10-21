@@ -91,3 +91,11 @@ export function hasMovingIris(face: BudiFace): boolean {
   const { eyes } = FACES[face];
   return eyes === 'open' || eyes === 'big' || eyes === 'teary';
 }
+
+/** Ausschnitte der Ebenen auf der Budi-Leinwand (x, y, Breite, Höhe): nur so groß wie nötig. */
+export const FACE_BOXES = {
+  eyes: [26, 64, 48, 28],
+  pupils: [28, 68, 44, 22],
+  mouth: [40, 84, 20, 16],
+  rest: [4, 60, 92, 40],
+} as const;

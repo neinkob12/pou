@@ -6,7 +6,7 @@ import type { CareReaction } from '../room/care/CareStage';
 import { ArtCanvas } from '../ui/ArtCanvas';
 import { CareFx } from './art/CareFx';
 import { EYE_Y, FaceArt, MOUTH_Y, type FacePart } from './art/FaceArt';
-import { hasMovingIris } from './art/faceSpec';
+import { FACE_BOXES, hasMovingIris } from './art/faceSpec';
 import { PLANT_H } from './art/geometry';
 import { HarvestArt } from './art/HarvestArt';
 import { plantPalette } from './art/palette';
@@ -14,6 +14,7 @@ import { PlantArt } from './art/PlantArt';
 import { PotArt, ShadowArt } from './art/PotArt';
 import { SleepZ } from './art/SleepZ';
 import { canBlink, type BudiFace } from './budiLook';
+import { BudiCanvas, type BudiBox } from './BudiCanvas';
 import { BudiLayer } from './BudiLayer';
 import { useBudiLook } from './useBudiLook';
 import { useBudiMotion } from './useBudiMotion';
@@ -36,12 +37,16 @@ interface BudiProps {
   size?: number;
 }
 
-/** Eine Gesichtsebene auf eigener stiller Leinwand. */
+/** Ausschnitte von Topf und Schatten auf der Budi-Leinwand. */
+const POT_BOX: BudiBox = [13, 53, 74, 46];
+const SHADOW_BOX: BudiBox = [16, 92, 68, 8];
+
+/** Eine Gesichtsebene auf eigener, knapp bemessener stiller Leinwand. */
 function FaceLayer({ face, part, size }: { face: BudiFace; part: FacePart; size: number }) {
   return (
-    <ArtCanvas width={size} height={size} still>
+    <BudiCanvas size={size} box={FACE_BOXES[part]}>
       <FaceArt face={face} part={part} />
-    </ArtCanvas>
+    </BudiCanvas>
   );
 }
 
@@ -65,9 +70,9 @@ export function Budi({ condition, reaction, hovering, accessory, size = BUDI_SIZ
     <View style={{ width: size, height: size }}>
       {look.pot ? (
         <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.shadow, motion.shadowStyle]}>
-          <ArtCanvas width={size} height={size} still>
+          <BudiCanvas size={size} box={SHADOW_BOX}>
             <ShadowArt />
-          </ArtCanvas>
+          </BudiCanvas>
         </Animated.View>
       ) : null}
       <Animated.View style={[StyleSheet.absoluteFill, styles.origin, motion.bodyStyle]}>
@@ -93,9 +98,9 @@ export function Budi({ condition, reaction, hovering, accessory, size = BUDI_SIZ
           </View>
         ) : null}
         {look.pot ? (
-          <ArtCanvas width={size} height={size} style={StyleSheet.absoluteFill} still>
+          <BudiCanvas size={size} box={POT_BOX}>
             <PotArt />
-          </ArtCanvas>
+          </BudiCanvas>
         ) : null}
         {look.pot && look.face ? (
           <View pointerEvents="none" style={StyleSheet.absoluteFill}>

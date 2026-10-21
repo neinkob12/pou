@@ -1,3 +1,5 @@
+import { springs } from '../../../lib/theme';
+
 // Bewegungswerte für Budi (ART-3). UI-Konstanten, keine Balancing-Werte.
 
 /** Atmen: Budi wird beim Einatmen etwas höher und schmaler. Im Schlaf langsamer und tiefer. */
@@ -42,7 +44,7 @@ export const LAND_MS = 80;
 
 /** Federn: wenig Dämpfung = deutliches Nachfedern (Overshoot). */
 export const BOUNCY = { damping: 7, stiffness: 260, mass: 0.7 };
-export const SOFT = { damping: 12, stiffness: 140, mass: 1 };
+export const SOFT = springs.pop;
 export const WOBBLY = { damping: 4, stiffness: 180, mass: 0.6 };
 
 /** Budi wird größer, wenn ein Werkzeug über ihm schwebt ("Mund auf"). */

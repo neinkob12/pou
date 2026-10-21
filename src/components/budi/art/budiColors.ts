@@ -1,13 +1,12 @@
 // Budis eigene Zeichenfarben (ART-3): Verläufe, Glanz, Konturen je Material. Abgeleitet aus der
-// Palette in src/lib/theme.ts, damit Budi zum Rest passt. Nur Grafik, keine Spielwerte.
+// Palette und den Spiel-Look-Tokens (ART-1) in src/lib/theme.ts, damit Budi zum Rest passt. Nur Grafik, keine Spielwerte.
 
-import { artColors, colors } from '../../../lib/theme';
-import { mix } from './color';
+import { artColors, colors, outline, tones } from '../../../lib/theme';
 
 export const budiColors = {
   /** Dunkle Kontur je Material: Topf warm-braun, Pflanze waldgrün (Casual-Game-Look). */
   potLine: '#5A2A1A',
-  plantLine: mix(colors.plantDark, '#000000', 0.18),
+  plantLine: outline.color,
   /** Topf: Verlauf von oben hell nach unten satt, Glanz oben links. */
   potTop: '#F0A77C',
   potMid: colors.terracotta,
@@ -26,10 +25,10 @@ export const budiColors = {
   floorShadow: 'rgba(47,30,40,0.32)',
   floorShadowFade: 'rgba(47,30,40,0)',
   /** Blätter: Spitze hell, Ansatz satt; hintere Blätter dunkler. */
-  leafTip: '#A8E58F',
-  leafBase: '#4FA548',
+  leafTip: tones.leaf.light,
+  leafBase: tones.leaf.dark,
   leafBackTip: '#6DBA5E',
-  leafBackBase: '#357F37',
+  leafBackBase: tones.leaf.edge,
   leafVein: 'rgba(255,255,255,0.28)',
   stemLight: '#7CC66A',
   stemDark: '#3F8C3C',
@@ -49,13 +48,13 @@ export const budiColors = {
   tongue: '#FF8A98',
   tongueShade: '#E6607A',
   tooth: colors.white,
-  heart: colors.coral,
-  heartLight: '#FFB3BE',
+  heart: tones.coral.base,
+  heartLight: tones.coral.light,
   tear: artColors.sweat,
   tearLight: '#D6F0FF',
   sick: artColors.sick,
   pale: 'rgba(185,217,138,0.45)',
   brow: '#3A2216',
-  sparkle: artColors.gold,
-  sparkleLight: '#FFF3B8',
+  sparkle: tones.gold.base,
+  sparkleLight: tones.gold.light,
 } as const;
