@@ -6,7 +6,8 @@ import { useSharedValue } from 'react-native-reanimated';
 
 import { colors, gameColors } from '../../../lib/theme';
 import { JumpBudi } from '../jump/JumpBudi';
-import { Mite } from '../smash/CritterSlot';
+import { drawMiteIcon } from '../smash/smashArt';
+import { StillPicture } from './art/Stage';
 import type { MinigameInfo } from './catalog';
 import { Bud } from './example/TapScene';
 
@@ -34,13 +35,6 @@ function Figure({ id }: { id: MinigameInfo['id'] }) {
     return (
       <Group transform={[{ translateX: C }, { translateY: C }, { scale: 24 }]}>
         <Bud />
-      </Group>
-    );
-  }
-  if (id === 'smash') {
-    return (
-      <Group transform={[{ translateX: C }, { translateY: C }, { scale: 26 }]}>
-        <Mite legWiggle={still} />
       </Group>
     );
   }

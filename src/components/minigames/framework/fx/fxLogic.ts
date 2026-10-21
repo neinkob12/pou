@@ -3,9 +3,10 @@
 // Die 'worklet'-Funktionen laufen im Frame-Callback auf dem UI-Thread; in Tests normale Funktionen.
 // Reihenfolge beachten: Worklets werden im Web nicht vorgezogen, Helfer stehen vor ihrer Nutzung.
 
-import { MINIGAME_FEEL } from '../../../../game/config';
+import { MINIGAME_ART, MINIGAME_FEEL } from '../../../../game/config';
 
 export type FeelConfig = typeof MINIGAME_FEEL;
+export type ArtConfig = typeof MINIGAME_ART;
 
 export interface Particle {
   x: number;
@@ -19,11 +20,26 @@ export interface Particle {
   color: number;
 }
 
+/** Schockwellen-Ring bei Treffern (Auftrag 51): wächst und wird dabei dünner und blasser. */
+export interface Ring {
+  x: number;
+  y: number;
+  bornMs: number;
+  /** Index in der Farbliste der Ebene. */
+  color: number;
+  /** Faktor auf MINIGAME_ART.ringRadius. */
+  scale: number;
+}
+
 export interface FxState {
   particles: Particle[];
   shakeStartMs: number;
   shakeMs: number;
   shakePx: number;
+  /** Fehlt bei älteren Zuständen: keine Ringe. */
+  rings?: Ring[];
+  /** Weißer Blitz über dem Feld (Auftrag 51), Startzeit; fehlt: kein Blitz. */
+  flashAtMs?: number;
 }
 
 export interface BurstOptions {
@@ -77,11 +93,54 @@ export function burst(
   return { ...fx, particles };
 }
 
-/** Wirft abgelaufene Partikel weg. Gibt denselben Zustand zurück, wenn nichts abgelaufen ist. */
-export function pruneFx(fx: FxState, nowMs: number): FxState {
+/** Wirft abgelaufene Partikel und Ringe weg. Gibt denselben Zustand zurück, wenn nichts abgelaufen ist. */
+export function pruneFx(fx: FxState, nowMs: number, art: ArtConfig = MINIGAME_ART): FxState {
   'worklet';
   const alive = fx.particles.filter((p) => nowMs - p.bornMs < p.lifeMs);
-  return alive.length === fx.particles.length ? fx : { ...fx, particles: alive };
+  const rings = fx.rings ?? [];
+  const ringsAlive = rings.filter((r) => nowMs - r.bornMs < art.ringLifeMs);
+  if (alive.length === fx.particles.length && ringsAlive.length === rings.length) return fx;
+  return { ...fx, particles: alive, rings: ringsAlive };
+}
+
+/** Hat der Zustand noch etwas zu zeigen oder aufzuräumen? */
+export function fxBusy(fx: FxState): boolean {
+  'worklet';
+  return fx.particles.length > 0 || (fx.rings?.length ?? 0) > 0;
+}
+
+/** Neuer Schockwellen-Ring an (x, y). Höchstens 12 gleichzeitig, die ältesten fliegen raus. */
+export function ring(fx: FxState, x: number, y: number, nowMs: number, color: number, scale = 1): FxState {
+  'worklet';
+  const rings = (fx.rings ?? []).concat([{ x, y, bornMs: nowMs, color, scale }]);
+  return { ...fx, rings: rings.length > 12 ? rings.slice(rings.length - 12) : rings };
+}
+
+/** Radius, Strichbreite und Deckkraft eines Rings; Deckkraft 0 heißt unsichtbar. */
+export function ringAt(r: Ring, nowMs: number, art: ArtConfig = MINIGAME_ART): { radius: number; width: number; alpha: number } {
+  'worklet';
+  const age = nowMs - r.bornMs;
+  if (age < 0 || age >= art.ringLifeMs) return { radius: 0, width: 0, alpha: 0 };
+  const t = age / art.ringLifeMs;
+  const ease = 1 - (1 - t) * (1 - t) * (1 - t);
+  const max = art.ringRadius * r.scale;
+  return { radius: max * (0.25 + 0.75 * ease), width: Math.max(1, 7 * r.scale * (1 - t)), alpha: 1 - t };
+}
+
+/** Startet den weißen Blitz. */
+export function flash(fx: FxState, nowMs: number): FxState {
+  'worklet';
+  return { ...fx, flashAtMs: nowMs };
+}
+
+/** Deckkraft des Blitzes jetzt (0 bis MINIGAME_ART.flashOpacity), fällt schnell ab. */
+export function flashAlpha(fx: FxState, nowMs: number, art: ArtConfig = MINIGAME_ART): number {
+  'worklet';
+  if (fx.flashAtMs === undefined) return 0;
+  const age = nowMs - fx.flashAtMs;
+  if (age < 0 || age >= art.flashMs) return 0;
+  const left = 1 - age / art.flashMs;
+  return art.flashOpacity * left * left;
 }
 
 /** Lage und Größe eines Partikels zum Zeitpunkt `nowMs`; Größe 0 heißt: unsichtbar. */
@@ -134,6 +193,23 @@ export function consumeHitStop(leftMs: number, dtMs: number): { leftMs: number; 
   if (leftMs <= 0) return { leftMs: 0, dtMs };
   const used = Math.min(leftMs, dtMs);
   return { leftMs: leftMs - used, dtMs: dtMs - used };
+}
+
+/**
+ * Zeitlupe (Auftrag 51): solange Rest-Zeitlupe da ist, zählt die echte Zeit nur mit `factor`.
+ * Verbraucht wird die Zeitlupe in echter Zeit, sie endet also nach slowMoMs, egal wie langsam.
+ */
+export function consumeSlowMo(leftMs: number, dtMs: number, factor: number): { leftMs: number; dtMs: number } {
+  'worklet';
+  if (leftMs <= 0) return { leftMs: 0, dtMs };
+  const slow = Math.min(leftMs, dtMs);
+  return { leftMs: leftMs - slow, dtMs: slow * factor + (dtMs - slow) };
+}
+
+/** Löst diese Kombo eine Zeitlupe aus? Jede volle Stufe (5, 10, 15 ...) einmal. */
+export function comboSlowMo(combo: number, every: number = MINIGAME_ART.slowMoEveryCombo): boolean {
+  'worklet';
+  return combo > 0 && combo % every === 0;
 }
 
 /** Kombo nach einem Treffer: schnell nach dem letzten heißt +1, sonst beginnt sie bei 1. */
