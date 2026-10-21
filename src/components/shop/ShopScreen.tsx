@@ -1,8 +1,8 @@
 import { shop } from '../../content/strings';
 import { useGameStore } from '../../store/gameStore';
 import { AlbumTabs } from '../album/AlbumTabs';
+import { GameScreen } from '../frame/GameScreen';
 import { CoinChip } from '../ui/CoinChip';
-import { Screen } from '../ui/Screen';
 import { CosmeticsTab } from './CosmeticsTab';
 import { UpgradesTab } from './UpgradesTab';
 
@@ -15,8 +15,8 @@ const shopTabs = [
 export function ShopScreen() {
   const coins = useGameStore((s) => s.coins);
   return (
-    <Screen title={shop.title} right={<CoinChip coins={coins} accessibilityLabel={shop.coinsLabel(coins)} />}>
+    <GameScreen backdrop="shop" title={shop.title} right={<CoinChip coins={coins} accessibilityLabel={shop.coinsLabel(coins)} />}>
       <AlbumTabs tabs={shopTabs} />
-    </Screen>
+    </GameScreen>
   );
 }

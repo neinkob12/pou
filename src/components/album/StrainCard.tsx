@@ -1,14 +1,14 @@
-import { Text, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 
 import type { Rarity, Strain } from '../../game/config';
 import { unlockProgress, type ProgressStats } from '../../game/progression';
 import { strainsAlbum } from '../../content/strings';
-import { colors, radii, surface, type ColorName } from '../../lib/theme';
+import { strainArt, ui } from '../../lib/assets';
+import { colors, outline, radii, surface, type ColorName } from '../../lib/theme';
 import { Badge } from '../ui/Badge';
 import { Bar } from '../ui/Bar';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
-import { IconTile } from '../ui/IconTile';
 
 const DAYS_PER_WEEK = 7;
 const PORTRAIT_SIZE = 84;
@@ -20,7 +20,6 @@ const RARITY_COLOR: Record<Rarity, ColorName> = {
   speed: 'lamp',
   legendary: 'terracotta',
 };
-
 
 interface StrainCardProps {
   strain: Strain;
@@ -64,7 +63,7 @@ function LockedPortrait() {
         justifyContent: 'center',
       }}
     >
-      <Text className="font-heading text-4xl text-white/70">{strainsAlbum.lockSymbol}</Text>
+      <Image source={ui.ui_lock} style={{ width: PORTRAIT_SIZE * 0.5, height: PORTRAIT_SIZE * 0.5, opacity: 0.8 }} />
     </View>
   );
 }
@@ -83,7 +82,22 @@ export function StrainCard({ strain, unlocked, stats, action }: StrainCardProps)
     >
       <View className="flex-row gap-3">
         {unlocked ? (
-          <IconTile label={strainsAlbum.portrait(strain.name)} color={RARITY_COLOR[strain.rarity]} size={PORTRAIT_SIZE} />
+          <View
+            accessibilityLabel={strainsAlbum.portrait(strain.name)}
+            style={{
+              width: PORTRAIT_SIZE,
+              height: PORTRAIT_SIZE,
+              borderRadius: radii.md,
+              backgroundColor: colors[RARITY_COLOR[strain.rarity]],
+              borderWidth: outline.thin,
+              borderBottomWidth: outline.thin + 2,
+              borderColor: outline.color,
+              overflow: 'hidden',
+            }}
+          >
+            {/* Sortenporträt von ART-2. */}
+            <Image source={strainArt[strain.id].portrait} style={{ width: '100%', height: '100%' }} />
+          </View>
         ) : (
           <LockedPortrait />
         )}

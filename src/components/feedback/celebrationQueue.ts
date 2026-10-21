@@ -2,7 +2,11 @@
 
 import type { PhaseId } from '../../game/config';
 
-export type Celebration = { kind: 'phase'; phase: PhaseId } | { kind: 'chest'; coins: number };
+export type Celebration =
+  | { kind: 'phase'; phase: PhaseId }
+  | { kind: 'chest'; coins: number }
+  // ART-5: Level-Aufstieg nach der Ernte.
+  | { kind: 'level'; level: number };
 
 /**
  * Neue Feier anhängen. Mehrere Phasenwechsel auf einmal (App war lange zu) zeigen nur den letzten:
