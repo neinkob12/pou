@@ -7,8 +7,10 @@ import { gameEvents } from '../../game/events';
 import { clock } from '../../lib/clock';
 import { useGameStore } from '../../store/gameStore';
 import { useNow } from '../../hooks/useNow';
-import { Bar } from '../ui/Bar';
 import { DailyChest } from './DailyChest';
+import { HudBar } from './hud/HudBar';
+import { HudPanel } from './hud/HudPanel';
+import { NEED_TONES } from './hud/hudStyle';
 
 /** Tagesziel im Raum (P19): ein Ziel pro Tag mit Fortschritt und Belohnungskiste. */
 export function DailyGoal() {
@@ -32,19 +34,20 @@ export function DailyGoal() {
     if (coins > 0) gameEvents.emit('dailyChestOpened', { coins, atMs: nowMs });
   };
 
+  const tone = NEED_TONES.mood;
   return (
-    <View className="flex-row items-center gap-3 rounded-2xl bg-white/80 px-4 py-2">
+    <HudPanel innerStyle={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, paddingVertical: 8 }}>
       <View className="flex-1 gap-1">
-        <View className="flex-row items-baseline justify-between">
-          <Text className="font-body-bold text-sm text-inkMuted">{dailyGoals.title}</Text>
-          <Text className="font-body text-sm text-inkMuted">{dailyGoals.progress(goal.progress, target)}</Text>
+        <View className="flex-row items-center justify-between">
+          <Text className="font-body-bold text-xs uppercase text-inkMuted">{dailyGoals.title}</Text>
+          <Text className="font-heading text-sm text-ink">{dailyGoals.progress(goal.progress, target)}</Text>
         </View>
-        <Text className="font-body-bold text-base text-ink">{goal.claimed ? dailyGoals.claimed : label}</Text>
-        <Bar value={goal.progress / target} color="lavender" accessibilityLabel={label} />
+        <Text numberOfLines={1} className="font-body-bold text-sm text-ink">
+          {goal.claimed ? dailyGoals.claimed : label}
+        </Text>
+        <HudBar value={goal.progress / target} fill={tone.fill} deep={tone.deep} height={12} accessibilityLabel={label} />
       </View>
-      {claimable ? (
-        <DailyChest onPress={openChest} />
-      ) : null}
-    </View>
+      {claimable ? <DailyChest onPress={openChest} /> : null}
+    </HudPanel>
   );
 }

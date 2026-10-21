@@ -14,18 +14,18 @@ export function LightSwitch({ view }: { view: PlantView }) {
   if (!status || !light) return null;
   const withSwitch = showLightSwitch(status, autoflower);
   return (
-    <View className="gap-2">
+    <View className="gap-1">
       <View className="flex-row items-center justify-between">
-        <Text className="font-body-bold text-sm text-ink">{lightPhase.schedule[light.schedule]}</Text>
-        <Text className="font-body text-sm text-inkMuted">
+        <Text className="font-body-bold text-xs text-ink">{lightPhase.schedule[light.schedule]}</Text>
+        <Text className="font-body-bold text-xs text-inkMuted">
           {autoflower ? lightPhase.autoflower : light.isDay ? lightPhase.lampOn : lightPhase.night}
         </Text>
       </View>
       {withSwitch && status.canFlipLight ? (
-        <Button label={lightPhase.switchLabel} onPress={() => setDialog(true)} />
+        <Button label={lightPhase.switchLabel} size="sm" onPress={() => setDialog(true)} />
       ) : null}
       {withSwitch && !status.canFlipLight ? (
-        <Text className="font-body text-sm text-inkMuted">
+        <Text className="font-body text-xs text-inkMuted">
           {lightPhase.switchLockedFrom(FLIP_ALLOWED_FROM_DAY, Math.floor(status.ageDays))}
         </Text>
       ) : null}
