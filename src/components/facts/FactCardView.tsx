@@ -1,7 +1,9 @@
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text } from 'react-native';
 
 import type { FactCard } from '../../content/facts';
 import { facts as t, phaseLabels } from '../../content/strings';
+import { Badge } from '../ui/Badge';
+import { Card } from '../ui/Card';
 import { openSource } from './openSource';
 
 interface FactCardViewProps {
@@ -15,19 +17,16 @@ export function FactCardView({ card, unlocked }: FactCardViewProps) {
 
   if (!unlocked) {
     return (
-      <View
-        accessibilityLabel={`${t.lockedTitle}. ${t.lockedHint(phase)}`}
-        className="gap-1 rounded-2xl border-2 border-dashed border-inkMuted bg-inkMuted/20 p-4"
-      >
+      <Card tone="muted" accessibilityLabel={`${t.lockedTitle}. ${t.lockedHint(phase)}`}>
         <Text className="font-heading text-lg text-inkMuted">{t.lockedTitle}</Text>
         <Text className="font-body text-sm text-inkMuted">{t.lockedHint(phase)}</Text>
-      </View>
+      </Card>
     );
   }
 
   return (
-    <View className="gap-2 rounded-2xl border-2 border-plantDark bg-white p-4">
-      <Text className="font-body text-xs text-inkMuted">{t.phaseLabel(phase)}</Text>
+    <Card>
+      <Badge label={t.phaseLabel(phase)} color="plantLight" />
       <Text className="font-heading text-lg text-ink">{card.title}</Text>
       <Text className="font-body text-base text-ink">{card.text}</Text>
       <Pressable
@@ -38,6 +37,6 @@ export function FactCardView({ card, unlocked }: FactCardViewProps) {
       >
         <Text className="font-body-bold text-sm text-plantDark underline">{t.sourceLabel(card.source)}</Text>
       </Pressable>
-    </View>
+    </Card>
   );
 }

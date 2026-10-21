@@ -51,6 +51,35 @@ export const radii = {
 
 export const theme = { colors, fonts, fontSizes, spacing, radii } as const;
 
+// --- WEB-5: Oberfläche (Screens, Karten, Knöpfe, Rahmen) ---
+// Ein gemeinsames System für alle Screens rund um die Spielwelt. Karten und Knöpfe tragen dieselbe
+// dunkelgrüne Kontur und Kante unten wie Budi und die Zimmer-Leisten (WEB-1).
+export const surface = {
+  /** Breite der Kontur von Karten und Knöpfen. */
+  line: 2,
+  /** Kante unten: Karten wirken wie Sticker, Knöpfe sinken beim Drücken ein. */
+  edge: 4,
+  /** Innenabstand und Lücke zwischen Karten auf allen Screens. */
+  screenPadding: spacing.md,
+  gap: spacing.md,
+  /** Hintergrund leicht abgedunkelt für gesperrte oder leere Karten. */
+  cardMuted: '#FBE9CB',
+  cardEdgeMuted: '#E3CFA9',
+  /** Weiche Tönung hinter Highlights (Ernte, neue Sorte). */
+  glow: 'rgba(255,212,92,0.45)',
+  glowFade: 'rgba(255,212,92,0)',
+  coralSoft: '#FFE1E5',
+  lavenderSoft: '#ECE4FB',
+  leafSoft: '#E3F4DE',
+  lampSoft: '#FFF1BF',
+  /** Rahmen der Web-Version am Rechner. */
+  frameBgTop: '#24492E',
+  frameBgBottom: '#16301E',
+  frameDot: 'rgba(123,201,111,0.10)',
+  frameShell: '#1B1B1B',
+  frameShellLight: '#3A3A3A',
+} as const;
+
 // --- WEB-1: Zeichenfarben für Budi und Zimmer (Skia) ---
 // Abstufungen der Palette für Schatten, Lichtkanten und Details. Nur Grafik, kein Spielwert.
 export const artColors = {
@@ -155,3 +184,4 @@ export const gameColors = {
   sky: '#DDF0F8',
   salt: '#F6F6F2',
 } as const;
+

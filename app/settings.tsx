@@ -1,18 +1,13 @@
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ScrollView, Text } from 'react-native';
-
 import { settingsSections } from '../src/components/settings/sections';
+import { Screen } from '../src/components/ui/Screen';
 import { settings } from '../src/content/strings';
 
 export default function SettingsRoute() {
   return (
-    <SafeAreaView className="flex-1 bg-cream" edges={['top']}>
-      <ScrollView contentContainerClassName="gap-4 p-4">
-        <Text className="font-heading text-3xl text-ink">{settings.title}</Text>
-        {settingsSections.map(({ key, Component }) => (
-          <Component key={key} />
-        ))}
-      </ScrollView>
-    </SafeAreaView>
+    <Screen title={settings.title}>
+      {settingsSections.map(({ key, Component }) => (
+        <Component key={key} />
+      ))}
+    </Screen>
   );
 }

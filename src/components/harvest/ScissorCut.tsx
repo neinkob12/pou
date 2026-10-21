@@ -6,8 +6,9 @@ import { scheduleOnRN } from 'react-native-worklets';
 
 import { harvestScreen } from '../../content/strings';
 import { harvest as harvestAssets } from '../../lib/assets';
-import { colors, radii } from '../../lib/theme';
+import { colors, radii, surface } from '../../lib/theme';
 import { AssetImage } from '../ui/AssetImage';
+import { Card } from '../ui/Card';
 
 /** So weit (Punkte) muss die Schere quer über den Stiel gezogen werden. */
 const CUT_DISTANCE = 140;
@@ -61,20 +62,37 @@ export function ScissorCut({ onCut }: ScissorCutProps) {
   }));
 
   return (
-    <View className="items-center gap-3">
-      <Text className="font-heading text-2xl text-ink">{harvestScreen.cutTitle}</Text>
-      <Text className="text-center font-body text-base text-ink">{harvestScreen.cutIntro}</Text>
-      <GestureDetector gesture={pan}>
-        <View style={{ width: '100%', height: AREA_HEIGHT, alignItems: 'center', justifyContent: 'center' }}>
+    <Card>
+      <View className="items-center gap-3">
+        <Text className="font-heading text-2xl text-ink">{harvestScreen.cutTitle}</Text>
+        <Text className="text-center font-body text-base text-ink">{harvestScreen.cutIntro}</Text>
+        <GestureDetector gesture={pan}>
           <View
-            accessibilityLabel={harvestScreen.cutStem}
-            style={{ width: 16, height: AREA_HEIGHT, borderRadius: radii.sm, backgroundColor: colors.plantLight }}
-          />
-          <Animated.View style={[{ position: 'absolute', left: 8 }, scissorsStyle]}>
-            <AssetImage source={harvestAssets.u8_scissors} label={harvestScreen.cutScissors} size={SCISSORS_SIZE} round />
-          </Animated.View>
-        </View>
-      </GestureDetector>
-    </View>
+            style={{
+              width: '100%',
+              height: AREA_HEIGHT,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: radii.md,
+              backgroundColor: surface.leafSoft,
+              overflow: 'hidden',
+            }}
+          >
+            <View
+              accessibilityLabel={harvestScreen.cutStem}
+              style={{ width: 16, height: AREA_HEIGHT, borderRadius: radii.sm, backgroundColor: colors.plantLight }}
+            />
+            <Animated.View style={[{ position: 'absolute', left: 8 }, scissorsStyle]}>
+              <AssetImage
+                source={harvestAssets.u8_scissors}
+                label={harvestScreen.cutScissors}
+                size={SCISSORS_SIZE}
+                round
+              />
+            </Animated.View>
+          </View>
+        </GestureDetector>
+      </View>
+    </Card>
   );
 }

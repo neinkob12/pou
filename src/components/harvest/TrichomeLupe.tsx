@@ -6,6 +6,7 @@ import { harvest as harvestAssets } from '../../lib/assets';
 import { colors } from '../../lib/theme';
 import { AssetImage } from '../ui/AssetImage';
 import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
 import { buildTrichomeField, scoreLupe, type TrichomeKind } from './harvestFlow';
 
 const LENS_SIZE = 280;
@@ -20,6 +21,12 @@ const HEAD_LOOK: Record<TrichomeKind, { fill: string; border: string }> = {
   amber: { fill: colors.terracotta, border: colors.lamp },
 };
 
+const LEGEND: { kind: TrichomeKind; label: string }[] = [
+  { kind: 'clear', label: harvestScreen.lupeLegendClear },
+  { kind: 'milky', label: harvestScreen.lupeLegendMilky },
+  { kind: 'amber', label: harvestScreen.lupeLegendAmber },
+];
+
 interface TrichomeLupeProps {
   seed: number;
   readyDays: number;
@@ -31,64 +38,77 @@ interface TrichomeLupeProps {
 export function TrichomeLupe({ seed, readyDays, onDone }: TrichomeLupeProps) {
   const field = useMemo(() => buildTrichomeField(seed, readyDays), [seed, readyDays]);
   const [tapped, setTapped] = useState<number[]>([]);
-  const toggle = (id: number) =>
-    setTapped((t) => (t.includes(id) ? t.filter((x) => x !== id) : [...t, id]));
+  const toggle = (id: number) => setTapped((t) => (t.includes(id) ? t.filter((x) => x !== id) : [...t, id]));
   const late = field.filter((h) => h.kind === 'amber').length > field.length / 3;
 
   return (
-    <View className="items-center gap-3">
-      <View className="flex-row items-center gap-2">
-        <AssetImage source={harvestAssets.u7_lupe} label={harvestScreen.lupeLabel} size={40} round />
-        <Text className="font-heading text-2xl text-ink">{harvestScreen.lupeTitle}</Text>
+    <Card>
+      <View className="items-center gap-3">
+        <View className="flex-row items-center gap-2">
+          <AssetImage source={harvestAssets.u7_lupe} label={harvestScreen.lupeLabel} size={40} round />
+          <Text className="font-heading text-2xl text-ink">{harvestScreen.lupeTitle}</Text>
+        </View>
+        <Text className="text-center font-body text-base text-ink">{harvestScreen.lupeIntro}</Text>
+        <View
+          style={{
+            width: LENS_SIZE,
+            height: LENS_SIZE,
+            borderRadius: LENS_SIZE / 2,
+            borderWidth: 8,
+            borderColor: colors.ink,
+            backgroundColor: colors.plantDark,
+            overflow: 'hidden',
+          }}
+        >
+          {field.map((head) => {
+            const look = HEAD_LOOK[head.kind];
+            const isTapped = tapped.includes(head.id);
+            return (
+              <Pressable
+                key={head.id}
+                accessibilityRole="button"
+                accessibilityState={{ selected: isTapped }}
+                accessibilityLabel={harvestScreen.lupeHeadLabel(head.id + 1)}
+                onPress={() => toggle(head.id)}
+                hitSlop={6}
+                style={{
+                  position: 'absolute',
+                  left: INSET + head.x * INNER - HEAD_SIZE / 2,
+                  top: INSET + head.y * INNER - HEAD_SIZE / 2,
+                  width: HEAD_SIZE,
+                  height: HEAD_SIZE,
+                  borderRadius: HEAD_SIZE / 2,
+                  backgroundColor: look.fill,
+                  borderWidth: isTapped ? 4 : 2,
+                  borderColor: isTapped ? colors.coral : look.border,
+                }}
+              />
+            );
+          })}
+        </View>
+        <View className="w-full gap-1 rounded-2xl bg-cream p-3">
+          {LEGEND.map(({ kind, label }) => (
+            <View key={kind} className="flex-row items-center gap-2">
+              <View
+                style={{
+                  width: 16,
+                  height: 16,
+                  borderRadius: 8,
+                  backgroundColor: HEAD_LOOK[kind].fill === 'transparent' ? colors.plantDark : HEAD_LOOK[kind].fill,
+                  borderWidth: 2,
+                  borderColor: kind === 'milky' ? colors.plantDark : HEAD_LOOK[kind].border,
+                }}
+              />
+              <Text className="font-body text-sm text-ink">{label}</Text>
+            </View>
+          ))}
+        </View>
+        {late ? <Text className="text-center font-body-bold text-sm text-ink">{harvestScreen.lupeLate}</Text> : null}
+        <View className="w-full gap-2">
+          <Button label={harvestScreen.lupeDone} onPress={() => onDone(scoreLupe(field, tapped))} />
+          <Button label={harvestScreen.lupeSkip} variant="secondary" onPress={() => onDone(null)} />
+        </View>
       </View>
-      <Text className="text-center font-body text-base text-ink">{harvestScreen.lupeIntro}</Text>
-      <View
-        style={{
-          width: LENS_SIZE,
-          height: LENS_SIZE,
-          borderRadius: LENS_SIZE / 2,
-          borderWidth: 8,
-          borderColor: colors.ink,
-          backgroundColor: colors.plantDark,
-          overflow: 'hidden',
-        }}
-      >
-        {field.map((head) => {
-          const look = HEAD_LOOK[head.kind];
-          const isTapped = tapped.includes(head.id);
-          return (
-            <Pressable
-              key={head.id}
-              accessibilityRole="button"
-              accessibilityState={{ selected: isTapped }}
-              accessibilityLabel={harvestScreen.lupeHeadLabel(head.id + 1)}
-              onPress={() => toggle(head.id)}
-              hitSlop={6}
-              style={{
-                position: 'absolute',
-                left: INSET + head.x * INNER - HEAD_SIZE / 2,
-                top: INSET + head.y * INNER - HEAD_SIZE / 2,
-                width: HEAD_SIZE,
-                height: HEAD_SIZE,
-                borderRadius: HEAD_SIZE / 2,
-                backgroundColor: look.fill,
-                borderWidth: isTapped ? 4 : 2,
-                borderColor: isTapped ? colors.coral : look.border,
-              }}
-            />
-          );
-        })}
-      </View>
-      <View className="items-center">
-        <Text className="font-body text-sm text-inkMuted">{harvestScreen.lupeLegendClear}</Text>
-        <Text className="font-body text-sm text-inkMuted">{harvestScreen.lupeLegendMilky}</Text>
-        <Text className="font-body text-sm text-inkMuted">{harvestScreen.lupeLegendAmber}</Text>
-      </View>
-      {late ? <Text className="text-center font-body-bold text-sm text-ink">{harvestScreen.lupeLate}</Text> : null}
-      <View className="w-full gap-2">
-        <Button label={harvestScreen.lupeDone} onPress={() => onDone(scoreLupe(field, tapped))} />
-        <Button label={harvestScreen.lupeSkip} variant="secondary" onPress={() => onDone(null)} />
-      </View>
-    </View>
+    </Card>
   );
 }
