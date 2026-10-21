@@ -1,5 +1,6 @@
 import { Text, View } from 'react-native';
 
+import { typography } from '../../lib/theme';
 import { HudBar } from './hud/HudBar';
 import { HudPanel } from './hud/HudPanel';
 import { NEED_TONES } from './hud/hudStyle';
@@ -13,9 +14,9 @@ export function PhaseHeader() {
   const text = phaseText(view.status);
   const tone = NEED_TONES.nutrients;
   return (
-    <HudPanel innerStyle={{ paddingHorizontal: 14, paddingTop: 8, paddingBottom: 8, gap: 6 }}>
+    <HudPanel innerStyle={{ paddingHorizontal: 12, paddingTop: 5, paddingBottom: 5, gap: 3 }}>
       <View className="flex-row items-center justify-between gap-2">
-        <Text className="font-heading text-xl text-ink" style={{ textShadowColor: 'rgba(47,93,58,0.18)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 0 }}>
+        <Text className="text-ink" style={typography.heading}>
           {text.phaseLabel}
         </Text>
         {text.remaining ? (
@@ -24,7 +25,7 @@ export function PhaseHeader() {
           </View>
         ) : null}
       </View>
-      <HudBar value={text.progress} fill={tone.fill} deep={tone.deep} accessibilityLabel={text.phaseLabel} />
+      <HudBar value={text.progress} fill={tone.base} deep={tone.dark} height={13} accessibilityLabel={text.phaseLabel} />
       <LightSwitch view={view} />
     </HudPanel>
   );

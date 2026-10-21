@@ -35,7 +35,7 @@ export function RoomScreen() {
     <CareStageProvider>
       <View className="flex-1">
         <RoomBackground />
-        <SafeAreaView edges={['top']} className="gap-2 px-4 pt-2">
+        <SafeAreaView edges={['top']} className="gap-1.5 px-3 pt-1">
           <View className="flex-row items-start gap-3">
             <NeedBars />
             <CoinDisplay />

@@ -1,5 +1,3 @@
-import { View } from 'react-native';
-
 import { room } from '../../content/strings';
 import { useNeeds } from '../../hooks/useNeeds';
 import { needBarValues } from './care/careLogic';
@@ -12,7 +10,7 @@ export function NeedBars() {
   const { snapshot } = useNeeds();
   const values = needBarValues(snapshot);
   return (
-    <HudPanel style={{ flex: 1 }} innerStyle={{ flexDirection: 'row', paddingHorizontal: 4, paddingVertical: 6 }}>
+    <HudPanel style={{ flex: 1 }} innerStyle={{ flexDirection: 'row', paddingHorizontal: 4, paddingVertical: 4 }}>
       {NEED_BARS.map((bar) => (
         <NeedBadge key={bar.id} bar={bar} value={values[bar.id]} label={room.needs[bar.id]} />
       ))}

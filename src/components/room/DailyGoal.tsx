@@ -36,16 +36,18 @@ export function DailyGoal() {
 
   const tone = NEED_TONES.mood;
   return (
-    <HudPanel innerStyle={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, paddingVertical: 8 }}>
+    <HudPanel innerStyle={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
       <View className="flex-1 gap-1">
-        <View className="flex-row items-center justify-between">
-          <Text className="font-body-bold text-xs uppercase text-inkMuted">{dailyGoals.title}</Text>
+        <View className="flex-row items-center gap-2">
+          <View className="rounded-full px-2" style={{ backgroundColor: tone.base }}>
+            <Text className="font-heading text-[11px] text-white">{dailyGoals.title}</Text>
+          </View>
+          <Text numberOfLines={1} className="flex-1 font-body-bold text-sm text-ink">
+            {goal.claimed ? dailyGoals.claimed : label}
+          </Text>
           <Text className="font-heading text-sm text-ink">{dailyGoals.progress(goal.progress, target)}</Text>
         </View>
-        <Text numberOfLines={1} className="font-body-bold text-sm text-ink">
-          {goal.claimed ? dailyGoals.claimed : label}
-        </Text>
-        <HudBar value={goal.progress / target} fill={tone.fill} deep={tone.deep} height={12} accessibilityLabel={label} />
+        <HudBar value={goal.progress / target} fill={tone.base} deep={tone.dark} height={11} accessibilityLabel={label} />
       </View>
       {claimable ? <DailyChest onPress={openChest} /> : null}
     </HudPanel>

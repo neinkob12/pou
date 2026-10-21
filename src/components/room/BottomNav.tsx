@@ -1,14 +1,19 @@
 import { Link, type Href } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ui, type UiAssetId } from '../../lib/assets';
 import type { GameIconId } from '../ui/icons/iconArt';
 import { room } from '../../content/strings';
-import { spacing } from '../../lib/theme';
+import { depth, gameRadii, outline, shadows, spacing, tones } from '../../lib/theme';
 import { AssetImage } from '../ui/AssetImage';
+import { GlossFill } from '../ui/game/GlossFill';
+import { usePressSpring } from '../ui/game/usePressSpring';
+import { NAV_TONES } from './hud/hudStyle';
 
-const ICON_SIZE = 36;
+const ICON_SIZE = 34;
+const TILE = 54;
 
 type NavId = keyof typeof room.nav;
 
@@ -19,23 +24,61 @@ const NAV: readonly { id: NavId; href: Href; icon: UiAssetId; art: GameIconId }[
   { id: 'settings', href: '/settings', icon: 'u12_settings', art: 'settings' },
 ];
 
-/** Untere Navigation im Raum, Pou-artig mit runden Icons. */
+/** Eine Kachel: 3D-Knopf mit eigener Farbe, sinkt beim Tippen ein und federt zurück (ART-4). */
+function NavTile({ item }: { item: (typeof NAV)[number] }) {
+  const tone = NAV_TONES[item.id];
+  const press = usePressSpring({ sink: depth.md });
+  const radius = gameRadii.button;
+  return (
+    <Link href={item.href} asChild>
+      <Pressable
+        accessibilityRole="link"
+        accessibilityLabel={room.nav[item.id]}
+        onPressIn={press.onPressIn}
+        onPressOut={press.onPressOut}
+        className="min-w-16 items-center gap-1"
+      >
+        <Animated.View style={[{ borderRadius: radius, boxShadow: shadows.button }, press.outerStyle]}>
+          <View
+            style={{
+              width: TILE,
+              height: TILE + depth.md,
+              borderRadius: radius,
+              borderWidth: outline.regular,
+              borderColor: outline.color,
+              backgroundColor: tone.edge,
+              paddingBottom: depth.md,
+            }}
+          >
+            <Animated.View style={[{ flex: 1, borderRadius: radius, alignItems: 'center', justifyContent: 'center' }, press.faceStyle]}>
+              <GlossFill tone={tone} radius={radius - outline.regular} />
+              <AssetImage source={ui[item.icon]} label={room.nav[item.id]} color="coral" size={ICON_SIZE} round icon={item.art} />
+            </Animated.View>
+          </View>
+        </Animated.View>
+        <Text className="font-heading text-xs text-ink">{room.nav[item.id]}</Text>
+      </Pressable>
+    </Link>
+  );
+}
+
+/** Untere Navigation im Raum: Leiste mit Kontur und vier bunten 3D-Kacheln. */
 export function BottomNav() {
   const insets = useSafeAreaInsets();
   return (
     <View
-      className="flex-row justify-around rounded-t-3xl border-t-2 border-plantDark bg-white pt-2"
-      style={{ paddingBottom: insets.bottom + spacing.sm }}
+      className="flex-row justify-around rounded-t-[28px] pt-2.5"
+      style={{
+        paddingBottom: insets.bottom + spacing.sm,
+        borderWidth: outline.regular,
+        borderBottomWidth: 0,
+        borderColor: outline.color,
+        backgroundColor: tones.cream.base,
+        boxShadow: shadows.card,
+      }}
     >
       {NAV.map((item) => (
-        <Link key={item.id} href={item.href} asChild>
-          <Pressable accessibilityRole="link" className="min-w-16 items-center gap-1 active:scale-95 active:opacity-80">
-            <View className="h-12 w-12 items-center justify-center rounded-2xl bg-cream">
-              <AssetImage source={ui[item.icon]} label={room.nav[item.id]} color="coral" size={ICON_SIZE} round icon={item.art} />
-            </View>
-            <Text className="font-body-bold text-xs text-ink">{room.nav[item.id]}</Text>
-          </Pressable>
-        </Link>
+        <NavTile key={item.id} item={item} />
       ))}
     </View>
   );

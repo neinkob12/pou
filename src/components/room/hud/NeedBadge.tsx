@@ -18,8 +18,8 @@ import type { NeedBarDef } from '../needBars';
 import { hud, NEED_TONES } from './hudStyle';
 import { needLevel } from './needLevel';
 
-const SIZE = 50;
-const ICON = 30;
+const SIZE = 46;
+const ICON = 28;
 const WIGGLE_DEG = 7;
 
 interface NeedBadgeProps {
@@ -92,8 +92,8 @@ export function NeedBadge({ bar, value, label }: NeedBadgeProps) {
             justifyContent: 'center',
           }}
         >
-          <Animated.View style={[{ position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: tone.fill }, fillStyle]}>
-            <View style={{ height: 3, backgroundColor: tone.deep, opacity: 0.5 }} />
+          <Animated.View style={[{ position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: tone.base }, fillStyle]}>
+            <View style={{ height: 3, backgroundColor: tone.edge, opacity: 0.5 }} />
           </Animated.View>
           <View
             pointerEvents="none"

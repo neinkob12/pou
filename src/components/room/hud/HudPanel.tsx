@@ -1,23 +1,23 @@
 import type { ReactNode } from 'react';
 import { View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { radii } from '../../../lib/theme';
+import { gameRadii, shadows, tones, type Tone } from '../../../lib/theme';
+import { GlossFill } from '../../ui/game/GlossFill';
 import { hud } from './hudStyle';
 
 interface HudPanelProps {
   children: ReactNode;
-  face?: string;
-  edge?: string;
+  tone?: Tone;
   radius?: number;
   style?: StyleProp<ViewStyle>;
   innerStyle?: StyleProp<ViewStyle>;
 }
 
 /**
- * Karte im Spielstil (ART-4): dicke Kontur, dunklere Kante unten wie ein Sticker, Glanz oben.
- * Ersetzt die halb durchsichtigen weißen Kästen im Zimmer.
+ * Leiste im Spielstil (ART-4): dicke Kontur, Kante unten wie ein Sticker, Verlauf mit Glanz,
+ * weicher Schatten. Ersetzt die halb durchsichtigen weißen Kästen im Zimmer.
  */
-export function HudPanel({ children, face = hud.face, edge = hud.edgeColor, radius = radii.lg, style, innerStyle }: HudPanelProps) {
+export function HudPanel({ children, tone = tones.cream, radius = gameRadii.card, style, innerStyle }: HudPanelProps) {
   return (
     <View
       style={[
@@ -25,17 +25,15 @@ export function HudPanel({ children, face = hud.face, edge = hud.edgeColor, radi
           borderRadius: radius,
           borderWidth: hud.line,
           borderColor: hud.outline,
-          backgroundColor: edge,
+          backgroundColor: tone.edge,
           paddingBottom: hud.edge,
+          boxShadow: shadows.card,
         },
         style,
       ]}
     >
-      <View style={[{ borderRadius: radius - hud.line, backgroundColor: face, overflow: 'hidden' }, innerStyle]}>
-        <View
-          pointerEvents="none"
-          style={{ position: 'absolute', top: 3, left: 10, right: 10, height: 5, borderRadius: radii.pill, backgroundColor: hud.gloss }}
-        />
+      <View style={[{ borderRadius: radius - hud.line }, innerStyle]}>
+        <GlossFill tone={tone} radius={radius - hud.line} />
         {children}
       </View>
     </View>

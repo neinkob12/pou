@@ -14,7 +14,7 @@ export function LightSwitch({ view }: { view: PlantView }) {
   if (!status || !light) return null;
   const withSwitch = showLightSwitch(status, autoflower);
   return (
-    <View className="gap-1">
+    <View className="gap-0.5">
       <View className="flex-row items-center justify-between">
         <Text className="font-body-bold text-xs text-ink">{lightPhase.schedule[light.schedule]}</Text>
         <Text className="font-body-bold text-xs text-inkMuted">
@@ -25,7 +25,7 @@ export function LightSwitch({ view }: { view: PlantView }) {
         <Button label={lightPhase.switchLabel} size="sm" onPress={() => setDialog(true)} />
       ) : null}
       {withSwitch && !status.canFlipLight ? (
-        <Text className="font-body text-xs text-inkMuted">
+        <Text className="font-body text-[11px] text-inkMuted">
           {lightPhase.switchLockedFrom(FLIP_ALLOWED_FROM_DAY, Math.floor(status.ageDays))}
         </Text>
       ) : null}
