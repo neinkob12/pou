@@ -28,6 +28,18 @@ Im Spiel (Browser, 390 x 844). Vorher-Stand siehe `docs/progress/web4.md` (Shop,
 | --- | --- | --- | --- |
 | ![](art2/nachher-02-zimmer.png) | ![](art2/nachher-03-shop.png) | ![](art2/nachher-04-album.png) | ![](art2/nachher-01-samen.png) |
 
+## Nachtrag a52: Keimling im App-Icon
+
+Branch `claude/auftrag-52-keimling-icon`. Der Chef hat entschieden: Keimling statt Fächerblatt im App-Auftritt. Android-Vordergrund und Monochrom etwas kleiner, damit beide Blätter im Sicherheitskreis bleiben.
+
+| Vorher App-Icon | Nachher App-Icon | Vorher Ladebild | Nachher Ladebild |
+| --- | --- | --- | --- |
+| ![](art2/vorher-blatt-app-icon.png) | ![](art2/nachher-keimling-app-icon.png) | ![](art2/vorher-blatt-splash.png) | ![](art2/nachher-keimling-splash.png) |
+
+Android (Hintergrund, Vordergrund, Monochrom) und Favicon:
+
+![](art2/nachher-keimling-android-favicon.png)
+
 ## Fertig
 
 - `src/components/ui/icons/shapes.tsx`: Grundformen neu. `Shape` und `Dot` mit Kontur (7 Einheiten), Verlauf und automatischem Glanzlicht, `Line` (Strich mit Kontur), `Sparkle` (Funkeln), `IconFrame` (Schlagschatten für das ganze Icon).
@@ -36,7 +48,7 @@ Im Spiel (Browser, 390 x 844). Vorher-Stand siehe `docs/progress/web4.md` (Shop,
 - `careIcons.tsx`: Wasser, Dünger, Licht, Laune, Gießkanne, Wachstums- und Blütendünger, Spinnmilbe, Trauermücke, Schimmel.
 - `itemArt.tsx`: Kiste zu und offen (U13), Lupe, Schere, Töpfe Stufe 1 bis 3, LED, Ventilator, Bio-Erde, Marienkäfer, alle mit dem neuen Look.
 - `strainArt.tsx`: je Sorte ein Abzeichen (Medaille mit Fächerblatt und Merkmal: Gurkenscheibe, Blüte, Pfeil, Blitz, Krone) und eine Samentüte als Porträt (U15).
-- `appIconArt.tsx`: App-Icon (Budi-Topf vor grünem Strahlenkranz), Android-Ebenen, Favicon, Ladebild mit Schriftzug „PotPou“ (Fredoka). Eigene Zeichnung, hängt nicht an Budis Spielgrafik.
+- `appIconArt.tsx`: App-Icon (Budi-Topf mit Keimling vor grünem Strahlenkranz), Android-Ebenen, Favicon, Ladebild mit Schriftzug „PotPou“ (Fredoka). Eigene Zeichnung, hängt nicht an Budis Spielgrafik.
 - `assets/render-art.cjs`: rendert alles nach `assets/images/` (256 px, scharf bis 85 pt bei 3x) und `assets/icon/`, plus Icon-Blatt mit `--sheet`.
 - `src/lib/assets.ts`: `ui` (Münze, Balken, Navigation, Kiste, Stern, Schloss, Samen, Edelstein), `care`, `health` und neu `strainArt` (Porträt und Abzeichen je Sorte) zeigen auf echte Bilder. Damit fallen die Platzhalter-Wege in `AssetImage` für diese Stellen weg.
 - `app.json` unverändert: Pfade bleiben, die Dateien darunter sind neu.
@@ -65,7 +77,7 @@ Im Spiel (Browser, 390 x 844). Vorher-Stand siehe `docs/progress/web4.md` (Shop,
 
 - Quelle aller Bilder bleibt die Skia-Zeichnung in `src/components/ui/icons/`. PNGs sind gerendert: nach Änderungen `node assets/render-art.cjs` laufen lassen (einzelne Datei: `node assets/render-art.cjs u9_coin`).
 - PNG statt Leinwand für Icons in Listen und Leisten: im Browser kein WebGL-Kontext je Icon, auf dem Handy weniger Arbeit. Die Tab-Leiste zeichnet weiter live (`GameIcon`).
-- Das App-Icon zeigt ein Fächerblatt, wie Budi im Spiel. Kein Konsum, nur Pflanze. Falls der Store-Review das Blatt im Icon anmerkt, lässt sich in `appIconArt.tsx` ein Keimling statt Blatt setzen.
+- App-Icon, Android-Ebenen, Favicon und Ladebild zeigen einen Keimling statt Fächerblatt (Chef-Entscheidung, Auftrag a52): unverfänglich für den Store-Review. Im Spiel bleibt Budi, wie er ist.
 
 ## Gefunden, nicht gemacht
 
