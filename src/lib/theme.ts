@@ -193,3 +193,115 @@ export const funColors = {
   shell: '#8C6A5A',
   shellLight: '#B89786',
 } as const;
+
+// --- ART-1: Spiel-Look (Auftrag 46) ---
+// Grundlage aller Bausteine in src/components/ui: satte Farben mit Verlauf (hell oben, dunkel
+// unten), dicke dunkle Kontur, Kante unten für den 3D-Knopf, weicher Schlagschatten, Glanzlicht.
+// Andere ART-Aufträge hängen eigene Abschnitte unten an und ändern diesen nicht.
+
+/** Ein Farbton in vier Stufen: Glanz oben, Fläche, Verlauf unten, Kante (Unterseite des Knopfs). */
+export interface Tone {
+  light: string;
+  base: string;
+  dark: string;
+  edge: string;
+  /** Text auf dieser Fläche. */
+  text: string;
+}
+
+export const tones = {
+  coral: { light: '#FFA3AE', base: '#FF6F82', dark: '#EE4D66', edge: '#B8304A', text: colors.white },
+  leaf: { light: '#A8E68D', base: '#62C64F', dark: '#45A738', edge: '#2C7526', text: colors.white },
+  gold: { light: '#FFE58A', base: '#FFCB3D', dark: '#F5A91E', edge: '#C47A0C', text: '#5A3A06' },
+  sky: { light: '#A6E4FF', base: '#4FB8F2', dark: '#2E98DC', edge: '#1D6AA3', text: colors.white },
+  grape: { light: '#CDB8FF', base: '#A27CF0', dark: '#8458DC', edge: '#5E3BAE', text: colors.white },
+  danger: { light: '#FF9A86', base: '#F4573F', dark: '#DB3A2B', edge: '#9F221A', text: colors.white },
+  cream: { light: '#FFFFFF', base: '#FFF6E6', dark: '#F6E2C0', edge: '#CDB08A', text: colors.ink },
+  stone: { light: '#F1EDE6', base: '#DAD3C8', dark: '#C4BBAE', edge: '#9C9285', text: '#7C7368' },
+  night: { light: '#4A5590', base: '#343E72', dark: '#262E5A', edge: '#151A38', text: colors.white },
+} as const satisfies Record<string, Tone>;
+
+export type ToneName = keyof typeof tones;
+
+/** Dicke dunkle Kontur um alles, was man anfassen kann. */
+export const outline = {
+  color: '#1F3A27',
+  thin: 2,
+  regular: 3,
+  thick: 4,
+} as const;
+
+/** Tiefe der Kante unten: so weit sinkt ein Knopf beim Tippen ein. */
+export const depth = {
+  sm: 3,
+  md: 5,
+  lg: 7,
+} as const;
+
+/** Weiche Schlagschatten (CSS-boxShadow, nativ ab RN 0.76 und im Web gleich). */
+export const shadows = {
+  button: '0 3px 4px rgba(31,58,39,0.28)',
+  card: '0 6px 14px rgba(31,58,39,0.18)',
+  pop: '0 18px 40px rgba(20,24,40,0.38)',
+  inset: 'inset 0 2px 3px rgba(31,58,39,0.25)',
+} as const;
+
+/** Glanzlicht oben auf Knöpfen, Leisten und Münzen. */
+export const gloss = {
+  color: colors.white,
+  opacity: 0.55,
+  /** Anteil der Höhe, den der helle obere Verlauf einnimmt. */
+  topShare: 0.5,
+} as const;
+
+/** Rundungen im Spiel-Look: weicher und größer als in einer App. */
+export const gameRadii = {
+  chip: 12,
+  button: 18,
+  card: 24,
+  modal: 30,
+  pill: 999,
+} as const;
+
+/**
+ * Zwei Schriften: Fredoka Bold für Titel und Zahlen (rund, verspielt), Nunito für Fließtext
+ * (gut lesbar). Titel tragen einen dunklen Schlagschatten wie Spielschrift.
+ */
+export const typography = {
+  display: { fontFamily: fonts.headingBold, fontSize: 40, lineHeight: 44 },
+  title: { fontFamily: fonts.headingBold, fontSize: 28, lineHeight: 32 },
+  heading: { fontFamily: fonts.headingBold, fontSize: 22, lineHeight: 26 },
+  button: { fontFamily: fonts.headingBold, fontSize: 18, lineHeight: 22 },
+  buttonSm: { fontFamily: fonts.headingBold, fontSize: 15, lineHeight: 18 },
+  number: { fontFamily: fonts.headingBold, fontSize: 18, lineHeight: 22 },
+  body: { fontFamily: fonts.body, fontSize: 16, lineHeight: 22 },
+  bodyBold: { fontFamily: fonts.bodyBold, fontSize: 16, lineHeight: 22 },
+  small: { fontFamily: fonts.bodyBold, fontSize: 12, lineHeight: 15 },
+} as const;
+
+export type TypeStyle = keyof typeof typography;
+
+/** Dunkler Schatten unter heller Spielschrift, damit sie auf jeder Farbe steht. */
+export const textShadow = {
+  color: 'rgba(31,58,39,0.55)',
+  offset: { width: 0, height: 2 },
+  radius: 0,
+} as const;
+
+/** Federn für Reanimated: alles bewegt sich mit Überschwingen, nichts springt hart. */
+export const springs = {
+  /** Einsinken beim Drücken: schnell und straff. */
+  press: { damping: 18, stiffness: 520, mass: 0.6 },
+  /** Loslassen: federt mit Überschwingen zurück. */
+  release: { damping: 9, stiffness: 320, mass: 0.7 },
+  /** Aufploppen von Modals, Badges, Münzen. */
+  pop: { damping: 11, stiffness: 240, mass: 0.8 },
+  /** Füllen von Leisten. */
+  fill: { damping: 16, stiffness: 120, mass: 1 },
+} as const;
+
+/** Wie stark ein Knopf beim Drücken staucht (Squash) und beim Loslassen überschwingt (Stretch). */
+export const pressScale = {
+  down: 0.95,
+  up: 1.04,
+} as const;

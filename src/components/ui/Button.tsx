@@ -1,65 +1,77 @@
 import type { ReactNode } from 'react';
-import { Pressable, Text } from 'react-native';
+import { Pressable, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 
-import { artColors, colors, radii, spacing, surface } from '../../lib/theme';
-
-type Variant = 'primary' | 'secondary' | 'success';
+import { outline, shadows, spacing } from '../../lib/theme';
+import { BUTTON_SIZES, buttonTone, needsTextShadow, type ButtonSize, type ButtonVariant } from './buttonLook';
+import { GameText } from './GameText';
+import { GlossFill } from './game/GlossFill';
+import { usePressSpring } from './game/usePressSpring';
 
 interface ButtonProps {
   label: string;
   onPress?: () => void;
   disabled?: boolean;
-  variant?: Variant;
+  variant?: ButtonVariant;
   /** Kleines Bild vor dem Text, etwa die Münze am Preis (WEB-5). */
   leading?: ReactNode;
-  /** Kompakt für Karten: 40 statt 48 hoch. */
-  size?: 'md' | 'sm';
+  /** sm 40, md 50, lg 62 hoch. */
+  size?: ButtonSize;
+  /** Ohne Klick-Klang und Vibration. */
+  quiet?: boolean;
 }
 
-const LOOK: Record<Variant, { bg: string; edge: string; text: string }> = {
-  primary: { bg: colors.coral, edge: artColors.curtainShade, text: 'text-white' },
-  secondary: { bg: colors.white, edge: colors.plantDark, text: 'text-ink' },
-  success: { bg: colors.plantLight, edge: colors.plantDark, text: 'text-ink' },
-};
-
-const SIZES = {
-  md: { minHeight: 48, paddingHorizontal: spacing.md + 4, paddingVertical: spacing.sm + 4 },
-  sm: { minHeight: 40, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
-} as const;
-
 /**
- * Runder Standard-Button: Koralle für Hauptaktionen, Weiß für Nebenaktionen, Grün für "fertig".
- * Kontur und Kante unten, sinkt beim Drücken ein (WEB-1). Gesperrt wirkt er stumpf statt blass (WEB-5).
+ * 3D-Spielknopf (ART-1): Fläche mit Verlauf und Glanzlicht auf einer dunkleren Kante, dicke
+ * Kontur, weicher Schatten. Beim Tippen sinkt die Fläche in die Kante, staucht und federt zurück.
  */
-export function Button({ label, onPress, disabled = false, variant = 'primary', leading, size = 'md' }: ButtonProps) {
-  const look = LOOK[variant];
+export function Button({ label, onPress, disabled = false, variant = 'primary', leading, size = 'md', quiet }: ButtonProps) {
+  const tone = buttonTone(variant, disabled);
+  const s = BUTTON_SIZES[size];
+  const inner = s.radius - outline.regular;
+  const press = usePressSpring({ sink: s.depth, disabled, quiet });
+
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ disabled }}
-      accessibilityLabel={label}
-      disabled={disabled}
-      onPress={onPress}
-      // Nur style, kein className: NativeWind verwirft im Web sonst die Style-Funktion (Kontur, Einsinken).
-      style={({ pressed }) => ({
-        ...SIZES[size],
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: spacing.sm,
-        borderRadius: radii.pill,
-        backgroundColor: disabled ? surface.cardMuted : look.bg,
-        borderWidth: surface.line,
-        borderColor: disabled ? surface.cardEdgeMuted : colors.plantDark,
-        borderBottomWidth: pressed || disabled ? surface.line : surface.edge,
-        borderBottomColor: disabled ? surface.cardEdgeMuted : look.edge,
-        transform: [{ translateY: pressed && !disabled ? surface.edge - surface.line : 0 }],
-      })}
-    >
-      {leading}
-      <Text className={`font-body-bold ${size === 'sm' ? 'text-sm' : 'text-base'} ${disabled ? 'text-inkMuted' : look.text}`}>
-        {label}
-      </Text>
-    </Pressable>
+    <Animated.View style={[{ borderRadius: s.radius, boxShadow: disabled ? undefined : shadows.button }, press.outerStyle]}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ disabled }}
+        accessibilityLabel={label}
+        disabled={disabled}
+        onPress={onPress}
+        onPressIn={press.onPressIn}
+        onPressOut={press.onPressOut}
+        // Nur style, kein className: NativeWind verwirft im Web sonst Styles an Pressable.
+        style={{
+          minHeight: s.minHeight,
+          borderRadius: s.radius,
+          borderWidth: outline.regular,
+          borderColor: outline.color,
+          backgroundColor: tone.edge,
+          paddingBottom: s.depth,
+        }}
+      >
+        <Animated.View style={[{ flexGrow: 1, borderRadius: inner }, press.faceStyle]}>
+          <GlossFill tone={tone} radius={inner} />
+          <View
+            style={{
+              flexGrow: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: spacing.sm,
+              paddingHorizontal: s.paddingHorizontal,
+              paddingVertical: spacing.xs,
+              minHeight: s.minHeight - s.depth - outline.regular * 2,
+            }}
+          >
+            {leading}
+            <GameText variant={size === 'sm' ? 'buttonSm' : size === 'lg' ? 'title' : 'button'} color={tone.text} shadow={needsTextShadow(tone)}>
+              {label}
+            </GameText>
+          </View>
+        </Animated.View>
+      </Pressable>
+    </Animated.View>
   );
 }
