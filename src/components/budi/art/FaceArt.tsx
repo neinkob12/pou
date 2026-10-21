@@ -3,15 +3,17 @@ import type { ReactNode } from 'react';
 
 import type { BudiFaceId } from '../../../lib/assets';
 import { artColors } from '../../../lib/theme';
+import { starPath } from '../../ui/icons/starPath';
+import { POT_BODY } from './PotArt';
 
 // Gesicht auf dem Topf (DESIGN_GUIDE D4), Budi-Leinwand 100 × 100. Augen groß und weit auseinander.
 /** Augenhöhe in Budi-Einheiten: um diese Linie klappen die Lider (useBudiMotion). */
 export const EYE_Y = 79.5;
 const EYE_X = [39.5, 60.5] as const;
-const EYE_RX = 4.3;
-const EYE_RY = 5.1;
-const MOUTH_Y = 88;
-const CHEEK_Y = 86;
+const EYE_RX = 5.1;
+const EYE_RY = 6;
+const MOUTH_Y = 89;
+const CHEEK_Y = 87;
 const CHEEK_X = [31, 69] as const;
 const LINE = 1.5;
 
@@ -28,7 +30,20 @@ type MouthKind =
   | 'o'
   | 'smallO'
   | 'sickWavy';
-type Extra = 'sweat' | 'worryBrows' | 'angryBrows' | 'sickCheeks' | 'blush' | 'droop';
+type Extra =
+  | 'sweat'
+  | 'worryBrows'
+  | 'angryBrows'
+  | 'sickCheeks'
+  | 'blush'
+  | 'droop'
+  | 'sparkles'
+  | 'eyeBags'
+  | 'angerMark'
+  | 'pale'
+  | 'shock'
+  | 'raisedBrows'
+  | 'dry';
 
 interface FaceSpec {
   eyes: EyeKind;
@@ -39,16 +54,16 @@ interface FaceSpec {
 const FACES: Record<BudiFaceId, FaceSpec> = {
   b10_face_neutral: { eyes: 'open', mouth: 'smile', extras: ['blush'] },
   b10_face_happy: { eyes: 'open', mouth: 'grin', extras: ['blush'] },
-  b10_face_very_happy: { eyes: 'closedHappy', mouth: 'laugh', extras: ['blush'] },
-  b10_face_thirsty: { eyes: 'open', mouth: 'tongueOut', extras: ['droop'] },
+  b10_face_very_happy: { eyes: 'closedHappy', mouth: 'laugh', extras: ['blush', 'sparkles'] },
+  b10_face_thirsty: { eyes: 'open', mouth: 'tongueOut', extras: ['droop', 'dry'] },
   b10_face_hungry: { eyes: 'open', mouth: 'drool', extras: ['worryBrows'] },
-  b10_face_tired: { eyes: 'half', mouth: 'flat', extras: [] },
+  b10_face_tired: { eyes: 'half', mouth: 'flat', extras: ['eyeBags'] },
   b10_face_snoring: { eyes: 'closedSleep', mouth: 'smallO', extras: ['blush'] },
   b10_face_stressed: { eyes: 'open', mouth: 'wavy', extras: ['worryBrows', 'sweat'] },
-  b10_face_sick: { eyes: 'half', mouth: 'sickWavy', extras: ['sickCheeks', 'sweat'] },
-  b10_face_offended: { eyes: 'squint', mouth: 'pout', extras: ['angryBrows', 'blush'] },
-  b10_face_coma: { eyes: 'cross', mouth: 'flat', extras: [] },
-  b10_face_surprised: { eyes: 'big', mouth: 'o', extras: [] },
+  b10_face_sick: { eyes: 'half', mouth: 'sickWavy', extras: ['pale', 'sickCheeks', 'sweat', 'eyeBags'] },
+  b10_face_offended: { eyes: 'squint', mouth: 'pout', extras: ['angryBrows', 'blush', 'angerMark'] },
+  b10_face_coma: { eyes: 'cross', mouth: 'flat', extras: ['pale'] },
+  b10_face_surprised: { eyes: 'big', mouth: 'o', extras: ['raisedBrows', 'shock'] },
   b12_blink: { eyes: 'closedSleep', mouth: 'smile', extras: ['blush'] },
 };
 
@@ -62,6 +77,7 @@ function OpenEye({ cx, big }: { cx: number; big: boolean }) {
   return (
     <Group>
       <Oval x={cx - rx} y={EYE_Y - ry} width={rx * 2} height={ry * 2} color={artColors.eye} />
+      <Oval x={cx - rx * 0.62} y={EYE_Y + ry * 0.05} width={rx * 1.24} height={ry * 0.8} color={artColors.iris} opacity={0.55} />
       <Circle cx={cx + rx * 0.32} cy={EYE_Y - ry * 0.38} r={rx * 0.38} color={artColors.eyeShine} />
       <Circle cx={cx - rx * 0.35} cy={EYE_Y + ry * 0.42} r={rx * 0.17} color={artColors.eyeShine} />
     </Group>
@@ -95,9 +111,9 @@ function Eyes({ kind }: { kind: EyeKind }) {
         </>
       );
     case 'closedHappy':
-      return <>{EYE_X.map((cx) => stroke(`M${cx - 4} ${EYE_Y + 1.5} Q${cx} ${EYE_Y - 4.5} ${cx + 4} ${EYE_Y + 1.5}`, artColors.eye, LINE * 1.4))}</>;
+      return <>{EYE_X.map((cx) => stroke(`M${cx - 4.8} ${EYE_Y + 1.8} Q${cx} ${EYE_Y - 5.4} ${cx + 4.8} ${EYE_Y + 1.8}`, artColors.eye, LINE * 1.4))}</>;
     case 'closedSleep':
-      return <>{EYE_X.map((cx) => stroke(`M${cx - 4} ${EYE_Y} Q${cx} ${EYE_Y + 4} ${cx + 4} ${EYE_Y}`, artColors.eye, LINE * 1.3))}</>;
+      return <>{EYE_X.map((cx) => stroke(`M${cx - 4.8} ${EYE_Y} Q${cx} ${EYE_Y + 4.8} ${cx + 4.8} ${EYE_Y}`, artColors.eye, LINE * 1.3))}</>;
     case 'squint':
       return (
         <>
@@ -116,7 +132,7 @@ function Eyes({ kind }: { kind: EyeKind }) {
       return (
         <>
           {EYE_X.map((cx) =>
-            stroke(`M${cx - 3.2} ${EYE_Y - 3.2} L${cx + 3.2} ${EYE_Y + 3.2} M${cx + 3.2} ${EYE_Y - 3.2} L${cx - 3.2} ${EYE_Y + 3.2}`, artColors.eye, LINE * 1.3),
+            stroke(`M${cx - 3.8} ${EYE_Y - 3.8} L${cx + 3.8} ${EYE_Y + 3.8} M${cx + 3.8} ${EYE_Y - 3.8} L${cx - 3.8} ${EYE_Y + 3.8}`, artColors.eye, LINE * 1.3),
           )}
         </>
       );
@@ -192,7 +208,7 @@ function ExtraPart({ kind }: { kind: Extra }): ReactNode {
       return (
         <>
           {CHEEK_X.map((cx) => (
-            <Oval key={cx} x={cx - 3.6} y={CHEEK_Y - 2} width={7.2} height={4} color={artColors.cheek} opacity={0.75} />
+            <Oval key={cx} x={cx - 4.4} y={CHEEK_Y - 2.4} width={8.8} height={4.8} color={artColors.cheek} opacity={0.75} />
           ))}
         </>
       );
@@ -224,6 +240,50 @@ function ExtraPart({ kind }: { kind: Extra }): ReactNode {
         <>
           {stroke(`M${EYE_X[0] - 4.5} ${EYE_Y - 8.5} L${EYE_X[0] + 4} ${EYE_Y - 5}`, artColors.eye, LINE * 1.3)}
           {stroke(`M${EYE_X[1] + 4.5} ${EYE_Y - 8.5} L${EYE_X[1] - 4} ${EYE_Y - 5}`, artColors.eye, LINE * 1.3)}
+        </>
+      );
+    case 'sparkles':
+      return (
+        <>
+          {[
+            [24, 72, 3.2],
+            [77, 70, 2.6],
+            [72, 92, 2],
+          ].map(([x, y, r]) => (
+            <Path key={x} path={starPath(x, y, r, 0.4)} color={artColors.gold} />
+          ))}
+        </>
+      );
+    case 'eyeBags':
+      return <>{EYE_X.map((cx) => stroke(`M${cx - 3.4} ${EYE_Y + 6.2} Q${cx} ${EYE_Y + 8.2} ${cx + 3.4} ${EYE_Y + 6.2}`, artColors.zzz, LINE * 0.9))}</>;
+    case 'angerMark':
+      return (
+        <Group>
+          {stroke('M70.5 69.5 Q72 72 74.5 71.5 M76.5 69 Q75 71.5 76 74 M74 76.5 Q72.5 74 70 74.5 M68.5 74 Q70 71.5 69 69', artColors.ribbonShade, LINE * 1.1)}
+        </Group>
+      );
+    case 'pale':
+      return <Path path={POT_BODY} color={artColors.sick} opacity={0.4} />;
+    case 'shock':
+      return (
+        <>
+          {stroke('M15 74 L11 72', artColors.eye, LINE)}
+          {stroke('M14 79 L9.5 79', artColors.eye, LINE)}
+          {stroke('M85 74 L89 72', artColors.eye, LINE)}
+          {stroke('M86 79 L90.5 79', artColors.eye, LINE)}
+        </>
+      );
+    case 'raisedBrows':
+      return (
+        <>
+          {EYE_X.map((cx) => stroke(`M${cx - 4} ${EYE_Y - 9.6} Q${cx} ${EYE_Y - 12} ${cx + 4} ${EYE_Y - 9.6}`, artColors.eye, LINE * 1.1))}
+        </>
+      );
+    case 'dry':
+      return (
+        <>
+          {stroke('M26 92 L28.5 89.5 L27.5 87.5', artColors.potShade, LINE * 0.9)}
+          {stroke('M74 91 L71.5 89 L72.5 86.5', artColors.potShade, LINE * 0.9)}
         </>
       );
     case 'droop':

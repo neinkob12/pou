@@ -2,9 +2,10 @@ import { Circle, Group, Oval, Path, RoundedRect } from '@shopify/react-native-sk
 import type { ReactNode } from 'react';
 
 import { artColors, colors } from '../../../lib/theme';
+import { ITEMS, type ItemIconId } from './itemArt';
+import { Dot, Shape, shine } from './shapes';
 
 // Icons im Budi-Stil (dunkelgrüne Kontur, flache Farben), Einheiten 100 × 100.
-const LINE = 6;
 
 export type GameIconId =
   | 'water'
@@ -21,28 +22,8 @@ export type GameIconId =
   | 'settings'
   | 'mite'
   | 'gnat'
-  | 'mold';
-
-/** Form mit Kontur: Strich unter der Füllung, damit nur die halbe Strichbreite außen sichtbar ist. */
-function Shape({ d, fill, line = LINE }: { d: string; fill: string; line?: number }) {
-  return (
-    <>
-      <Path path={d} color={artColors.outline} style="stroke" strokeWidth={line} strokeJoin="round" strokeCap="round" />
-      <Path path={d} color={fill} />
-    </>
-  );
-}
-
-function Dot({ cx, cy, r, fill }: { cx: number; cy: number; r: number; fill: string }) {
-  return (
-    <>
-      <Circle cx={cx} cy={cy} r={r + LINE / 2} color={artColors.outline} />
-      <Circle cx={cx} cy={cy} r={r} color={fill} />
-    </>
-  );
-}
-
-const shine = (d: string) => <Path path={d} color={colors.white} opacity={0.7} style="stroke" strokeWidth={5} strokeCap="round" />;
+  | 'mold'
+  | ItemIconId;
 
 const DROP = 'M50 10 C62 30 78 46 78 63 C78 80 65 90 50 90 C35 90 22 80 22 63 C22 46 38 30 50 10 Z';
 const LEAF = 'M22 80 C18 48 38 18 82 16 C84 56 62 84 22 80 Z';
@@ -216,6 +197,7 @@ const ICONS: Record<GameIconId, () => ReactNode> = {
       <Circle cx={46} cy={68} r={3} color={artColors.sick} />
     </Group>
   ),
+  ...ITEMS,
 };
 
 /** Ein Icon zeichnen (in einer auf 100 Einheiten skalierten Skia-Gruppe). */

@@ -70,7 +70,7 @@ export function Budi({ condition, reaction, hovering, accessory, size = BUDI_SIZ
           >
             <Animated.View style={[styles.origin, motion.plantStyle]}>
               <ArtCanvas width={size} height={plantHeight} still>
-                <PlantArt id={plant.base} palette={palette} />
+                <PlantArt id={plant.base} palette={palette} leafWidth={plant.leafWidth} />
               </ArtCanvas>
             </Animated.View>
           </View>

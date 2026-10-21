@@ -40,17 +40,19 @@ export interface StrainStyle {
   /** Farbschleier über der Pflanze, solange keine eigene Varianten-Datei (B9) existiert. */
   tint: ColorName | null;
   tintPhases: readonly PhaseId[];
+  /** Breite der Fiederblätter (1 = normal): Sativa schmal und gefingert, Indica breit. */
+  leafWidth: number;
 }
 
-const NO_STRAIN_STYLE: StrainStyle = { scaleX: 1, scaleY: 1, tint: null, tintPhases: [] };
+const NO_STRAIN_STYLE: StrainStyle = { scaleX: 1, scaleY: 1, tint: null, tintPhases: [], leafWidth: 1 };
 
 /** Sorten-Varianten laut docs/ASSETS.md (B9). */
 export const STRAIN_STYLES: Record<StrainId, StrainStyle> = {
   gustav: NO_STRAIN_STYLE,
-  lotte: { ...NO_STRAIN_STYLE, tint: 'lavender', tintPhases: ['flowering', 'ready'] },
-  sascha: { ...NO_STRAIN_STYLE, scaleX: 0.88, scaleY: 1.12 },
-  anton: { ...NO_STRAIN_STYLE, scaleX: 0.85, scaleY: 0.85 },
-  koelsch: { ...NO_STRAIN_STYLE, tint: 'lamp', tintPhases: ['seedling', 'vegetative', 'flowering', 'ready'] },
+  lotte: { ...NO_STRAIN_STYLE, tint: 'lavender', tintPhases: ['flowering', 'ready'], leafWidth: 1.15 },
+  sascha: { ...NO_STRAIN_STYLE, scaleX: 0.88, scaleY: 1.12, leafWidth: 0.6 },
+  anton: { ...NO_STRAIN_STYLE, scaleX: 0.85, scaleY: 0.85, leafWidth: 1.4 },
+  koelsch: { ...NO_STRAIN_STYLE, tint: 'lamp', tintPhases: ['seedling', 'vegetative', 'flowering', 'ready'], leafWidth: 0.85 },
 };
 
 export function plantLayerFor(phase: PhaseId, phaseProgress: number): BudiPlantId {
@@ -113,6 +115,7 @@ export interface PlantLayer {
   tint: ColorName | null;
   scaleX: number;
   scaleY: number;
+  leafWidth: number;
 }
 
 /** Sorten-Variante: eigene Datei gewinnt, sonst Grundebene mit Farbschleier und Form. */
@@ -128,9 +131,10 @@ export function plantLayerWithStrain(
   const shaped = !HARVESTED_PHASES.includes(phase);
   const scaleX = shaped ? style.scaleX : 1;
   const scaleY = shaped ? style.scaleY : 1;
-  if (hasAsset(variant)) return { key: variant, base: plant, tint: null, scaleX, scaleY };
+  const { leafWidth } = style;
+  if (hasAsset(variant)) return { key: variant, base: plant, tint: null, scaleX, scaleY, leafWidth };
   const tint = style.tintPhases.includes(phase) ? style.tint : null;
-  return { key: plant, base: plant, tint, scaleX, scaleY };
+  return { key: plant, base: plant, tint, scaleX, scaleY, leafWidth };
 }
 
 export interface BudiLook {

@@ -18,7 +18,7 @@ interface Built {
   cotyledons: string[];
 }
 
-function build(id: BudiPlantId): Built {
+function build(id: BudiPlantId, leafWidth: number): Built {
   const spec = plantSpec(id);
   // Untere Hälfte der Blätter liegt hinten: dunkler, damit die Pflanze Tiefe bekommt.
   const half = Math.floor(spec.leaves.length / 2);
@@ -26,7 +26,7 @@ function build(id: BudiPlantId): Built {
     const shapes: string[] = [];
     const veins: string[] = [];
     spec.leaves.slice(from, to).forEach((leaf) => {
-      fanLeaf(leafBase(leaf), leaf.deg, leaf.size, leaf.count).forEach((l) => {
+      fanLeaf(leafBase(leaf), leaf.deg, leaf.size, leaf.count, leafWidth).forEach((l) => {
         shapes.push(l.shape);
         veins.push(l.vein);
       });
@@ -98,14 +98,16 @@ function Bud({ x, y, r, palette }: { x: number; y: number; r: number; palette: P
 interface PlantArtProps {
   id: BudiPlantId;
   palette: PlantPalette;
+  /** Breite der Fiederblätter je Sorte (1 = normal), siehe STRAIN_STYLES in budiLook.ts. */
+  leafWidth?: number;
 }
 
 /**
  * Budis Pflanze je Phase (B1 bis B6), auf der Pflanzen-Leinwand PLANT_W × PLANT_H.
  * Muss in einer Skia-Gruppe liegen, die auf diese Einheiten skaliert.
  */
-export function PlantArt({ id, palette }: PlantArtProps) {
-  const built = useMemo(() => build(id), [id]);
+export function PlantArt({ id, palette, leafWidth = 1 }: PlantArtProps) {
+  const built = useMemo(() => build(id, leafWidth), [id, leafWidth]);
   const { spec } = built;
   return (
     <Group>

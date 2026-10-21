@@ -51,6 +51,35 @@ export const radii = {
 
 export const theme = { colors, fonts, fontSizes, spacing, radii } as const;
 
+// --- WEB-5: Oberfläche (Screens, Karten, Knöpfe, Rahmen) ---
+// Ein gemeinsames System für alle Screens rund um die Spielwelt. Karten und Knöpfe tragen dieselbe
+// dunkelgrüne Kontur und Kante unten wie Budi und die Zimmer-Leisten (WEB-1).
+export const surface = {
+  /** Breite der Kontur von Karten und Knöpfen. */
+  line: 2,
+  /** Kante unten: Karten wirken wie Sticker, Knöpfe sinken beim Drücken ein. */
+  edge: 4,
+  /** Innenabstand und Lücke zwischen Karten auf allen Screens. */
+  screenPadding: spacing.md,
+  gap: spacing.md,
+  /** Hintergrund leicht abgedunkelt für gesperrte oder leere Karten. */
+  cardMuted: '#FBE9CB',
+  cardEdgeMuted: '#E3CFA9',
+  /** Weiche Tönung hinter Highlights (Ernte, neue Sorte). */
+  glow: 'rgba(255,212,92,0.45)',
+  glowFade: 'rgba(255,212,92,0)',
+  coralSoft: '#FFE1E5',
+  lavenderSoft: '#ECE4FB',
+  leafSoft: '#E3F4DE',
+  lampSoft: '#FFF1BF',
+  /** Rahmen der Web-Version am Rechner. */
+  frameBgTop: '#24492E',
+  frameBgBottom: '#16301E',
+  frameDot: 'rgba(123,201,111,0.10)',
+  frameShell: '#1B1B1B',
+  frameShellLight: '#3A3A3A',
+} as const;
+
 // --- WEB-1: Zeichenfarben für Budi und Zimmer (Skia) ---
 // Abstufungen der Palette für Schatten, Lichtkanten und Details. Nur Grafik, kein Spielwert.
 export const artColors = {
@@ -68,6 +97,7 @@ export const artColors = {
   potRim: '#D9825A',
   cheek: '#FF9DA8',
   eye: '#2B2B2B',
+  iris: '#6B4A3A',
   eyeShine: colors.white,
   mouth: '#7A2F3A',
   tongue: '#FF7A8A',
@@ -111,6 +141,32 @@ export const artColors = {
   metal: '#5B6B7A',
   metalLight: '#8B9CAB',
   mold: '#E8E6D9',
+  // Gegenstände (WEB-4): Kiste, Töpfe, Shop-Upgrades, Accessoires
+  gold: '#F5C443',
+  goldShade: '#D99A2B',
+  glaze: '#7FB8E6',
+  glazeShade: '#4F8FC4',
+  lens: '#CFEFFF',
+  ladybug: '#E8454F',
+  sack: '#E2C392',
+  sackShade: '#BF9A66',
+  plastic: '#F4F1EA',
+  plasticShade: '#D6D0C4',
+  cabinet: '#3A3350',
+  cabinetShade: '#2A2440',
+  ribbon: colors.coral,
+  ribbonShade: '#E6606F',
+  denim: '#4C6FB8',
+  straw: '#E9C87A',
+  strawShade: '#C9A452',
+  // Zimmer-Licht (WEB-4)
+  moonGlow: 'rgba(200,215,255,0.55)',
+  moonGlowFade: 'rgba(200,215,255,0)',
+  shadow: 'rgba(47,41,60,0.18)',
+  shadowNight: 'rgba(10,12,30,0.45)',
+  shadowFade: 'rgba(47,41,60,0)',
+  rugNight: '#5E4A8C',
+  rugNightShade: '#46376E',
 } as const;
 
 // Minigame-Farben (Auftrag 40, WEB-2): hellere und dunklere Töne der Palette für Hintergründe,
@@ -128,3 +184,4 @@ export const gameColors = {
   sky: '#DDF0F8',
   salt: '#F6F6F2',
 } as const;
+
