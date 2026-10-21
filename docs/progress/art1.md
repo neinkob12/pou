@@ -11,7 +11,7 @@ Branch: `claude/auftrag-46-art-1-design-system-buttons-karten-leist` · PR: #54 
   - `Bar` mit heller Rinne, Verlauf und Glanz, füllt sich mit Feder nach. Neu: `tone`.
   - `Badge` (ploppt auf), `Chip` (Zähler-Pille), `CoinChip` (zählt hoch, hüpft).
   - `Modal` ploppt mit Überschwingen auf, Titel auf Korallen-Band. `PopIn` für eigene Popups.
-  - `TabIcon` (aktiver Tab auf goldener Pille, federt hoch), `TabBar.ts` mit `gameTabBarOptions(insets.bottom)`.
+  - `TabIcon` (aktiver Tab auf goldener Pille, federt hoch), `TabBar.ts` mit `gameTabBarOptions(insets.bottom)`, eingehängt in `app/_layout.tsx` (Freigabe CvD).
   - `BackButton` als kleiner 3D-Knopf, `NavLink` als 3D-Zeile, `ScreenTitle`, `SectionTitle`, `GameText`, `EmptyState`.
   - Hilfen: `ui/game/GlossFill`, `ui/game/gradient` (CSS-Verlauf, nativ `experimental_backgroundImage`, im Web `backgroundImage`), `ui/game/usePressSpring`.
 - **Haptik und Klang**: jeder Knopf und jede tippbare Karte spielt `cue('tap')` beim Drücken (Einstellungen werden respektiert). `quiet` schaltet es ab.
@@ -35,7 +35,6 @@ Geprüft mit Playwright bei 390 x 844 und 1280 x 800: keine Konsolenfehler oder 
 
 ## Offen
 
-- Tab-Leiste: `gameTabBarOptions` ist fertig, eingehängt wird sie in `app/_layout.tsx` von ART-5 (Datei gehört nicht ART-1).
 - Keine neue Schriftdatei: Fredoka Bold ist schon rund und verspielt und wird bereits geladen. Eine dritte Schrift hätte `useAppFonts.ts` geändert (nicht meine Datei).
 
 ## Fehlende Assets

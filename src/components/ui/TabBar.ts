@@ -21,6 +21,6 @@ export function gameTabBarOptions(bottomInset: number) {
       paddingTop: 6,
       paddingBottom: bottomInset + 6,
     },
-    tabBarLabelStyle: { fontFamily: fonts.headingBold, fontSize: 12 },
+    tabBarLabelStyle: { fontFamily: fonts.headingBold, fontSize: 11 },
   } as const;
 }
