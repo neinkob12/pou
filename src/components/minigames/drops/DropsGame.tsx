@@ -3,7 +3,6 @@
 // Leben und Fänge. Am Rundenende füllen die Fänge Budis Balken über applyCare (dropsReward.ts).
 // Feedback (Auftrag 40): Spritzer, Topf federt, Popups, Wackeln bei Salz, Kombo für Fänge in Folge.
 
-import { Canvas, Group } from '@shopify/react-native-skia';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Platform, Text, View, type LayoutChangeEvent } from 'react-native';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
@@ -13,16 +12,21 @@ import { scheduleOnRN } from 'react-native-worklets';
 import { dropsGame as t, minigameFeel } from '../../../content/strings';
 import { DROPS_GAME, MINIGAME_FRAMEWORK } from '../../../game/config';
 import { cue, useMinigameAudio } from '../../../lib/audio';
-import { colors, funColors, gameColors } from '../../../lib/theme';
+import { colors } from '../../../lib/theme';
+import { Drift } from '../framework/art/Drift';
+import { sparks, tones } from '../framework/art/palette';
+import { Stage } from '../framework/art/Stage';
+import { useScene } from '../framework/art/useScene';
 import { ComboBadge } from '../framework/fx/ComboBadge';
 import { EventBanner, useBanner } from '../framework/fx/EventBanner';
-import { FxLayer } from '../framework/fx/FxLayer';
+import { crossesSlowMo } from '../framework/fx/fxLogic';
 import { PopupLayer } from '../framework/fx/PopupLayer';
 import { useFx } from '../framework/fx/useFx';
-import { useShakeTransform } from '../framework/fx/useShake';
+import { useShakeStyle } from '../framework/fx/useShake';
 import { useKeyAxis } from '../framework/input/useKeyboard';
 import type { MinigameSession } from '../framework/useMinigameSession';
-import { DropsCanvas } from './DropsCanvas';
+import { drawDropsBackdrop, drawDropsClouds } from './dropsArt';
+import { drawDropsScene } from './dropsScene';
 import { floorY, movePotByKeys, vanishedDrops } from './dropsFeel';
 import { DropsHud } from './DropsHud';
 import {
@@ -38,12 +42,18 @@ import {
 import { applyDropsReward } from './dropsReward';
 import { useDropsSpecial } from './useDropsSpecial';
 
-/** Partikel: 0 Wasser, 1 Dünger, 2 Salz, 3 Gold, 4 Schutzblatt. */
-const PALETTE = [gameColors.water, colors.plantLight, colors.inkMuted, funColors.gold, colors.plantDark] as const;
+/** Partikel und Ringe: 0 Wasser, 1 Dünger, 2 Salz, 3 Gold, 4 Schutzblatt, 5 Funken. */
+const PALETTE = [tones.water.base, tones.fertilizer.base, tones.salt.dark, sparks.gold, tones.leaf.base, sparks.white] as const;
+const SPARKLES = [3, 5] as const;
+
+/** Wolken ziehen langsam nach links (Parallaxe). */
+function cloudLayer(width: number, height: number) {
+  return <Drift width={width} height={height} draw={drawDropsClouds} durationMs={40000} direction="left" />;
+}
 const KIND_COLOR = { water: 0, fertilizer: 1, salt: 2, golden: 3, leaf: 4 } as const;
 
 export function DropsGame({ session }: { session: MinigameSession }) {
-  const { clock, addScore, endGame, setExtraLifeHandler, phase, result } = session;
+  const { clock, addScore, endGame, setExtraLifeHandler, slowMo, phase, result } = session;
   const size = useSharedValue({ width: 0, height: 0 });
   const field = useSharedValue(createField(0));
   const lastCatchMs = useSharedValue(-1e9);
@@ -56,8 +66,23 @@ export function DropsGame({ session }: { session: MinigameSession }) {
   const { banner, show: showBanner, clear: clearBanner } = useBanner();
   const [reward, setReward] = useState<DropsReward | null | undefined>(undefined);
   const rewardedRef = useRef(false);
-  const fx = useFx();
-  const shakeTransform = useShakeTransform(fx.state, fx.now);
+  const fx = useFx(session.timeScale);
+  const shakeStyle = useShakeStyle(fx.state, fx.now, size);
+  const scene = useScene((canvas) => {
+    'worklet';
+    const { width, height } = size.get();
+    drawDropsScene(canvas, {
+      field: field.get(),
+      elapsedMs: clock.get().elapsedMs,
+      width,
+      height,
+      now: fx.now.get(),
+      lastCatchMs: lastCatchMs.get(),
+      fx: fx.state.get(),
+      palette: PALETTE,
+      sparkles: SPARKLES,
+    });
+  });
   useMinigameAudio(phase, result?.coins ?? null);
 
   const onStep = useCallback(
@@ -124,11 +149,21 @@ export function DropsGame({ session }: { session: MinigameSession }) {
     }
     if (events.points > 0) {
       lastCatchMs.set(fx.now.get());
-      streak.set(streak.get() + events.points);
+      const before = streak.get();
+      streak.set(before + events.points);
+      fx.ringAt(catchX, potTop(height), 0, 0.8);
+      // Zeitlupe, wenn die Serie eine volle Stufe überschreitet (5, 10, 15 ...).
+      if (crossesSlowMo(before, before + events.points)) {
+        slowMo();
+        fx.flash();
+        fx.ringAt(catchX, potTop(height), 3, 2);
+        fx.burstAt(catchX, potTop(height), { count: 14, color: 5, upward: true, speed: 1.2 });
+      }
     }
     if (events.livesLost > 0) {
       streak.set(0);
       fx.shakeFail();
+      fx.ringAt(catchX, potTop(height), 2, 1.4);
     }
     const shower = inShower(elapsedMs);
     if (shower !== showerOn.get()) {
@@ -187,12 +222,15 @@ export function DropsGame({ session }: { session: MinigameSession }) {
     },
   });
 
-  const onLayout = (e: LayoutChangeEvent) => {
-    const { width, height } = e.nativeEvent.layout;
-    size.set({ width, height });
-    const f = field.get();
-    field.set({ ...f, potX: clampPot(f.potX || width / 2, width) });
-  };
+  const onLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      const { width, height } = e.nativeEvent.layout;
+      size.set({ width, height });
+      const f = field.get();
+      field.set({ ...f, potX: clampPot(f.potX || width / 2, width) });
+    },
+    [field, size],
+  );
 
   const gain = {
     water: barGain(caught.water),
@@ -202,14 +240,14 @@ export function DropsGame({ session }: { session: MinigameSession }) {
     <View className="flex-1">
       <DropsHud lives={lives} gain={gain} reward={reward} />
       <GestureDetector gesture={pan}>
-        <View className="flex-1 overflow-hidden" onLayout={onLayout}>
-          <Canvas style={{ flex: 1 }} pointerEvents="none">
-            <Group transform={shakeTransform}>
-              <DropsCanvas field={field} size={size} now={fx.now} lastCatchMs={lastCatchMs}>
-                <FxLayer state={fx.state} now={fx.now} palette={PALETTE} />
-              </DropsCanvas>
-            </Group>
-          </Canvas>
+        <View className="flex-1 overflow-hidden">
+          <Stage
+            scene={scene}
+            backdrop={drawDropsBackdrop}
+            layers={cloudLayer}
+            onLayout={onLayout}
+            shakeStyle={shakeStyle}
+          />
           <PopupLayer popups={fx.popups} onDone={fx.removePopup} />
           <ComboBadge combo={combo} />
           <EventBanner banner={banner} onDone={clearBanner} />

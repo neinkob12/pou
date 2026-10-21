@@ -1,70 +1,73 @@
-// Bild auf der Auswahl-Karte (Auftrag 40): die Hauptfigur jedes Spiels auf einem runden Feld in der
-// Kartenfarbe, aus denselben Skia-Formen wie im Spiel.
+// Bild auf der Auswahl-Karte (Auftrag 40, Auftrag 51): die Hauptfigur jedes Spiels auf einem runden,
+// glänzenden Feld in der Kartenfarbe, aus denselben Sprites wie im Spiel. Ein stilles Bild.
 
-import { Canvas, Circle, Group, Path, Skia } from '@shopify/react-native-skia';
-import { useSharedValue } from 'react-native-reanimated';
+import { Skia, type SkCanvas } from '@shopify/react-native-skia';
 
-import { colors, gameColors } from '../../../lib/theme';
-import { JumpBudi } from '../jump/JumpBudi';
+import { colors } from '../../../lib/theme';
+import { drawDropIcon } from '../drops/dropsArt';
+import { drawBudiIcon } from '../jump/jumpArt';
 import { drawMiteIcon } from '../smash/smashArt';
-import { StillPicture } from './art/Stage';
+import { circlePath, outlined, type Pen } from './art/kit';
+import { ink } from './art/palette';
+import { StillPicture, type BackdropDraw } from './art/Stage';
 import type { MinigameInfo } from './catalog';
-import { Bud } from './example/TapScene';
+import { drawBudIcon } from './example/tapArt';
 
 const SIZE = 72;
 const C = SIZE / 2;
 
-/** Wassertropfen in Einheitsgröße. */
-const DROP = Skia.PathBuilder.Make()
-  .moveTo(0, -1.35)
-  .cubicTo(1.1, -0.15, 0.95, 1, 0, 1)
-  .cubicTo(-0.95, 1, -1.1, -0.15, 0, -1.35)
-  .close()
-  .detach();
-/** Fragezeichen-Bogen über Budi im Quiz. */
-const QUESTION = Skia.PathBuilder.Make()
-  .moveTo(-4, -6)
-  .quadTo(0, -12, 4, -6)
-  .quadTo(5, -3, 0, -1)
-  .lineTo(0, 1)
-  .detach();
-
-function Figure({ id }: { id: MinigameInfo['id'] }) {
-  const still = useSharedValue(0);
+function figure(id: MinigameInfo['id'], c: SkCanvas, pen: Pen) {
+  'worklet';
+  c.save();
   if (id === 'tap') {
-    return (
-      <Group transform={[{ translateX: C }, { translateY: C }, { scale: 24 }]}>
-        <Bud />
-      </Group>
-    );
+    c.translate(C, C);
+    c.scale(23, 23);
+    drawBudIcon(c, pen);
+  } else if (id === 'smash') {
+    c.translate(C, C - 2);
+    c.scale(24, 24);
+    drawMiteIcon(c, pen);
+  } else if (id === 'drops') {
+    c.translate(C, C + 3);
+    c.scale(18, 18);
+    drawDropIcon(c, pen);
+  } else {
+    c.translate(C - 1, C + 9);
+    c.scale(17, 17);
+    drawBudiIcon(c, pen);
+    if (id === 'quiz') {
+      // Fragezeichen neben Budi
+      const q = Skia.PathBuilder.Make()
+        .moveTo(0.9, -1.2)
+        .quadTo(1.3, -1.9, 1.7, -1.3)
+        .quadTo(1.8, -0.9, 1.35, -0.7)
+        .lineTo(1.35, -0.45)
+        .detach();
+      c.drawPath(q, pen.stroke(ink.outline, 0.32));
+      c.drawPath(q, pen.stroke(colors.white, 0.14));
+      c.drawCircle(1.35, -0.1, 0.13, pen.fill(ink.outline));
+    }
   }
-  if (id === 'drops') {
-    return (
-      <Group transform={[{ translateX: C }, { translateY: C + 2 }, { scale: 20 }]}>
-        <Path path={DROP} color={gameColors.water} />
-        <Path path={DROP} color={gameColors.waterDark} style="stroke" strokeWidth={0.08} />
-        <Circle cx={-0.3} cy={-0.05} r={0.22} color={colors.white} opacity={0.7} />
-      </Group>
-    );
-  }
-  return (
-    <Group transform={[{ translateX: C }, { translateY: C + 6 }, { scale: 3.4 }]}>
-      <JumpBudi />
-      {id === 'quiz' && (
-        <Group transform={[{ translateX: 6 }, { translateY: -1 }]}>
-          <Path path={QUESTION} color={colors.ink} style="stroke" strokeWidth={1} strokeCap="round" />
-          <Circle cx={0} cy={3} r={0.7} color={colors.ink} />
-        </Group>
-      )}
-    </Group>
-  );
+  c.restore();
 }
 
+function iconDraw(game: MinigameInfo): BackdropDraw {
+  return (c, pen) => {
+    'worklet';
+    const base = colors[game.color];
+    outlined(c, pen, circlePath(C, C, C - 3), pen.radial(C * 0.7, C * 0.6, C * 1.3, [colors.white, base]), 1.5);
+    c.drawOval(Skia.XYWHRect(C * 0.45, C * 0.2, C * 0.7, C * 0.32), pen.fill(ink.shineSoft));
+    figure(game.id, c, pen);
+  };
+}
+
+const draws = new Map<string, BackdropDraw>();
+
 export function MinigameIcon({ game }: { game: MinigameInfo }) {
-  return (
-    <Canvas style={{ width: SIZE, height: SIZE }}>
-      <Circle cx={C} cy={C} r={C} color={colors[game.color]} opacity={0.35} />
-      <Figure id={game.id} />
-    </Canvas>
-  );
+  let draw = draws.get(game.id);
+  if (!draw) {
+    draw = iconDraw(game);
+    draws.set(game.id, draw);
+  }
+  return <StillPicture width={SIZE} height={SIZE} draw={draw} />;
 }

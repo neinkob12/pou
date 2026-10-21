@@ -107,7 +107,14 @@ export function record(draw: (canvas: SkCanvas, pen: Pen) => void): SkPicture {
  * Fläche mit dicker Kontur: erst die Kontur doppelt so breit, dann die Fläche darüber. So liegt
  * die Kontur außen und frisst nichts von der Fläche.
  */
-export function outlined(canvas: SkCanvas, pen: Pen, path: SkPath, fill: SkPaint, width: number, color = ink.outline) {
+export function outlined(
+  canvas: SkCanvas,
+  pen: Pen,
+  path: SkPath,
+  fill: SkPaint,
+  width: number,
+  color: string = ink.outline,
+) {
   'worklet';
   canvas.drawPath(path, pen.stroke(color, width * 2));
   canvas.drawPath(path, fill);

@@ -8,6 +8,7 @@ import type { SkCanvas } from '@shopify/react-native-skia';
 import { PEST_SMASH } from '../../../game/config';
 import { drawFlash, drawFx } from '../framework/art/drawFx';
 import { stamp } from '../framework/art/kit';
+import { popIn } from '../framework/art/motion';
 import type { FxState } from '../framework/fx/fxLogic';
 import { holeLayout, type Critter, type SmashState } from './pestSmash';
 import { smashSprites } from './smashArt';
@@ -16,16 +17,6 @@ import { smashSprites } from './smashArt';
 const CRITTER_SCALE = 0.6;
 const POP_IN_MS = 220;
 const SINK_MS = 140;
-
-/** Überschwingen beim Auftauchen (easeOutBack), 0 bis 1 mit Spitze über 1. */
-export function popIn(t: number): number {
-  'worklet';
-  if (t <= 0) return 0;
-  if (t >= 1) return 1;
-  const s = 2.2;
-  const u = t - 1;
-  return 1 + (s + 1) * u * u * u + s * u * u;
-}
 
 /** Wie weit ein Tier gerade aus dem Loch schaut (0 drin, 1 ganz draußen). */
 export function emergeAt(c: Critter, elapsedMs: number): number {

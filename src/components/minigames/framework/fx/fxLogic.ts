@@ -212,6 +212,12 @@ export function comboSlowMo(combo: number, every: number = MINIGAME_ART.slowMoEv
   return combo > 0 && combo % every === 0;
 }
 
+/** Überschreitet eine Serie, die in einem Schritt von `before` auf `after` springt, eine volle Stufe? */
+export function crossesSlowMo(before: number, after: number, every: number = MINIGAME_ART.slowMoEveryCombo): boolean {
+  'worklet';
+  return after > before && Math.floor(after / every) > Math.floor(before / every);
+}
+
 /** Kombo nach einem Treffer: schnell nach dem letzten heißt +1, sonst beginnt sie bei 1. */
 export function comboAfterHit(
   combo: number,
