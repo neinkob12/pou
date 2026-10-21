@@ -1,15 +1,10 @@
-import { useEffect } from 'react';
 import { Text, View } from 'react-native';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import Animated, {
-  cancelAnimation,
-  Easing,
   measure,
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
-  withDelay,
-  withRepeat,
   withSequence,
   withSpring,
   withTiming,
@@ -38,6 +33,14 @@ const SWING_PER_SPEED = 0.025;
 const SWING_MAX_DEG = 16;
 const BOB_PX = 3;
 const BOB_MS = 1300;
+/** Wippen im Fach als CSS-Animation: kostet kein JavaScript pro Frame (ART-4, Messung in art4.md). */
+const BOB = {
+  animationName: { from: { transform: [{ translateY: 0 }] }, to: { transform: [{ translateY: -BOB_PX }] } },
+  animationDuration: `${BOB_MS}ms`,
+  animationTimingFunction: 'ease-in-out',
+  animationIterationCount: 'infinite',
+  animationDirection: 'alternate',
+} as const;
 const POUR_TILT_DEG: Record<CareToolId, number> = { water: -40, fertilizeGrow: -25, fertilizeBloom: -25 };
 
 const TOOL_LOOK: Record<CareToolId, { asset: CareAssetId; color: ColorName; art: GameIconId }> = {
@@ -69,14 +72,8 @@ export function CareTool({ tool, index, disabled, onDrop }: CareToolProps) {
   const squash = useSharedValue(0);
   const swing = useSharedValue(0);
   const over = useSharedValue(0);
-  const bob = useSharedValue(0);
   const target = useSharedValue<Rect | null>(null);
-
-  useEffect(() => {
-    if (disabled || reduced) return;
-    bob.value = withDelay(index * 260, withRepeat(withTiming(1, { duration: BOB_MS, easing: Easing.inOut(Easing.sin) }), -1, true));
-    return () => cancelAnimation(bob);
-  }, [bob, index, disabled, reduced]);
+  const bobbing = !disabled && !reduced;
 
   const pan = usePanGesture({
     enabled: !disabled,
@@ -127,7 +124,7 @@ export function CareTool({ tool, index, disabled, onDrop }: CareToolProps) {
     return {
       transform: [
         { translateX: x.value },
-        { translateY: y.value - (1 - lifted.value) * bob.value * BOB_PX },
+        { translateY: y.value },
         { rotate: `${withTiming(over.value * tilt, { duration: 180 }) + swing.value}deg` },
         { scaleX: s * (1 + squash.value * 0.18) },
         { scaleY: s * (1 - squash.value * 0.18) },
@@ -136,7 +133,7 @@ export function CareTool({ tool, index, disabled, onDrop }: CareToolProps) {
   });
   // Das Werkzeug muss beim Ziehen über allem im Fach liegen, also die äußere Hülle anheben.
   const outer = useAnimatedStyle(() => ({ zIndex: lifted.value > 0.01 ? 10 : 0 }));
-  const shadow = useAnimatedStyle(() => ({ opacity: 0.25 * (1 - lifted.value), transform: [{ scaleX: 1 - bob.value * 0.12 }] }));
+  const shadow = useAnimatedStyle(() => ({ opacity: 0.25 * (1 - lifted.value) }));
 
   const look = TOOL_LOOK[tool];
   return (
@@ -158,28 +155,30 @@ export function CareTool({ tool, index, disabled, onDrop }: CareToolProps) {
         <Animated.View
           style={[{ position: 'absolute', bottom: 6, width: PEDESTAL * 0.6, height: 8, borderRadius: 8, backgroundColor: hud.outline }, shadow]}
         />
-        <GestureDetector gesture={pan}>
-          <Animated.View
-            accessible
-            accessibilityRole="button"
-            accessibilityLabel={care.tools[tool]}
-            accessibilityHint={care.dragHint}
-            accessibilityState={{ disabled }}
-            accessibilityActions={[{ name: 'activate' }]}
-            onAccessibilityAction={() => !disabled && onDrop()}
-            style={style}
-          >
-            <AssetImage
-              source={careAssets[look.asset]}
-              label={care.toolPlaceholder[tool]}
-              color={look.color}
-              size={TOOL_SIZE}
-              round
-              icon={look.art}
-            />
-            {tool === 'water' ? <WaterDrops visible={over} /> : null}
-          </Animated.View>
-        </GestureDetector>
+        <Animated.View style={bobbing ? [BOB, { animationDelay: `${index * 260}ms` }] : undefined}>
+          <GestureDetector gesture={pan}>
+            <Animated.View
+              accessible
+              accessibilityRole="button"
+              accessibilityLabel={care.tools[tool]}
+              accessibilityHint={care.dragHint}
+              accessibilityState={{ disabled }}
+              accessibilityActions={[{ name: 'activate' }]}
+              onAccessibilityAction={() => !disabled && onDrop()}
+              style={style}
+            >
+              <AssetImage
+                source={careAssets[look.asset]}
+                label={care.toolPlaceholder[tool]}
+                color={look.color}
+                size={TOOL_SIZE}
+                round
+                icon={look.art}
+              />
+              {tool === 'water' ? <WaterDrops visible={over} /> : null}
+            </Animated.View>
+          </GestureDetector>
+        </Animated.View>
       </View>
       <View className="rounded-full border-2 px-2" style={{ borderColor: hud.outline, backgroundColor: hud.pedestal.base }}>
         <Text className="font-body-bold text-[11px] text-ink">{care.toolShort[tool]}</Text>

@@ -5,8 +5,9 @@ import { SKY, type RoomPalette } from './roomPalette';
 import { Box, LINE } from './roomShapes';
 import type { RoomWeather } from './weather';
 
-// Fenster mit Blick nach draußen (ART-4). Hinten: Rahmen, Himmel, Hügel, Sonne oder Mond.
-// Vorn (eigene Leinwand über den ziehenden Wolken): Fensterkreuz, Spiegelung, Brett, Stange.
+// Fenster mit Blick nach draußen (ART-4). Der Himmel liegt auf einer kleinen eigenen Leinwand
+// unter dem Zimmer; das Zimmer stanzt die Glasfläche aus und zeichnet Kreuz, Spiegelung, Brett,
+// Stange und Vorhänge darüber. So ziehen Wolken hinter dem Fensterkreuz, ohne weitere Ebenen.
 
 const FRAME = 2;
 
@@ -15,7 +16,22 @@ function skyColors(p: RoomPalette, isDay: boolean, weather: RoomWeather): [strin
   return [p.skyTop, p.skyBottom];
 }
 
-export function WindowBack({ l, p, isDay, weather }: { l: RoomLayout; p: RoomPalette; isDay: boolean; weather: RoomWeather }) {
+/** Rahmen und Schatten des Fensters, auf der Hintergrund-Leinwand. Die Glasfläche wird danach ausgestanzt. */
+export function WindowFrame({ l, p }: { l: RoomLayout; p: RoomPalette }) {
+  const { x, y, w, h } = l.window;
+  return (
+    <Group>
+      {/* Schatten des Fensters auf der Wand */}
+      <RoundedRect x={x - FRAME + 1} y={y - FRAME + 1.4} width={w + FRAME * 2} height={h + FRAME * 2} r={2} color={p.shade} />
+      <Box x={x - FRAME} y={y - FRAME} w={w + FRAME * 2} h={h + FRAME * 2} r={2} top={p.frameLight} bottom={p.frame} outline={p.outline} />
+      {/* Loch für den Himmel: darunter liegt die Himmels-Leinwand mit ziehenden Wolken. */}
+      <Rect x={x} y={y} width={w} height={h} color="black" blendMode="clear" />
+    </Group>
+  );
+}
+
+/** Blick nach draußen: Himmel, Sonne oder Mond, Hügel, Baum. Eigene kleine Leinwand unter dem Zimmer. */
+export function SkyArt({ l, p, isDay, weather }: { l: RoomLayout; p: RoomPalette; isDay: boolean; weather: RoomWeather }) {
   const { x, y, w, h } = l.window;
   const sunX = x + w * 0.7;
   const sunY = y + h * 0.3;
@@ -25,39 +41,30 @@ export function WindowBack({ l, p, isDay, weather }: { l: RoomLayout; p: RoomPal
   const near = `M${x} ${y + h * 0.86} Q${x + w * 0.4} ${y + h * 0.7} ${x + w} ${y + h * 0.84} L${x + w} ${y + h} L${x} ${y + h} Z`;
   return (
     <Group>
-      {/* Schatten des Fensters auf der Wand */}
-      <RoundedRect x={x - FRAME + 1} y={y - FRAME + 1.4} width={w + FRAME * 2} height={h + FRAME * 2} r={2} color={p.shade} />
-      <Box x={x - FRAME} y={y - FRAME} w={w + FRAME * 2} h={h + FRAME * 2} r={2} top={p.frameLight} bottom={p.frame} outline={p.outline} />
-      <Group clip={{ x, y, width: w, height: h }}>
-        <Rect x={x} y={y} width={w} height={h}>
-          <LinearGradient start={vec(0, y)} end={vec(0, y + h)} colors={skyColors(p, isDay, weather)} />
-        </Rect>
-        {showSky ? (
-          <Group>
-            <Circle cx={sunX} cy={sunY} r={r * 2.4}>
-              <RadialGradient
-                c={vec(sunX, sunY)}
-                r={r * 2.4}
-                colors={isDay ? [SKY.sunGlow, SKY.sunGlowFade] : [SKY.moonGlow, SKY.moonGlowFade]}
-              />
-            </Circle>
-            <Circle cx={sunX} cy={sunY} r={r} color={isDay ? SKY.sun : SKY.moon} />
-            {isDay ? null : <Circle cx={sunX + r * 0.5} cy={sunY - r * 0.35} r={r * 0.85} color={p.skyTop} />}
-          </Group>
-        ) : null}
-        {weather === 'cloudy' && isDay ? (
-          <Group>
-            <Oval x={x + w * 0.5} y={sunY} width={w * 0.5} height={h * 0.14} color={SKY.cloudDay} opacity={0.92} />
-            <Oval x={x + w * 0.58} y={sunY - h * 0.06} width={w * 0.26} height={h * 0.16} color={SKY.cloudDay} opacity={0.92} />
-          </Group>
-        ) : null}
-        <Path path={far} color={p.hillFar} />
-        <Path path={near} color={p.hillNear} />
-        {/* Baum auf dem nahen Hügel */}
-        <Rect x={x + w * 0.24} y={y + h * 0.7} width={0.9} height={h * 0.1} color={p.woodShade} />
-        <Circle cx={x + w * 0.245} cy={y + h * 0.66} r={w * 0.08} color={p.hillShade} />
-        <Circle cx={x + w * 0.23} cy={y + h * 0.645} r={w * 0.045} color={p.hillFar} opacity={0.6} />
-      </Group>
+      <Rect x={x} y={y} width={w} height={h}>
+        <LinearGradient start={vec(0, y)} end={vec(0, y + h)} colors={skyColors(p, isDay, weather)} />
+      </Rect>
+      {showSky ? (
+        <Group>
+          <Circle cx={sunX} cy={sunY} r={r * 2.4}>
+            <RadialGradient c={vec(sunX, sunY)} r={r * 2.4} colors={isDay ? [SKY.sunGlow, SKY.sunGlowFade] : [SKY.moonGlow, SKY.moonGlowFade]} />
+          </Circle>
+          <Circle cx={sunX} cy={sunY} r={r} color={isDay ? SKY.sun : SKY.moon} />
+          {isDay ? null : <Circle cx={sunX + r * 0.5} cy={sunY - r * 0.35} r={r * 0.85} color={p.skyTop} />}
+        </Group>
+      ) : null}
+      {weather === 'cloudy' && isDay ? (
+        <Group>
+          <Oval x={x + w * 0.5} y={sunY} width={w * 0.5} height={h * 0.14} color={SKY.cloudDay} opacity={0.92} />
+          <Oval x={x + w * 0.58} y={sunY - h * 0.06} width={w * 0.26} height={h * 0.16} color={SKY.cloudDay} opacity={0.92} />
+        </Group>
+      ) : null}
+      <Path path={far} color={p.hillFar} />
+      <Path path={near} color={p.hillNear} />
+      {/* Baum auf dem nahen Hügel */}
+      <Rect x={x + w * 0.24} y={y + h * 0.7} width={0.9} height={h * 0.1} color={p.woodShade} />
+      <Circle cx={x + w * 0.245} cy={y + h * 0.66} r={w * 0.08} color={p.hillShade} />
+      <Circle cx={x + w * 0.23} cy={y + h * 0.645} r={w * 0.045} color={p.hillFar} opacity={0.6} />
     </Group>
   );
 }
@@ -90,7 +97,7 @@ export function WindowFront({ l, p, isDay }: { l: RoomLayout; p: RoomPalette; is
   );
 }
 
-/** Ein Vorhang, links gezeichnet, Einheiten 10 × Fensterhöhe + 8. Rechts wird gespiegelt. */
+/** Ein Vorhang, links gezeichnet, Einheiten 10 × h. Rechts wird gespiegelt (siehe Curtains). */
 export function CurtainArt({ h, p }: { h: number; p: RoomPalette }) {
   const outer = `M0.8 0.8 L9 0.8 Q6.4 ${h * 0.35} 8 ${h * 0.6} Q9.4 ${h * 0.8} 6.6 ${h - 0.8} L1.4 ${h - 0.8} Q0 ${h * 0.6} 0.8 0.8 Z`;
   return (
@@ -109,6 +116,22 @@ export function CurtainArt({ h, p }: { h: number; p: RoomPalette }) {
       {[2, 5, 8].map((cx) => (
         <Circle key={cx} cx={cx} cy={0.9} r={0.7} color={p.outline} />
       ))}
+    </Group>
+  );
+}
+
+/** Beide Vorhänge, links und gespiegelt rechts, in Zimmer-Einheiten. */
+export function Curtains({ l, p }: { l: RoomLayout; p: RoomPalette }) {
+  const { x, y, w, h } = l.window;
+  const ch = h + 8;
+  return (
+    <Group>
+      <Group transform={[{ translateX: x - 5 }, { translateY: y - 5 }]}>
+        <CurtainArt h={ch} p={p} />
+      </Group>
+      <Group transform={[{ translateX: x + w + 5 }, { translateY: y - 5 }, { scaleX: -1 }]}>
+        <CurtainArt h={ch} p={p} />
+      </Group>
     </Group>
   );
 }

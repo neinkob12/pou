@@ -6,7 +6,7 @@ import type { RoomLayout } from './roomLayout';
 import { SKY, type RoomPalette } from './roomPalette';
 import { LINE } from './roomShapes';
 import { Poster, Wainscot, Wall } from './RoomWall';
-import { WindowBack } from './RoomWindow';
+import { Curtains, WindowFrame, WindowFront } from './RoomWindow';
 import type { RoomWeather } from './weather';
 
 // Budis Zimmer (ART-4), in Ebenen: hinten Wand, Fenster, Poster, Kommode; Mitte Boden und Teppich;
@@ -20,13 +20,18 @@ interface SceneProps {
   weather: RoomWeather;
 }
 
-/** Hintergrund und Mitte: alles, was hinter Budi liegt und sich nicht bewegt. */
+/**
+ * Hintergrund und Mitte: alles, was hinter Budi liegt und sich nicht bewegt, auf einer Leinwand.
+ * Jede weitere Leinwand ist im Browser eine eigene Ebene, die jeden Frame neu zusammengesetzt wird.
+ */
 export function RoomArt({ l, p, isDay, weather }: SceneProps) {
   return (
     <Group>
       <Wall l={l} p={p} />
       <Wainscot l={l} p={p} />
-      <WindowBack l={l} p={p} isDay={isDay} weather={weather} />
+      <WindowFrame l={l} p={p} />
+      <WindowFront l={l} p={p} isDay={isDay} />
+      <Curtains l={l} p={p} />
       <Poster l={l} p={p} isDay={isDay} />
       <HangingPlant l={l} p={p} />
       <Garland l={l} p={p} />
@@ -34,12 +39,13 @@ export function RoomArt({ l, p, isDay, weather }: SceneProps) {
       <WindowLight l={l} p={p} weather={weather} />
       <Dresser l={l} p={p} />
       <Rug l={l} p={p} />
+      {isDay ? null : <RoomGlowArt l={l} />}
       <Vignette l={l} p={p} />
     </Group>
   );
 }
 
-/** Schein der Lichterkette und des Nachtlichts. Liegt auf eigener Leinwand, damit er pulsieren kann. */
+/** Schein der Lichterkette und des Nachtlichts (nachts). */
 export function RoomGlowArt({ l }: { l: RoomLayout }) {
   const bulbs = Array.from({ length: GARLAND_BULBS }, (_, i) => garlandAt(l.garland, (i + 0.5) / GARLAND_BULBS));
   const nx = l.dresser.x + 22.6;
@@ -116,8 +122,14 @@ export function ForegroundCushion({ l, p }: { l: RoomLayout; p: RoomPalette }) {
   );
 }
 
-/** Ausschnitt der Vordergrund-Leinwand: vom Wandfuß bis knapp unter den Teppich. */
-export function foregroundBox(l: RoomLayout) {
-  const y = l.floorY - 12;
-  return { x: 0, y, w: 100, h: Math.min(l.height, l.rugY + 22) - y };
+/** Ausschnitt der Pflanzen-Leinwand links (Vordergrund). Klein halten: jede Leinwand ist eine Ebene. */
+export function plantBox(l: RoomLayout) {
+  const y = l.rugY - 12;
+  return { x: 0, y, w: 26, h: Math.min(l.height, l.rugY + 22) - y };
+}
+
+/** Ausschnitt der Kissen-Leinwand rechts (Vordergrund). */
+export function cushionBox(l: RoomLayout) {
+  const y = l.rugY + 3;
+  return { x: 78, y, w: 22, h: Math.min(l.height, l.rugY + 18) - y };
 }

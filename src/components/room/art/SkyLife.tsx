@@ -1,22 +1,14 @@
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import Animated, {
-  cancelAnimation,
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withDelay,
-  withRepeat,
-  withSequence,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 
 import type { Box } from './roomLayout';
 import { SKY } from './roomPalette';
 import type { RoomWeather } from './weather';
 
 // Bewegung im Fenster (ART-4): ziehende Wolken, Regen, funkelnde Sterne, ab und zu eine Sternschnuppe.
-// Kleine Views mit Reanimated, abgeschnitten auf die Glasfläche. Die Leinwände bleiben still.
+// Kleine Views mit CSS-Animationen von Reanimated (im Browser im Compositor, nativ im UI-Thread,
+// kein JavaScript pro Frame), abgeschnitten auf die Glasfläche. Die Leinwände bleiben still.
 
 interface CloudSpec {
   /** Höhe im Fenster, 0 bis 1. */
@@ -58,23 +50,31 @@ const SHOOTING_MS = 700;
 const RAIN_MS = 700;
 const RAIN_STREAKS = 14;
 
+const pct = (f: number) => `${Math.round(f * 1000) / 10}%`;
+
 function Cloud({ glass, spec, color }: { glass: Box; spec: CloudSpec; color: string }) {
   const cw = glass.w * spec.scale;
   const from = -cw;
   const to = glass.w;
-  const x = useSharedValue(from + (to - from) * spec.start);
-  useEffect(() => {
-    const full = spec.seconds * 1000;
-    x.value = withSequence(
-      withTiming(to, { duration: full * (1 - spec.start), easing: Easing.linear }),
-      withRepeat(withSequence(withTiming(from, { duration: 0 }), withTiming(to, { duration: full, easing: Easing.linear })), -1),
-    );
-    return () => cancelAnimation(x);
-  }, [x, from, to, spec]);
-  const style = useAnimatedStyle(() => ({ transform: [{ translateX: x.value }] }));
+  const anim = useMemo(() => {
+    // Beginnt bei `start`, zieht bis zum rechten Rand, springt nach links und läuft zur Startlage.
+    const startX = from + (to - from) * spec.start;
+    const edge = 1 - spec.start;
+    return {
+      animationName: {
+        '0%': { transform: [{ translateX: startX }] },
+        [pct(edge)]: { transform: [{ translateX: to }] },
+        [pct(Math.min(1, edge + 0.001))]: { transform: [{ translateX: from }] },
+        '100%': { transform: [{ translateX: startX }] },
+      },
+      animationDuration: `${spec.seconds}s`,
+      animationTimingFunction: 'linear',
+      animationIterationCount: 'infinite',
+    } as const;
+  }, [from, to, spec]);
   const ch = cw * 0.5;
   return (
-    <Animated.View style={[styles.abs, { top: glass.h * spec.fy, width: cw, height: ch }, style]}>
+    <Animated.View style={[styles.abs, { top: glass.h * spec.fy, width: cw, height: ch }, anim]}>
       <View style={[styles.puff, { left: 0, top: ch * 0.45, width: cw, height: ch * 0.55, backgroundColor: color }]} />
       <View style={[styles.puff, { left: cw * 0.15, top: ch * 0.15, width: cw * 0.4, height: ch * 0.7, backgroundColor: color }]} />
       <View style={[styles.puff, { left: cw * 0.42, top: 0, width: cw * 0.42, height: ch * 0.8, backgroundColor: color }]} />
@@ -82,49 +82,67 @@ function Cloud({ glass, spec, color }: { glass: Box; spec: CloudSpec; color: str
   );
 }
 
+const TWINKLE = {
+  animationName: {
+    from: { opacity: 0.3, transform: [{ scale: 0.6 }, { rotate: '45deg' }] },
+    to: { opacity: 1, transform: [{ scale: 1.2 }, { rotate: '45deg' }] },
+  },
+  animationDuration: `${TWINKLE_MS}ms`,
+  animationTimingFunction: 'ease-in-out',
+  animationIterationCount: 'infinite',
+  animationDirection: 'alternate',
+} as const;
+
 function Star({ glass, star }: { glass: Box; star: (typeof STARS)[number] }) {
-  const t = useSharedValue(0);
-  useEffect(() => {
-    t.value = withDelay(star.delay, withRepeat(withTiming(1, { duration: TWINKLE_MS, easing: Easing.inOut(Easing.sin) }), -1, true));
-    return () => cancelAnimation(t);
-  }, [t, star.delay]);
-  const style = useAnimatedStyle(() => ({ opacity: 0.3 + t.value * 0.7, transform: [{ scale: 0.6 + t.value * 0.6 }, { rotate: '45deg' }] }));
   return (
     <Animated.View
-      style={[styles.abs, { left: glass.w * star.fx, top: glass.h * star.fy, width: star.size, height: star.size, backgroundColor: SKY.star }, style]}
+      style={[
+        styles.abs,
+        { left: glass.w * star.fx, top: glass.h * star.fy, width: star.size, height: star.size, backgroundColor: SKY.star },
+        TWINKLE,
+        { animationDelay: `${star.delay}ms` },
+      ]}
     />
   );
 }
 
 function ShootingStar({ glass }: { glass: Box }) {
-  const t = useSharedValue(0);
-  useEffect(() => {
-    t.value = withRepeat(
-      withSequence(withDelay(SHOOTING_EVERY_MS, withTiming(1, { duration: SHOOTING_MS, easing: Easing.out(Easing.quad) })), withTiming(0, { duration: 0 })),
-      -1,
-    );
-    return () => cancelAnimation(t);
-  }, [t]);
-  const style = useAnimatedStyle(() => ({
-    opacity: t.value > 0 ? Math.sin(t.value * Math.PI) : 0,
-    transform: [{ translateX: -t.value * glass.w * 0.6 }, { translateY: t.value * glass.h * 0.35 }, { rotate: '-30deg' }],
-  }));
-  return <Animated.View style={[styles.abs, styles.shooting, { left: glass.w * 0.75, top: glass.h * 0.1 }, style]} />;
+  const anim = useMemo(() => {
+    const total = SHOOTING_EVERY_MS + SHOOTING_MS;
+    const rest = pct(SHOOTING_EVERY_MS / total);
+    const at = (t: number) => [{ translateX: -t * glass.w * 0.6 }, { translateY: t * glass.h * 0.35 }, { rotate: '-30deg' }];
+    return {
+      animationName: {
+        '0%': { opacity: 0, transform: at(0) },
+        [rest]: { opacity: 0, transform: at(0) },
+        [pct((SHOOTING_EVERY_MS + SHOOTING_MS * 0.4) / total)]: { opacity: 1, transform: at(0.4) },
+        '100%': { opacity: 0, transform: at(1) },
+      },
+      animationDuration: `${total}ms`,
+      animationTimingFunction: 'linear',
+      animationIterationCount: 'infinite',
+    } as const;
+  }, [glass.w, glass.h]);
+  return <Animated.View style={[styles.abs, styles.shooting, { left: glass.w * 0.75, top: glass.h * 0.1 }, anim]} />;
 }
 
 function Rain({ glass }: { glass: Box }) {
-  const t = useSharedValue(0);
-  useEffect(() => {
-    t.value = withRepeat(withTiming(1, { duration: RAIN_MS, easing: Easing.linear }), -1);
-    return () => cancelAnimation(t);
-  }, [t]);
-  const style = useAnimatedStyle(() => ({ transform: [{ translateY: (t.value - 1) * glass.h }] }));
+  const anim = useMemo(
+    () =>
+      ({
+        animationName: { from: { transform: [{ translateY: -glass.h }] }, to: { transform: [{ translateY: 0 }] } },
+        animationDuration: `${RAIN_MS}ms`,
+        animationTimingFunction: 'linear',
+        animationIterationCount: 'infinite',
+      }) as const,
+    [glass.h],
+  );
   const streaks = Array.from({ length: RAIN_STREAKS }, (_, i) => ({
     left: ((i * 37) % 100) / 100,
     top: ((i * 53) % 100) / 100,
   }));
   return (
-    <Animated.View style={[styles.abs, { left: 0, top: 0, width: glass.w, height: glass.h * 2 }, style]}>
+    <Animated.View style={[styles.abs, { left: 0, top: 0, width: glass.w, height: glass.h * 2 }, anim]}>
       {[0, 1].map((copy) =>
         streaks.map((s) => (
           <View
