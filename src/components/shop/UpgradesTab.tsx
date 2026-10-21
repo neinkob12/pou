@@ -4,6 +4,7 @@ import { screenUi } from '../../content/strings';
 import { UPGRADE_IDS } from '../../game/config';
 import { maxLevel, levelOf } from '../../game/shop';
 import { useGameStore } from '../../store/gameStore';
+import { BackdropNote } from '../frame/BackdropNote';
 import { Appear } from '../ui/Appear';
 import { Card } from '../ui/Card';
 import { UpgradeCard } from './UpgradeCard';
@@ -19,7 +20,7 @@ export function UpgradesTab() {
           <Text className="text-center font-body-bold text-base text-plantDark">{screenUi.shopMaxed}</Text>
         </Card>
       ) : (
-        <Text className="px-1 font-body text-sm text-inkMuted">{screenUi.upgradesIntro}</Text>
+        <BackdropNote text={screenUi.upgradesIntro} />
       )}
       {UPGRADE_IDS.map((id, i) => (
         <Appear key={id} index={i}>

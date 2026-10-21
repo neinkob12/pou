@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
 import { Text, View } from 'react-native';
 
-import { colors, fonts, radii, spacing } from '../../lib/theme';
+import { colors, fonts, spacing } from '../../lib/theme';
 import { BackButton } from '../ui/BackButton';
+import { BackdropNote } from './BackdropNote';
 
 /** Tiefe des Titels: dunkle Kopie darunter, wie aufgeklebte Spielschrift. */
 const TITLE_DEPTH = 3;
@@ -47,19 +48,7 @@ export function GameTitle({ title, subtitle, back = false, right }: GameTitlePro
         </Text>
         {right}
       </View>
-      {subtitle ? (
-        <View
-          style={{
-            alignSelf: 'flex-start',
-            borderRadius: radii.md,
-            backgroundColor: 'rgba(255,255,255,0.78)',
-            paddingHorizontal: spacing.sm + 2,
-            paddingVertical: spacing.xs,
-          }}
-        >
-          <Text style={{ fontFamily: fonts.body, fontSize: 15, color: colors.ink }}>{subtitle}</Text>
-        </View>
-      ) : null}
+      {subtitle ? <BackdropNote text={subtitle} /> : null}
     </View>
   );
 }

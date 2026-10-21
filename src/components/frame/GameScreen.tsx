@@ -3,7 +3,7 @@ import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { surface } from '../../lib/theme';
-import type { BackdropVariant } from './backdrops';
+import { BACKDROPS, type BackdropVariant } from './backdrops';
 import { GameTitle } from './GameTitle';
 import { ScreenBackdrop } from './ScreenBackdrop';
 import { ScreenEnter } from './ScreenEnter';
@@ -29,7 +29,8 @@ export function GameScreen({ backdrop, title, subtitle, back, right, fixed = fal
   const head = title ? <GameTitle title={title} subtitle={subtitle} back={back} right={right} /> : null;
   return (
     <View
-      style={{ flex: 1 }}
+      // Grundton sofort, damit beim ersten Öffnen nichts Leeres aufblitzt, bevor die Leinwand steht.
+      style={{ flex: 1, backgroundColor: BACKDROPS[backdrop].top }}
       onLayout={(e) => setSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}
     >
       <ScreenBackdrop variant={backdrop} width={size.width} height={size.height} />

@@ -719,5 +719,5 @@ export const celebrations = {
   // ART-5: Level-Aufstieg
   levelTitle: 'Level geschafft!',
   level: (level: number) => `Level ${level}`,
-  levelText: 'Du wirst ein richtig guter Gärtner. Schau ins Album, was neu ist.',
+  levelText: 'Du wirst richtig gut im Gärtnern. Schau ins Album, was neu ist.',
 };

@@ -17,7 +17,9 @@ import { Sparkles } from './Sparkles';
 import { useCameraShake } from './useCameraShake';
 import { useLevelUps } from './useLevelUps';
 
-const GLOW_SIZE = 380;
+const GLOW_SIZE = 640;
+/** Abdunkeln hinter der Feier. */
+const DIM = 'rgba(43,43,43,0.62)';
 /** Wie stark die Karte beim Erscheinen wackelt, je Feier. */
 const SHAKE: Record<Celebration['kind'], number> = { phase: 0.4, chest: 0.6, level: 0.8 };
 
@@ -101,7 +103,7 @@ export function CelebrationLayer() {
             key={`dim-${currentKey}`}
             entering={FadeIn.duration(220)}
             pointerEvents="none"
-            className="absolute inset-0 bg-ink/60"
+            style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, backgroundColor: DIM }}
           />
           <View pointerEvents="none" className="absolute inset-0 items-center justify-center">
             <GlowRays size={GLOW_SIZE} />
