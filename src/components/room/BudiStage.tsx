@@ -11,6 +11,8 @@ import { budiSpeak } from '../budi/voice';
 import { ComaOverlay } from '../budi/ComaOverlay';
 import { Pests } from '../budi/Pests';
 import { useCareStage } from './care/CareStage';
+import { HoverGlow } from './care/HoverGlow';
+import { hud } from './hud/hudStyle';
 import { usePetGesture } from './care/usePetGesture';
 
 // Slot (P10). Budi-Grafik, Idle-Animation und Reaktionen (inkl. Herzen beim Streicheln) aus P20 und WEB-1.
@@ -31,9 +33,9 @@ export function BudiStage() {
   return (
     <View className="flex-1 items-center justify-end pb-4">
       {showCondition ? (
-        <Text className="mb-2 rounded-full bg-white/80 px-3 py-1 font-body-bold text-sm text-ink">
-          {care.conditions[condition]}
-        </Text>
+        <View className="mb-2 rounded-full border-2 bg-white px-3 py-1" style={{ borderColor: hud.outline, borderBottomWidth: 4 }}>
+          <Text className="font-body-bold text-sm text-ink">{care.conditions[condition]}</Text>
+        </View>
       ) : null}
       <GestureDetector gesture={pet}>
         <Animated.View
@@ -45,6 +47,7 @@ export function BudiStage() {
           accessibilityActions={[{ name: 'activate' }]}
           onAccessibilityAction={() => canCare && onPet()}
         >
+          <HoverGlow hovering={hovering} />
           <Budi condition={condition} reaction={reaction} hovering={hovering} accessory={useEquippedAccessory()} />
           <Pests />
           <ComaOverlay condition={condition} />

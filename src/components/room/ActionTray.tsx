@@ -3,14 +3,16 @@ import { Text, View } from 'react-native';
 
 import { care } from '../../content/strings';
 import { useNeeds } from '../../hooks/useNeeds';
-import { useCareStage } from './care/CareStage';
+import { useCareControls } from './care/CareStage';
 import { CARE_TOOLS, type CareTool as CareToolId } from './care/careLogic';
 import { CareTool } from './care/CareTool';
+import { HudPanel } from './hud/HudPanel';
+import { hud } from './hud/hudStyle';
 
-/** Fach unter Budi: Gießkanne und zwei Dünger zum Ziehen, darunter ein Hinweis. */
+/** Holzfach unter Budi (Look ART-4): Gießkanne und zwei Dünger zum Ziehen, darunter ein Hinweis. */
 export function ActionTray() {
   const { phase, condition, canCare, care: doCare } = useNeeds();
-  const { react } = useCareStage();
+  const { react } = useCareControls();
 
   const onDrop = useCallback(
     (tool: CareToolId) => {
@@ -27,12 +29,14 @@ export function ActionTray() {
 
   return (
     <View className="items-center gap-2 px-4">
-      <View className="flex-row justify-center gap-8 rounded-3xl bg-white/70 px-6 py-3">
-        {CARE_TOOLS.map((tool) => (
-          <CareTool key={tool} tool={tool} disabled={!canCare} onDrop={() => onDrop(tool)} />
+      <HudPanel tone={hud.tray} innerStyle={{ flexDirection: 'row', justifyContent: 'center', gap: 22, paddingHorizontal: 18, paddingTop: 8, paddingBottom: 6 }}>
+        {CARE_TOOLS.map((tool, i) => (
+          <CareTool key={tool} tool={tool} index={i} disabled={!canCare} onDrop={() => onDrop(tool)} />
         ))}
+      </HudPanel>
+      <View className="rounded-full px-3 py-1" style={{ backgroundColor: hud.hintBg }}>
+        <Text className="text-center font-body-bold text-xs text-white">{hint}</Text>
       </View>
-      <Text className="text-center font-body text-xs text-inkMuted">{hint}</Text>
     </View>
   );
 }

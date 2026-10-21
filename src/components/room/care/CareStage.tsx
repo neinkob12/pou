@@ -23,7 +23,11 @@ interface CareStageValue {
   react: (type: CareActionId, feedback: CareFeedback) => void;
 }
 
-const CareStageContext = createContext<CareStageValue | null>(null);
+/** Was Werkzeuge und Fach brauchen: ändert sich nie, damit sie bei Budis Reaktionen nicht neu rendern. */
+type CareControls = Omit<CareStageValue, 'reaction'>;
+
+const CareControlsContext = createContext<CareControls | null>(null);
+const CareReactionContext = createContext<CareReaction | null>(null);
 
 /** Verbindet Werkzeug-Fach und Budi: Ziel, Schwebe-Zustand, letzte Reaktion. */
 export function CareStageProvider({ children }: { children: ReactNode }) {
@@ -37,12 +41,24 @@ export function CareStageProvider({ children }: { children: ReactNode }) {
   // Gestörte Dunkelphase: Budi zeigt Stress wie nach falscher Pflege (Kopfschütteln, beleidigt).
   const onDisturbed = useCallback(() => react('pet', 'warning'), [react]);
   useLightDisturbStress(onDisturbed);
-  const value = useMemo(() => ({ targetRef, hovering, reaction, react }), [targetRef, hovering, reaction, react]);
-  return <CareStageContext.Provider value={value}>{children}</CareStageContext.Provider>;
+  const controls = useMemo(() => ({ targetRef, hovering, react }), [targetRef, hovering, react]);
+  return (
+    <CareControlsContext.Provider value={controls}>
+      <CareReactionContext.Provider value={reaction}>{children}</CareReactionContext.Provider>
+    </CareControlsContext.Provider>
+  );
 }
 
-export function useCareStage(): CareStageValue {
-  const value = useContext(CareStageContext);
-  if (!value) throw new Error('useCareStage braucht CareStageProvider (RoomScreen).');
+/** Ziel, Schwebe-Zustand und react(), ohne die letzte Reaktion (für Werkzeuge und Fach). */
+export function useCareControls(): CareControls {
+  const value = useContext(CareControlsContext);
+  if (!value) throw new Error('useCareControls braucht CareStageProvider (RoomScreen).');
   return value;
+}
+
+/** Alles, auch die letzte Reaktion (für Budi). */
+export function useCareStage(): CareStageValue {
+  const controls = useCareControls();
+  const reaction = useContext(CareReactionContext);
+  return { ...controls, reaction };
 }

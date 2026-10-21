@@ -19,7 +19,7 @@ import { Lamp } from './Lamp';
 import { NeedBars } from './NeedBars';
 import { PhaseHeader } from './PhaseHeader';
 import { PhaseChangePopup } from './phase/PhaseChangePopup';
-import { RoomBackground } from './RoomBackground';
+import { RoomBackground, RoomForeground } from './RoomBackground';
 import { RoomUpgrades } from './RoomUpgrades';
 
 // Hauptraum: nur Komposition der Slots. Besitzer je Welle siehe docs/AUFTRAEGE.md
@@ -35,7 +35,7 @@ export function RoomScreen() {
     <CareStageProvider>
       <View className="flex-1">
         <RoomBackground />
-        <SafeAreaView edges={['top']} className="gap-2 px-4 pt-2">
+        <SafeAreaView edges={['top']} className="gap-1.5 px-3 pt-1">
           <View className="flex-row items-start gap-3">
             <NeedBars />
             <CoinDisplay />
@@ -47,6 +47,7 @@ export function RoomScreen() {
         <Lamp />
         <RoomUpgrades />
         <BudiStage />
+        <RoomForeground />
         <HealthWatch />
         <ActionTray />
         <View className="h-3" />
