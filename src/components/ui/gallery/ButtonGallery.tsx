@@ -13,7 +13,7 @@ const ICONS: { id: GameIconId; tone: ToneName }[] = [
 ];
 
 export function ButtonGallery() {
-  // Skia-Icons erst beim Rendern laden, siehe ui/TabIcon.tsx.
+  // Skia-Icons erst beim Rendern laden, siehe ui/tabbar/TabItem.tsx.
   // eslint-disable-next-line @typescript-eslint/no-require-imports -- verzögertes Laden
   const { GameIcon } = require('../icons/GameIcon') as typeof import('../icons/GameIcon');
   return (

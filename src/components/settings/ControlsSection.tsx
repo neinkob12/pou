@@ -1,6 +1,7 @@
 import { Pressable, Text, View } from 'react-native';
 
 import { jumpGame as texts } from '../../content/strings';
+import { chrome } from '../../lib/theme';
 import { useGameStore } from '../../store/gameStore';
 import type { JumpControl } from '../minigames/jump/jumpControls';
 import { SettingsSection } from './SettingsSection';
@@ -26,9 +27,10 @@ export function ControlsSection() {
               accessibilityRole="radio"
               accessibilityState={{ selected }}
               onPress={() => setControl(value)}
-              className={`min-h-10 flex-1 items-center justify-center rounded-full px-4 active:opacity-70 ${selected ? 'bg-plantDark' : ''}`}
+              className={`min-h-10 flex-1 items-center justify-center rounded-full px-4 active:opacity-70 ${selected ? 'bg-white' : ''}`}
+              style={selected ? { boxShadow: chrome.glassShadow } : undefined}
             >
-              <Text className={`font-body-bold text-base ${selected ? 'text-white' : 'text-inkMuted'}`}>{label}</Text>
+              <Text className={`font-heading text-base ${selected ? 'text-plantDark' : 'text-inkMuted'}`}>{label}</Text>
             </Pressable>
           );
         })}

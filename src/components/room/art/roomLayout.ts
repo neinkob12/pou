@@ -1,12 +1,15 @@
 // Lage der Möbel im Zimmer, ohne React, damit testbar. Einheiten: Bildbreite = 100.
-// Der Boden hängt am unteren Rand (dort stehen Werkzeug-Fach und Navigation, Budi steht darüber),
+// Der Boden hängt am unteren Rand (dort steht das Dock mit den Werkzeugen, Budi steht darüber),
 // Fenster und Kommode hängen am Boden, damit die Leisten oben sie nicht verdecken.
 // Reine Grafik, keine Spielwerte.
 
-/** Abstand Teppichmitte (Budis Topfboden) zum unteren Bildrand in Punkten. */
-export const RUG_FROM_BOTTOM_PX = 262;
+/**
+ * Abstand Teppichmitte (Budis Topfboden) zum unteren Bildrand in Punkten. Seit dem Redesign liegt
+ * die Tab-Leiste unter dem Zimmer; darüber das Dock (RoomDock: 104 Punkte plus 52 Boden), dann Budi.
+ */
+export const RUG_FROM_BOTTOM_PX = 182;
 /** Abstand Wand/Boden-Kante zum unteren Bildrand in Punkten. */
-export const FLOOR_FROM_BOTTOM_PX = 300;
+export const FLOOR_FROM_BOTTOM_PX = 226;
 /** Fenster und Regal beginnen frühestens bei diesem Anteil der Bildhöhe (darüber liegen die Balken). */
 const FURNITURE_TOP = 0.3;
 /** Abstand Fensterbrett zum Boden in Einheiten: Fenster hängt tief, damit die Leisten oben es nicht verdecken. */

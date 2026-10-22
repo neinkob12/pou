@@ -1,26 +1,36 @@
-import { ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View } from 'react-native';
 
 import { minigameFramework as t, minigames } from '../../../content/strings';
 import { useGameStore } from '../../../store/gameStore';
-import { GameText } from '../../ui/GameText';
+import { GameScreen } from '../../frame/GameScreen';
+import { Appear } from '../../ui/Appear';
 import { MINIGAME_CATALOG } from './catalog';
+import { featuredGame } from './hubLook';
 import { MinigameCard } from './MinigameCard';
 
-/** Auswahl-Screen: eine Karte je Minigame mit Rekord. */
+/**
+ * Auswahl-Screen (Redesign): oben groß das Spiel des Tagesziels, darunter alle anderen als Kacheln
+ * im Raster. Spiel-Hintergrund wie die anderen Screens (ART-5).
+ */
 export function MinigameSelect() {
   const highscores = useGameStore((s) => s.minigameHighscores);
+  const goal = useGameStore((s) => s.dailyGoal);
+  const { game: top, forGoal } = featuredGame(MINIGAME_CATALOG, goal);
+  const rest = MINIGAME_CATALOG.filter((g) => g.id !== top.id);
   return (
-    <SafeAreaView className="flex-1 bg-cream" edges={['top']}>
-      <ScrollView contentContainerClassName="gap-4 p-4">
-        <GameText variant="title" accessibilityRole="header">
-          {minigames.title}
-        </GameText>
-        <GameText variant="body">{t.selectSubtitle}</GameText>
-        {MINIGAME_CATALOG.map((game) => (
-          <MinigameCard key={game.id} game={game} highscore={highscores[game.id]} />
+    <GameScreen backdrop="games" title={minigames.title} subtitle={t.selectSubtitle}>
+      <Appear>
+        <MinigameCard game={top} highscore={highscores[top.id]} featured forGoal={forGoal} />
+      </Appear>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+        {rest.map((game, i) => (
+          <View key={game.id} style={{ width: '47%', flexGrow: 1 }}>
+            <Appear index={i + 1}>
+              <MinigameCard game={game} highscore={highscores[game.id]} />
+            </Appear>
+          </View>
         ))}
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+    </GameScreen>
   );
 }

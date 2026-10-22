@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Animated, Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { cardTones, depth, gameRadii, insets, outline, shadows, spacing, tones } from '../../lib/theme';
+import { cardTones, chrome, depth, gameRadii, insets, outline, spacing, tones } from '../../lib/theme';
 import { gradientStyle } from './game/gradient';
 import { usePressSpring } from './game/usePressSpring';
 
@@ -20,8 +20,9 @@ interface CardProps {
 }
 
 /**
- * Karte im Spiel-Look (ART-1): zarter Verlauf, dicke Kontur, dicke Unterkante wie ein Sticker,
- * Lichtkante innen oben und weicher Schatten. Mit onPress federt sie beim Drücken wie ein Knopf.
+ * Karte im Spiel-Look: zarter Verlauf, Lichtkante innen oben, weicher Schatten und eine helle
+ * Unterkante wie ein Sticker. Seit dem Redesign ohne dicke dunkle Kontur: Behälter treten zurück,
+ * damit Knöpfe und Bilder darin führen. Mit onPress federt sie beim Drücken wie ein Knopf.
  */
 export function Card({
   children,
@@ -35,20 +36,22 @@ export function Card({
 }: CardProps) {
   const t = cardTones[tone];
   const muted = tone === 'muted';
-  const border = selected ? tones.coral.edge : t.border;
   const press = usePressSpring({ sink: depth.sm, quiet: false });
+  // Getönte Karten (Erfolg, Selten, Highlight) behalten eine feine Kante in ihrer Farbe.
+  const line = selected ? tones.coral.edge : muted ? t.border : chrome.cardLine;
   const body: ViewStyle = {
     ...gradientStyle(`linear-gradient(180deg, ${t.top} 0%, ${t.bottom} 100%)`, t.bottom),
     borderRadius: gameRadii.card,
-    borderWidth: selected ? outline.thick : outline.regular,
+    borderWidth: selected ? outline.regular : muted ? outline.thin : 1,
     borderStyle: muted ? 'dashed' : 'solid',
-    borderColor: border,
-    borderBottomWidth: muted ? outline.regular : outline.regular + depth.sm,
+    borderColor: line,
+    borderBottomWidth: muted ? outline.thin : depth.sm + 1,
+    borderBottomColor: selected ? tones.coral.edge : muted ? t.border : tone === 'night' ? t.border : chrome.cardEdge,
     boxShadow: muted ? undefined : insets.highlight,
     padding,
     gap: spacing.sm,
   };
-  const shell: ViewStyle = { borderRadius: gameRadii.card, boxShadow: muted ? undefined : shadows.card };
+  const shell: ViewStyle = { borderRadius: gameRadii.card, boxShadow: muted ? undefined : chrome.cardShadow };
 
   if (!onPress) {
     return (

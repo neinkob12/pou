@@ -14,12 +14,13 @@ import { AssetImage } from '../ui/AssetImage';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
+import { ItemStage } from './ItemStage';
 import { LevelPips } from './LevelPips';
 import { PriceCoin } from './PriceCoin';
 import { PurchaseBurst } from './PurchaseBurst';
 import { UPGRADE_COLORS, upgradeAssetId } from './upgradeVisuals';
 
-const IMAGE_SIZE = 64;
+const IMAGE_SIZE = 58;
 
 /**
  * Ein Upgrade im Shop: Bild, Name, Wirkung, Stufen-Punkte und Kauf-Button mit Rückmeldung (WEB-3).
@@ -55,13 +56,15 @@ export function UpgradeCard({ id }: { id: UpgradeId }) {
       <Card tone={maxed ? 'success' : 'plain'}>
         <View className="flex-row items-center gap-3">
           <View>
-            <AssetImage
-              source={upgradeAssets[upgradeAssetId(id, level)]}
-              label={text.name}
-              color={UPGRADE_COLORS[id]}
-              size={IMAGE_SIZE}
-              tile
-            />
+            <ItemStage>
+              <AssetImage
+                source={upgradeAssets[upgradeAssetId(id, level)]}
+                label={text.name}
+                color={UPGRADE_COLORS[id]}
+                size={IMAGE_SIZE}
+                tile
+              />
+            </ItemStage>
             <PurchaseBurst playKey={boughtKey} />
             {boughtKey > 0 ? (
               <Animated.View
@@ -75,7 +78,9 @@ export function UpgradeCard({ id }: { id: UpgradeId }) {
           </View>
           <View className="flex-1 gap-1">
             <Text className="font-heading text-lg leading-6 text-ink">{text.name}</Text>
-            <Text className="font-body text-sm text-inkMuted">{text.text}</Text>
+            <Text numberOfLines={2} className="font-body text-sm leading-5 text-inkMuted">
+              {text.text}
+            </Text>
             {max > 1 ? <LevelPips level={level} max={max} label={shop.level(level, max)} /> : null}
           </View>
         </View>
@@ -87,7 +92,7 @@ export function UpgradeCard({ id }: { id: UpgradeId }) {
               <Text className="flex-1 font-body text-xs text-inkMuted">
                 {next && !affordable ? shop.missingCoins(next.price - coins) : ''}
               </Text>
-              <Button label={label} size="sm" disabled={!affordable} onPress={buy} leading={<PriceCoin />} />
+              <Button label={label} size="sm" variant="success" disabled={!affordable} onPress={buy} leading={<PriceCoin />} />
             </>
           )}
         </View>

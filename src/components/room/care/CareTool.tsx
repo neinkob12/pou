@@ -14,7 +14,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 import { care as careAssets, type CareAssetId } from '../../../lib/assets';
 import { care } from '../../../content/strings';
 import { cue } from '../../../lib/audio';
-import { springs, type ColorName } from '../../../lib/theme';
+import { springs, tones, type ColorName, type Tone } from '../../../lib/theme';
 import { AssetImage } from '../../ui/AssetImage';
 import type { GameIconId } from '../../ui/icons/iconArt';
 import { hud } from '../hud/hudStyle';
@@ -23,8 +23,8 @@ import { isInsideRect, type CareTool as CareToolId, type Rect } from './careLogi
 import { playPickupHaptic } from './haptics';
 import { WaterDrops } from './WaterDrops';
 
-const TOOL_SIZE = 60;
-const PEDESTAL = 68;
+const TOOL_SIZE = 56;
+const PEDESTAL = 64;
 /** Toleranz um Budi herum, damit das Ablegen nicht pixelgenau sein muss. */
 const HOVER_SLOP = 24;
 const LIFT_SCALE = 0.18;
@@ -43,10 +43,10 @@ const BOB = {
 } as const;
 const POUR_TILT_DEG: Record<CareToolId, number> = { water: -40, fertilizeGrow: -25, fertilizeBloom: -25 };
 
-const TOOL_LOOK: Record<CareToolId, { asset: CareAssetId; color: ColorName; art: GameIconId }> = {
-  water: { asset: 'u3_watering_can', color: 'night', art: 'wateringCan' },
-  fertilizeGrow: { asset: 'u4_fertilizer_grow', color: 'plantLight', art: 'fertilizerGrow' },
-  fertilizeBloom: { asset: 'u4_fertilizer_bloom', color: 'lavender', art: 'fertilizerBloom' },
+const TOOL_LOOK: Record<CareToolId, { asset: CareAssetId; color: ColorName; art: GameIconId; tone: Tone }> = {
+  water: { asset: 'u3_watering_can', color: 'night', art: 'wateringCan', tone: tones.sky },
+  fertilizeGrow: { asset: 'u4_fertilizer_grow', color: 'plantLight', art: 'fertilizerGrow', tone: tones.leaf },
+  fertilizeBloom: { asset: 'u4_fertilizer_bloom', color: 'lavender', art: 'fertilizerBloom', tone: tones.grape },
 };
 
 interface CareToolProps {
@@ -72,6 +72,8 @@ export function CareTool({ tool, index, disabled, onDrop }: CareToolProps) {
   const squash = useSharedValue(0);
   const swing = useSharedValue(0);
   const over = useSharedValue(0);
+  /** 0 bis 1: wie weit das Werkzeug zum Ausgießen gekippt ist (folgt `over` mit einer Zeitkurve). */
+  const pour = useSharedValue(0);
   const target = useSharedValue<Rect | null>(null);
   const bobbing = !disabled && !reduced;
 
@@ -96,6 +98,7 @@ export function CareTool({ tool, index, disabled, onDrop }: CareToolProps) {
       const inside = isInsideRect(e.absoluteX, e.absoluteY, target.value, HOVER_SLOP) ? 1 : 0;
       if (over.value !== inside) {
         over.value = inside;
+        pour.value = withTiming(inside, { duration: 180 });
         hovering.set(inside);
       }
     },
@@ -110,6 +113,7 @@ export function CareTool({ tool, index, disabled, onDrop }: CareToolProps) {
     onFinalize: () => {
       'worklet';
       over.value = 0;
+      pour.value = withTiming(0, { duration: 180 });
       hovering.set(0);
       swing.value = withSpring(0, springs.release);
       lifted.value = withSpring(0, springs.release);
@@ -125,7 +129,9 @@ export function CareTool({ tool, index, disabled, onDrop }: CareToolProps) {
       transform: [
         { translateX: x.value },
         { translateY: y.value },
-        { rotate: `${withTiming(over.value * tilt, { duration: 180 }) + swing.value}deg` },
+        // Nur Zahlen im Text: eine Zeitkurve hier drin machte die ganze Transformation ungültig,
+        // das Werkzeug blieb beim Ziehen optisch im Fach stehen.
+        { rotate: `${pour.value * tilt + swing.value}deg` },
         { scaleX: s * (1 + squash.value * 0.18) },
         { scaleY: s * (1 - squash.value * 0.18) },
       ],
@@ -139,17 +145,17 @@ export function CareTool({ tool, index, disabled, onDrop }: CareToolProps) {
   return (
     <Animated.View className={`items-center ${disabled ? 'opacity-50' : ''}`} style={outer}>
       <View style={{ width: PEDESTAL, height: PEDESTAL, alignItems: 'center', justifyContent: 'center' }}>
-        {/* Sockel: runde Mulde im Holz */}
+        {/* Sockel: farbige Scheibe je Werkzeug, passend zum Bedürfnis, das es füllt. */}
         <View
           style={{
             position: 'absolute',
             bottom: 2,
             width: PEDESTAL,
-            height: PEDESTAL * 0.42,
+            height: PEDESTAL * 0.4,
             borderRadius: PEDESTAL,
-            backgroundColor: hud.tray.dark,
-            borderWidth: 2,
-            borderColor: hud.tray.edge,
+            backgroundColor: look.tone.light,
+            borderBottomWidth: 3,
+            borderBottomColor: look.tone.base,
           }}
         />
         <Animated.View
@@ -180,9 +186,9 @@ export function CareTool({ tool, index, disabled, onDrop }: CareToolProps) {
           </GestureDetector>
         </Animated.View>
       </View>
-      <View className="rounded-full border-2 px-2" style={{ borderColor: hud.outline, backgroundColor: hud.pedestal.base }}>
-        <Text className="font-body-bold text-[11px] text-ink">{care.toolShort[tool]}</Text>
-      </View>
+      <Text className="font-heading text-[11px] leading-[13px]" style={{ color: look.tone.edge }}>
+        {care.toolShort[tool]}
+      </Text>
     </Animated.View>
   );
 }
